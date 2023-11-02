@@ -339,20 +339,23 @@ download_raster <- function(file_name,
   headers <- add_headers(Authorization = paste("Bearer", bearer))
   download_path <- file.path(temp_dir, file_name)
   
+  if(quiet == FALSE) print(paste0("Downloading: ", file_name))
+  
   response <- GET(url, headers = headers, write_disk(download_path, overwrite = TRUE))
   
-  if (http_type(response) == "application/octet-stream") {
-    cat("Downloaded", file_name, "to", download_path, "\n")
-  } else {
-    cat("Failed to download", file_name, ". Status code:", http_status(response), "\n")
-  }
+  # if (http_type(response) == "application/octet-stream") {
+  #   cat("Downloaded", file_name, "to", download_path, "\n")
+  # } else {
+  #   cat("Failed to download", file_name, ". Status code:", http_status(response), "\n")
+  # }
   
-  print(file_name)
+  #tmp <- system(wget_command, intern = T, ignore.stdout = TRUE, ignore.stderr = TRUE)
 
-  if(quiet == FALSE) print(paste0("Downloading: ", file_name))
-  tmp <- system(wget_command, intern = T, ignore.stdout = TRUE, ignore.stderr = TRUE)
-
-  r <- file_to_raster(file.path(temp_dir, product_id, year, day, file_name),
+  # r <- file_to_raster(file.path(temp_dir, product_id, year, day, file_name),
+  #                     variable,
+  #                     quality_flag_rm)
+  
+  r <- file_to_raster(file.path(temp_dir, file_name),
                       variable,
                       quality_flag_rm)
 
