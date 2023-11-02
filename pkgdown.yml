@@ -3,8 +3,5 @@ pkgdown: 2.0.6
 pkgdown_sha: ~
 articles:
   blackmarbler-vignette: blackmarbler-vignette.html
-last_built: 2023-11-02T18:49Z
-urls:
-  reference: https://worldbank.github.io/blackmarbler/reference
-  article: https://worldbank.github.io/blackmarbler/articles
+last_built: 2023-11-02T18:56Z
 
