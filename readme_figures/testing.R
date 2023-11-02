@@ -11,12 +11,26 @@ library(sf)
 library(lubridate)
 library(geodata)
 library(exactextractr)
+
 library(blackmarbler)
+library(geodata)
+library(sf)
+library(dplyr)
 
 bearer <- read.csv("~/Desktop/bearer_bm.csv") %>%
   pull(token)
 
 gha_1_sf <- gadm(country = "GHA", level=1, path = tempdir()) %>% st_as_sf()
+
+r_2021 <- bm_raster(roi_sf = gha_1_sf,
+                    product_id = "VNP46A4",
+                    date = 2020,
+                    bearer = bearer)
+
+
+
+
+
 
 library(rnaturalearth)
 library(rgeos)
