@@ -321,7 +321,7 @@ download_raster <- function(file_name,
                             bearer,
                             quality_flag_rm,
                             quiet){
-
+  
   year       <- file_name %>% substring(10,13)
   day        <- file_name %>% substring(14,16)
   product_id <- file_name %>% substring(1,7)
@@ -336,13 +336,21 @@ download_raster <- function(file_name,
   url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
                 product_id, '/', year, '/', day, '/', file_name)
   
-  headers <- add_headers(Authorization = paste("Bearer", bearer))
+  headers <- c('Authorization' = paste('Bearer', bearer))
   download_path <- file.path(temp_dir, file_name)
   
   if(quiet == FALSE) print(paste0("Downloading: ", file_name))
   
-  response <- GET(url, headers = headers, write_disk(download_path, overwrite = TRUE))
+  #urla <<- url
+  #download_patha <<- download_path
   
+  response <- GET(url, add_headers(headers), write_disk(download_path, overwrite = TRUE))
+  
+  if(response$status_code != 200){
+    print("Error in downloading data")
+    print(response)
+  }
+
   # if (http_type(response) == "application/octet-stream") {
   #   cat("Downloaded", file_name, "to", download_path, "\n")
   # } else {
@@ -826,6 +834,8 @@ bm_raster_i <- function(roi_sf,
     }
 
   }
+  
+  
 
   # Grab tile dataframe --------------------------------------------------------
   #product_id <- "VNP46A4"
@@ -834,13 +844,12 @@ bm_raster_i <- function(roi_sf,
   year  <- date %>% year()
   month <- date %>% month()
   day   <- date %>% yday()
-
+  
   bm_files_df <- create_dataset_name_df(product_id = product_id,
                                         all = T,
                                         years = year,
                                         months = month,
                                         days = day)
-
   # Intersecting tiles ---------------------------------------------------------
   # Remove grid along edges, which causes st_intersects to fail
   bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
@@ -849,7 +858,6 @@ bm_raster_i <- function(roi_sf,
   #inter <- st_intersects(bm_tiles_sf, roi_1row_sf, sparse = F) %>% as.vector()
   # inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
   #   apply(1, sum)
-
 
   inter <- tryCatch(
     {

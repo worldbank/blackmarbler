@@ -22,14 +22,18 @@ library(httr)
 bearer <- read.csv("~/Desktop/bearer_bm.csv") %>%
   pull(token)
 
-gha_1_sf <- gadm(country = "GHA", level=1, path = tempdir()) %>% st_as_sf()
+gha_0_sf <- gadm(country = "GHA", level=0, path = tempdir()) %>% st_as_sf()
 
-r_2021 <- bm_raster(roi_sf = gha_1_sf,
+r_2021 <- bm_raster(roi_sf = gha_0_sf,
                     product_id = "VNP46A4",
-                    date = 2020,
+                    date = 2019,
                     bearer = bearer)
 
+headers <- c('Authorization' = paste('Bearer', bearer))
+response <- GET(urla, add_headers(headers), write_disk("~/Desktop/aaaa.h5", overwrite = TRUE))
+response
 
+response <- GET(urla, add_headers(headers), write_disk(download_path, overwrite = TRUE))
 
 
 

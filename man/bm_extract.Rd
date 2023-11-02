@@ -9,11 +9,11 @@ bm_extract(
   product_id,
   date,
   bearer,
+  aggregation_fun = c("mean"),
   variable = NULL,
   quality_flag_rm = 255,
   check_all_tiles_exist = TRUE,
-  output_location_type = "r_memory",
-  aggregation_fun = c("mean"),
+  output_location_type = "memory",
   file_dir = NULL,
   file_prefix = NULL,
   file_skip_if_exists = TRUE,
@@ -38,7 +38,9 @@ bm_extract(
 \item For \code{product_id} \code{"VNP46A4"}, year or date  (e.g., \code{"2021-10-01"}, where the month and day will be ignored, or \code{2021}).
 }}
 
-\item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/ramarty/blackmarbler#bearer-token-}{here}.}
+\item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/worldbank/blackmarbler#bearer-token-}{here}.}
+
+\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
 
 \item{variable}{Variable to used to create raster (default: \code{NULL}). If \code{NULL}, uses the following default variables:
 \itemize{
@@ -68,23 +70,23 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 
 \item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}
 
-\item{output_location_type}{Where to produce output; either \code{r_memory} or \code{file}. If \code{r_memory}, functions returns a raster in R. If \code{file}, function exports a \code{.tif} file and returns \code{NULL}.
+\item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a raster in R. If \code{file}, function exports a \code{.tif} file and returns \code{NULL}.
 
 For \code{output_location_type = file}:}
 
 \item{file_dir}{The directory where data should be exported (default: \code{NULL}, so the working directory will be used)}
 
+\item{file_prefix}{Prefix to add to the file to be saved. The file will be saved as the following: \verb{[file_prefix][product_id]_t[date].tif}}
+
 \item{file_skip_if_exists}{Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
 
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
-
-\item{file_prefix:}{Prefix to add to the file to be saved. The file will be saved as the following: \verb{[file_prefix][product_id]_t[date].tif}}
 }
 \value{
 Raster
 }
 \description{
-Make a raster of nighttime lights from \href{https://blackmarble.gsfc.nasa.gov/}{NASA Black Marble data}
+Extract and aggregate nighttime lights data from \href{https://blackmarble.gsfc.nasa.gov/}{NASA Black Marble data}
 }
 \examples{
 \dontrun{
