@@ -7,6 +7,7 @@ if(F){
   
   usethis::use_pkgdown()
   pkgdown::build_site()
+  pkgdown::build_site_github_pages()
   usethis::use_pkgdown_github_pages()
   
   usethis::use_pkgdown()

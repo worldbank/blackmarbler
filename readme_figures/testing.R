@@ -19,6 +19,51 @@ library(dplyr)
 library(httr)
 
 
+
+library(blackmarbler)
+library(geodata)
+library(sf)
+library(ggplot2)
+
+#bearer <- "BEARER-TOKEN"
+
+roi <- gadm(country = "GHA", 
+            level=0, 
+            path = tempdir()) |> 
+  st_as_sf()
+
+r <- bm_extract(roi_sf = roi,
+               product_id = "VNP46A4",
+               date = 2017,
+               bearer = bearer)
+
+r <- r |> mask(roi_sf) 
+
+r_df <- rasterToPoints(r, spatial = TRUE) |> as.data.frame()
+names(r_df) <- c("value", "x", "y")
+
+## Transform NTL
+r_df$value[r_df$value <= 1] <- 0
+
+r_df$value_adj <- log(r_df$value+1)
+
+##### Map 
+p <- ggplot() +
+  geom_raster(data = r_df, 
+              aes(x = x, y = y, 
+                  fill = value_adj)) +
+  scale_fill_gradient2(low = "black",
+                       mid = "yellow",
+                       high = "red",
+                       midpoint = 4.5) +
+  coord_quickmap() + 
+  theme_void() +
+  theme(legend.position = "none")
+
+
+
+
+
 bearer <- read.csv("~/Desktop/bearer_bm.csv") %>%
   pull(token)
 
