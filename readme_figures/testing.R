@@ -1,6 +1,6 @@
 
 #remove.packages("blackmarbler")
-#devtools::install_github("ramarty/blackmarbler")
+#devtools::install_github("worldbank/blackmarbler")
 library(purrr)
 library(furrr)
 library(stringr)

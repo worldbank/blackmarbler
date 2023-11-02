@@ -28,7 +28,7 @@ The package can be installed via devtools.
 
 ```r
 # install.packages("devtools")
-devtools::install_github("ramarty/blackmarbler")
+devtools::install_github("worldbank/blackmarbler")
 ```
 
 ## Bearer Token <a name="token">
