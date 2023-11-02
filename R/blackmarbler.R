@@ -12,6 +12,7 @@ if(F){
   library(sf)
   library(lubridate)
   library(exactextractr)
+  library(httr)
 }
 
 #' Black Marble Tile Grid Shapefile
@@ -325,12 +326,28 @@ download_raster <- function(file_name,
   day        <- file_name %>% substring(14,16)
   product_id <- file_name %>% substring(1,7)
 
-  wget_command <- paste0('wget -e robots=off -m -np .html,.tmp -nH --cut-dirs=3 ',
-                         '"https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',product_id,'/', year, '/', day, '/', file_name,'"',
-                         ' --header "Authorization: Bearer ',
-                         bearer,
-                         '" -P ',
-                         temp_dir)
+  #wget_command <- paste0('wget -e robots=off -m -np .html,.tmp -nH --cut-dirs=3 ',
+  #                       '"https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',product_id,'/', year, '/', day, '/', file_name,'"',
+  #                       ' --header "Authorization: Bearer ',
+  #                       bearer,
+  #                       '" -P ',
+  #                       temp_dir)
+  
+  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
+                product_id, '/', year, '/', day, '/', file_name)
+  
+  headers <- add_headers(Authorization = paste("Bearer", bearer))
+  download_path <- file.path(temp_dir, file_name)
+  
+  response <- GET(url, headers = headers, write_disk(download_path, overwrite = TRUE))
+  
+  if (http_type(response) == "application/octet-stream") {
+    cat("Downloaded", file_name, "to", download_path, "\n")
+  } else {
+    cat("Failed to download", file_name, ". Status code:", http_status(response), "\n")
+  }
+  
+  print(file_name)
 
   if(quiet == FALSE) print(paste0("Downloading: ", file_name))
   tmp <- system(wget_command, intern = T, ignore.stdout = TRUE, ignore.stderr = TRUE)
@@ -662,6 +679,7 @@ bm_extract <- function(roi_sf,
 #' @import readr
 #' @import exactextractr
 #' @import purrr
+#' @import httr
 #' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head))
 
 # @rawNamespace import(utils, except = c(stack, unstack))

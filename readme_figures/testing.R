@@ -16,6 +16,8 @@ library(blackmarbler)
 library(geodata)
 library(sf)
 library(dplyr)
+library(httr)
+
 
 bearer <- read.csv("~/Desktop/bearer_bm.csv") %>%
   pull(token)
