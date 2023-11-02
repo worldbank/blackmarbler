@@ -9,8 +9,8 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
-URL: https://ramarty.github.io/blackmarbler/
-BugReports: https://github.com/ramarty/blackmarbler/issues
+URL: https://worldbank.github.io/blackmarbler/
+BugReports: https://github.com/worldbank/blackmarbler/issues
 biocViews:
 Imports:
   readr,
@@ -22,4 +22,5 @@ Imports:
   sf,
   exactextractr,
   stringr,
-  rhdf5
+  rhdf5,
+  httr

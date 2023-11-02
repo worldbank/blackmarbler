@@ -26,8 +26,27 @@ gha_0_sf <- gadm(country = "GHA", level=0, path = tempdir()) %>% st_as_sf()
 
 r_2021 <- bm_raster(roi_sf = gha_0_sf,
                     product_id = "VNP46A4",
-                    date = 2019,
+                    date = 2018,
                     bearer = bearer)
+
+r_2021_c <- bm_raster(roi_sf = gha_0_sf,
+                    product_id = "VNP46A4",
+                    date = 2020,
+                    variable = "NearNadir_Composite_Snow_Free",
+                    bearer = bearer)
+
+r_2021_c_n <- bm_raster(roi_sf = gha_0_sf,
+                      product_id = "VNP46A3",
+                      date = "2021-10",
+                      variable = "NearNadir_Coamposite_Snow_Free_Num",
+                      bearer = bearer)
+
+h5_data <- H5Fopen("~/Desktop/testaa.h5")
+
+variable <- "NearNadir_Composite_Snow_Free_Num"
+out <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[variable]]
+
+summary(as.vector(out))
 
 headers <- c('Authorization' = paste('Bearer', bearer))
 response <- GET(urla, add_headers(headers), write_disk("~/Desktop/aaaa.h5", overwrite = TRUE))

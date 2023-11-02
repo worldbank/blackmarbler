@@ -4,7 +4,13 @@ if(F){
   roxygen2::roxygenise("~/Documents/Github/blackmarbler")
   
   pkgdown::clean_site()
+  
+  usethis::use_pkgdown()
+  pkgdown::build_site()
   pkgdown::deploy_to_branch()
+  
+  usethis::use_pkgdown()
+  usethis::use_github_pages()
   usethis::use_pkgdown_github_pages() #####
   usethis::use_github_action_check_standard()
   
