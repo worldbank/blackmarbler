@@ -5,6 +5,8 @@ if(F){
   library(readr)
   library(geodata)
   library(ggplot2)
+  library(dplyr)
+  library(sf)
   
   # Setup ------------------------------------------------------------------------
   bearer <- read_csv("~/Desktop/bearer_bm.csv") %>%
