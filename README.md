@@ -119,6 +119,7 @@ Before downloading and extracting Black Marble data, we first load packages, def
 library(blackmarbler)
 library(geodata)
 library(sf)
+library(ggplot2)
 
 #### Define NASA bearer token
 bearer <- "BEARER-TOKEN-HERE"
@@ -127,7 +128,7 @@ bearer <- "BEARER-TOKEN-HERE"
 # Define region of interest (roi). The roi must be (1) an sf polygon and (2)
 # in the WGS84 (epsg:4326) coordinate reference system. Here, we use the 
 # getData function to load a polygon of Ghana
-roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) %>% st_as_sf()
+roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
 ```
 
 ### Make raster of nighttime lights <a name="raster">
@@ -162,21 +163,21 @@ To extract data for multiple time periods, add multiple time periods to `date`. 
 ```r
 #### Daily data in March 2021
 r_daily <- bm_raster(roi_sf = roi_sf,
-                              product_id = "VNP46A3",
-                              date = seq.Date(from = ymd("2021-03-01"), to = ymd("2021-03-31"), by = "day"),
-                              bearer = bearer)
+                     product_id = "VNP46A3",
+                     date = seq.Date(from = ymd("2021-03-01"), to = ymd("2021-03-31"), by = "day"),
+                     bearer = bearer)
 
 #### Monthly aggregated data in 2021 and 2022
 r_monthly <- bm_raster(roi_sf = roi_sf,
-                                product_id = "VNP46A3",
-                                date = seq.Date(from = ymd("2021-01-01"), to = ymd("2022-12-01"), by = "month"),
-                                bearer = bearer)
+                       product_id = "VNP46A3",
+                       date = seq.Date(from = ymd("2021-01-01"), to = ymd("2022-12-01"), by = "month"),
+                       bearer = bearer)
 
 #### Yearly aggregated data in 2012 and 2021
 r_annual <- bm_raster(roi_sf = roi_sf,
-                               product_id = "VNP46A4",
-                               date = 2012:2021,
-                               bearer = bearer)
+                      product_id = "VNP46A4",
+                      date = 2012:2021,
+                      bearer = bearer)
 ```
 
 ### Map of nighttime lights <a name="map">
@@ -186,14 +187,14 @@ Using one of the rasters, we can make a map of nighttime lights
 ```r
 #### Make raster
 r <- bm_raster(roi_sf = roi_sf,
-                        product_id = "VNP46A4",
-                        date = 2021,
-                        bearer = bearer)
+               product_id = "VNP46A4",
+               date = 2021,
+               bearer = bearer)
 
 #### Prep data
-r <- r %>% mask(roi_sf) 
+r <- r |> mask(roi_sf) 
 
-r_df <- rasterToPoints(r, spatial = TRUE) %>% as.data.frame()
+r_df <- rasterToPoints(r, spatial = TRUE) |> as.data.frame()
 names(r_df) <- c("value", "x", "y")
 
 ## Remove very low values of NTL; can be considered noise 
@@ -234,7 +235,7 @@ ntl_df <- bm_extract(roi_sf = roi_sf,
                      bearer = bearer)
 
 #### Trends over time
-ntl_df %>%
+ntl_df |>
   ggplot() +
   geom_col(aes(x = date,
   y = ntl_mean),
@@ -275,10 +276,10 @@ bm_extract(roi_sf = roi_sf,
            file_dir = file.path(getwd(), "bm_files", "daily"))
 
 # Append daily-level datasets into one file
-file.path(getwd(), "bm_files", "daily") %>%
+file.path(getwd(), "bm_files", "daily") |>
   list.files(pattern = "*.Rds",
-  full.names = T) %>%
-  map_df(readRDS) %>%
+  full.names = T) |>
+  map_df(readRDS) |>
   saveRDS(file.path(getwd(), "bm_files", "ntl_daily.Rds"))
 ```
 

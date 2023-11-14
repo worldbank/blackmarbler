@@ -4,9 +4,8 @@
 
 if(F){
   library(purrr)
-  library(furrr)
   library(stringr)
-  library(rhdf5)
+  library(hdf5r)
   library(raster)
   library(dplyr)
   library(sf)
@@ -102,7 +101,8 @@ file_to_raster <- function(f,
   #xMax<-spInfo$EastBoundingCoord
 
   ## Data
-  h5_data <- H5Fopen(f)
+  #h5_data <- H5Fopen(f)
+  h5_data <- h5file(f, "r+")
 
   #### Daily
   if(f %>% str_detect("VNP46A1|VNP46A2")){
@@ -119,17 +119,22 @@ file_to_raster <- function(f,
     yMin <- min(grid_i_sf_box$ymin) %>% round()
     xMax <- max(grid_i_sf_box$xmax) %>% round()
     yMax <- max(grid_i_sf_box$ymax) %>% round()
+    
+    var_names <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields"]]$names
 
-    if(!(variable %in% names(h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`))){
+    if(!(variable %in% var_names)){
       warning(paste0("'", variable, "'",
                      " not a valid variable option. Valid options include:\n",
-                     paste(names(h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`), collapse = "\n")
+                     paste(var_names, collapse = "\n")
       ))
     }
 
-    out <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`[[variable]]
-    qf  <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`$Mandatory_Quality_Flag
-
+    #out <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`[[variable]]
+    #qf  <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`$Mandatory_Quality_Flag
+    
+    out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable)]][,]
+    qf  <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
+    
     if(length(quality_flag_rm) > 0){
       for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
         out[qf == val] <- NA
@@ -138,17 +143,23 @@ file_to_raster <- function(f,
 
     #### Monthly/Annually
   } else{
-    lat <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lat
-    lon <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lon
-
-    if(!(variable %in% names(h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`))){
+    #lat <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lat
+    #lon <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lon
+    
+    lat <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lat"]][]
+    lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
+    
+    var_names <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields"]]$names
+    
+    if(!(variable %in% var_names)){
       warning(paste0("'", variable, "'",
                      " not a valid variable option. Valid options include:\n",
-                     paste(names(h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`), collapse = "\n")
+                     paste(var_names, collapse = "\n")
       ))
     }
 
-    out <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[variable]]
+    #out <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[variable]]
+    out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable)]][,]
 
     if(length(quality_flag_rm) > 0){
 
@@ -157,10 +168,11 @@ file_to_raster <- function(f,
         str_replace_all("_Std", "")
 
       qf_name <- paste0(variable_short, "_Quality")
-      if(qf_name %in% names(h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`)){
+      if(qf_name %in% var_names){
 
-        qf <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[paste0(variable, "_Quality")]]
-
+        #qf <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[paste0(variable, "_Quality")]]
+        qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable, "_Quality")]][,]
+        
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
           out[qf == val] <- NA
         }
@@ -192,27 +204,22 @@ file_to_raster <- function(f,
   #transpose data to fix flipped row and column order
   #depending upon how your data are formatted you might not have to perform this
   out <- t(out)
-  #land_water_mask <- t(land_water_mask)
 
   #assign data ignore values to NA
   out[out == nodata_val] <- NA
 
   #turn the out object into a raster
   outr <- raster(out,crs=myCrs)
-  #land_water_mask_r <- raster(land_water_mask,crs=myCrs)
 
   #create extents class
   rasExt <- raster::extent(c(xMin,xMax,yMin,yMax))
 
   #assign the extents to the raster
   extent(outr) <- rasExt
-  #extent(land_water_mask_r) <- rasExt
 
-  #water to 0
-  #outr[][outr[] %in% 65535] <- NA # This is a fill value; always exclude
-
-  h5closeAll()
-
+  #h5closeAll()
+  h5_data$close_all()
+  
   return(outr)
 }
 
@@ -341,10 +348,8 @@ download_raster <- function(file_name,
   
   if(quiet == FALSE) print(paste0("Downloading: ", file_name))
   
-  #urla <<- url
-  #download_patha <<- download_path
-  
   response <- GET(url, add_headers(headers), write_disk(download_path, overwrite = TRUE))
+  response <- GET(url, add_headers(headers), write_disk("~/Desktop/test.h5", overwrite = TRUE))
   
   if(response$status_code != 200){
     print("Error in downloading data")
@@ -681,15 +686,13 @@ bm_extract <- function(roi_sf,
 #' @export
 #'
 #' @import purrr
-#' @import furrr
 #' @import stringr
-#' @import rhdf5
+#' @import hdf5r
 #' @import dplyr
 #' @import sf
 #' @import lubridate
 #' @import readr
 #' @import exactextractr
-#' @import purrr
 #' @import httr
 #' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head))
 
@@ -706,7 +709,7 @@ bm_raster <- function(roi_sf,
                       file_prefix = NULL,
                       file_skip_if_exists = TRUE,
                       quiet = FALSE){
-
+  
   # Define Tempdir -------------------------------------------------------------
   temp_main_dir = tempdir()
 

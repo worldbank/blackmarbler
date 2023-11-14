@@ -2,9 +2,9 @@
 #remove.packages("blackmarbler")
 #devtools::install_github("worldbank/blackmarbler")
 library(purrr)
-library(furrr)
+#library(furrr)
 library(stringr)
-library(rhdf5)
+#library(rhdf5)
 library(raster)
 library(dplyr)
 library(sf)
@@ -12,30 +12,36 @@ library(lubridate)
 library(geodata)
 library(exactextractr)
 
-library(blackmarbler)
+#library(blackmarbler)
 library(geodata)
 library(sf)
 library(dplyr)
 library(httr)
 
-
-
-library(blackmarbler)
-library(geodata)
-library(sf)
-library(ggplot2)
-
-#bearer <- "BEARER-TOKEN"
+library(hdf5r)
+source("~/Documents/Github/blackmarbler/R/blackmarbler.R")
 
 roi <- gadm(country = "GHA", 
             level=0, 
             path = tempdir()) |> 
   st_as_sf()
 
-r <- bm_extract(roi_sf = roi,
-               product_id = "VNP46A4",
-               date = 2017,
-               bearer = bearer)
+bearer <- read.csv("~/Desktop/bearer_bm.csv") %>%
+  pull(token)
+
+r <- bm_raster(roi_sf = roi,
+                product_id = "VNP46A2",
+                date = "2020-01-01",
+                bearer = bearer)
+
+
+
+
+#bearer <- "BEARER-TOKEN"
+
+
+
+
 
 r <- r |> mask(roi_sf) 
 
