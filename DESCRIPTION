@@ -11,16 +11,14 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 URL: https://worldbank.github.io/blackmarbler/
 BugReports: https://github.com/worldbank/blackmarbler/issues
-biocViews:
 Imports:
   readr,
   dplyr,
   purrr,
-  furrr,
   lubridate,
   raster,
   sf,
   exactextractr,
   stringr,
-  rhdf5,
+  hdf5r,
   httr
