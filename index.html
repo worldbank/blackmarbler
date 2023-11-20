@@ -66,22 +66,12 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="blackmarbler-">blackmarbler <img src="reference/figures/hex.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#blackmarbler-"></a>
 </h1></div>
-<p>Create Georeferenced Rasters of Nighttime Lights from <a href="https://blackmarble.gsfc.nasa.gov/" class="external-link">NASA Black Marble data</a>.</p>
+<p><strong>BlackMarbleR</strong> is an R package for working with Black Marble data. <a href="https://blackmarble.gsfc.nasa.gov/" class="external-link">Black Marble</a> is a <a href="https://earthobservatory.nasa.gov/" class="external-link">NASA Earth Observatory</a> project that provides global nighttime lights data. The package automates the process of downloading all relevant tiles from the NASA LAADS archive to cover a region of interest, converting the raw files (in H5 format) to georeferenced rasters, and mosaicing rasters together when needed.</p>
 <ul>
-<li><a href="#overview">Overview</a></li>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#token">Bearer token</a></li>
 <li>
-<a href="#function-args">Functions and arguments</a>
-<ul>
-<li><a href="#functions">Functions</a></li>
-<li><a href="#args-required">Required Arguments</a></li>
-<li><a href="#args-optional">Optional Arguments</a></li>
-<li><a href="#args-extract">Argument only for <code>bm_extract</code></a></li>
-</ul>
-</li>
-<li>
-<a href="#quickstart">Quick start</a>
+<a href="#usage">Usage</a>
 <ul>
 <li><a href="#setup">Setup</a></li>
 <li><a href="#raster">Make raster</a></li>
@@ -91,13 +81,16 @@
 <li><a href="#update-data">Workflow to update data</a></li>
 </ul>
 </li>
+<li>
+<a href="#function-args">Functions and arguments</a>
+<ul>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#args-required">Required Arguments</a></li>
+<li><a href="#args-optional">Optional Arguments</a></li>
+<li><a href="#args-extract">Argument only for <code>bm_extract</code></a></li>
 </ul>
-<div class="section level2">
-<h2 id="overview-">Overview <a name="overview"></a>
-<a class="anchor" aria-label="anchor" href="#overview-"></a>
-</h2>
-<p>This package facilitates downloading nighttime lights <a href="https://blackmarble.gsfc.nasa.gov/" class="external-link">Black Marble</a> data. Black Marble data is downloaded from the <a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/" class="external-link">NASA LAADS Archive</a>. The package automates the process of downloading all relevant tiles from the NASA LAADS archive to cover a region of interest, converting the raw files (in H5 format) to georeferenced rasters, and mosaicing rasters together when needed.</p>
-</div>
+</li>
+</ul>
 <div class="section level2">
 <h2 id="installation-">Installation <a name="installation"></a>
 <a class="anchor" aria-label="anchor" href="#installation-"></a>
@@ -121,128 +114,8 @@
 </ol>
 </div>
 <div class="section level2">
-<h2 id="functions-and-arguments-">Functions and arguments <a name="function-args"></a>
-<a class="anchor" aria-label="anchor" href="#functions-and-arguments-"></a>
-</h2>
-<div class="section level3">
-<h3 id="functions-">Functions <a name="functions"></a>
-<a class="anchor" aria-label="anchor" href="#functions-"></a>
-</h3>
-<p>The package provides two functions.</p>
-<ul>
-<li>
-<code>bm_raster</code> produces a raster of Black Marble nighttime lights.</li>
-<li>
-<code>bm_extract</code> produces a dataframe of aggregated nighttime lights to a region of interest (e.g., average nighttime lights within US States).</li>
-</ul>
-<p>Both functions take the following arguments:</p>
-</div>
-<div class="section level3">
-<h3 id="required-arguments-">Required arguments <a name="args-required"></a>
-<a class="anchor" aria-label="anchor" href="#required-arguments-"></a>
-</h3>
-<ul>
-<li><p><strong>roi_sf:</strong> Region of interest; sf polygon. Must be in the <a href="https://epsg.io/4326" class="external-link">WGS 84 (epsg:4326)</a> coordinate reference system. For <code>bm_extract</code>, aggregates nighttime lights within each polygon of <code>roi_sf</code>.</p></li>
-<li>
-<p><strong>product_id:</strong> One of the following:</p>
-<ul>
-<li>
-<code>"VNP46A1"</code>: Daily (raw)</li>
-<li>
-<code>"VNP46A2"</code>: Daily (corrected)</li>
-<li>
-<code>"VNP46A3"</code>: Monthly</li>
-<li>
-<code>"VNP46A4"</code>: Annual</li>
-</ul>
-</li>
-<li>
-<p><strong>date:</strong> Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.</p>
-<ul>
-<li>For <code>product_id</code>s <code>"VNP46A1"</code> and <code>"VNP46A2"</code>, a date (eg, <code>"2021-10-03"</code>).</li>
-<li>For <code>product_id</code> <code>"VNP46A3"</code>, a date or year-month (e.g., <code>"2021-10-01"</code>, where the day will be ignored, or <code>"2021-10"</code>).</li>
-<li>For <code>product_id</code> <code>"VNP46A4"</code>, year or date (e.g., <code>"2021-10-01"</code>, where the month and day will be ignored, or <code>2021</code>).</li>
-</ul>
-</li>
-<li><p><strong>bearer:</strong> NASA bearer token. For instructions on how to create a token, see <a href="https://github.com/ramarty/blackmarbler#bearer-token-" class="external-link">here</a>.</p></li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="optional-arguments-">Optional arguments <a name="args-optional"></a>
-<a class="anchor" aria-label="anchor" href="#optional-arguments-"></a>
-</h3>
-<ul>
-<li>
-<p><strong>variable:</strong> Variable to used to create raster (default: <code>NULL</code>). For information on all variable choices, see <a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf" class="external-link">here</a>; for <code>VNP46A1</code>, see Table 3; for <code>VNP46A2</code> see Table 6; for <code>VNP46A3</code> and <code>VNP46A4</code>, see Table 9. If <code>NULL</code>, uses the following default variables:</p>
-<ul>
-<li>For <code>product_id</code> <code>"VNP46A1"</code>, uses <code>DNB_At_Sensor_Radiance_500m</code>.</li>
-<li>For <code>product_id</code> <code>"VNP46A2"</code>, uses <code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>.</li>
-<li>For <code>product_id</code>s <code>"VNP46A3"</code> and <code>"VNP46A4"</code>, uses <code>NearNadir_Composite_Snow_Free</code>.</li>
-</ul>
-</li>
-<li>
-<p><strong>quality_flag_rm:</strong> Quality flag values to use to set values to <code>NA</code>. Each pixel has a quality flag value, where low quality values can be removed. Values are set to <code>NA</code> for each value in ther <code>quality_flag_rm</code> vector. (Default: <code>c(255)</code>).</p>
-<ul>
-<li>For <code>VNP46A1</code> and <code>VNP46A2</code> (daily data):
-<ul>
-<li>
-<code>0</code>: High-quality, Persistent nighttime lights</li>
-<li>
-<code>1</code>: High-quality, Ephemeral nighttime Lights</li>
-<li>
-<code>2</code>: Poor-quality, Outlier, potential cloud contamination, or other issues</li>
-<li>
-<code>255</code>: No retrieval, Fill value (masked out on ingestion)</li>
-</ul>
-</li>
-<li>For <code>VNP46A3</code> and <code>VNP46A4</code> (monthly and annual data):
-<ul>
-<li>
-<code>0</code>: Good-quality, The number of observations used for the composite is larger than 3</li>
-<li>
-<code>1</code>: Poor-quality, The number of observations used for the composite is less than or equal to 3</li>
-<li>
-<code>2</code>: Gap filled NTL based on historical data</li>
-<li>
-<code>255</code>: Fill value</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>
-<p><strong>output_location_type:</strong> Where output should be stored (default: <code>r_memory</code>). Either:</p>
-<ul>
-<li>
-<code>r_memory</code> where the function will return an output in R</li>
-<li>
-<code>file</code> where the function will export the data as a file. For <code>bm_raster</code>, a <code>.tif</code> file will be saved; for <code>bm_extract</code>, a <code>.Rds</code> file will be saved. A file is saved for each date. Consequently, if <code>date = c(2018, 2019, 2020)</code>, three datasets will be saved: one for each year. Saving a dataset for each date can facilitate re-running the function later and only downloading data for dates where data have not been downloaded.</li>
-</ul>
-</li>
-</ul>
-<p>If <code>output_location_type = "file"</code>, the following arguments can be used:</p>
-<ul>
-<li>
-<strong>file_dir:</strong> The directory where data should be exported (default: <code>NULL</code>, so the working directory will be used)</li>
-<li>
-<strong>file_prefix:</strong> Prefix to add to the file to be saved. The file will be saved as the following: <code>[file_prefix][product_id]_t[date].[tif/Rds]</code>
-</li>
-<li>
-<strong>file_skip_if_exists:</strong> Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>). If the function is first run with <code>date = c(2018, 2019, 2020)</code>, then is later run with <code>date = c(2018, 2019, 2020, 2021)</code>, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="argument-for-bm_extract-only-">Argument for <code>bm_extract</code> only <a name="args-extract"></a>
-<a class="anchor" aria-label="anchor" href="#argument-for-bm_extract-only-"></a>
-</h3>
-<ul>
-<li>
-<strong>aggregation_fun:</strong> A vector of functions to aggregate data (default: <code>"mean"</code>). The <code>exact_extract</code> function from the <code>exactextractr</code> package is used for aggregations; this parameter is passed to <code>fun</code> argument in <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract</a></code>.</li>
-</ul>
-</div>
-</div>
-<div class="section level2">
-<h2 id="quickstart-">Quickstart <a name="quickstart"></a>
-<a class="anchor" aria-label="anchor" href="#quickstart-"></a>
+<h2 id="usage-">Usage <a name="usage"></a>
+<a class="anchor" aria-label="anchor" href="#usage-"></a>
 </h2>
 <div class="section level3">
 <h3 id="setup-">Setup <a name="setup"></a>
@@ -411,6 +284,126 @@
 <span>  full.names <span class="op">=</span> <span class="cn">T</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">map_df</span><span class="op">(</span><span class="va">readRDS</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/readRDS.html" class="external-link">saveRDS</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span>, <span class="st">"ntl_daily.Rds"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="functions-and-arguments-">Functions and arguments <a name="function-args"></a>
+<a class="anchor" aria-label="anchor" href="#functions-and-arguments-"></a>
+</h2>
+<div class="section level3">
+<h3 id="functions-">Functions <a name="functions"></a>
+<a class="anchor" aria-label="anchor" href="#functions-"></a>
+</h3>
+<p>The package provides two functions.</p>
+<ul>
+<li>
+<code>bm_raster</code> produces a raster of Black Marble nighttime lights.</li>
+<li>
+<code>bm_extract</code> produces a dataframe of aggregated nighttime lights to a region of interest (e.g., average nighttime lights within US States).</li>
+</ul>
+<p>Both functions take the following arguments:</p>
+</div>
+<div class="section level3">
+<h3 id="required-arguments-">Required arguments <a name="args-required"></a>
+<a class="anchor" aria-label="anchor" href="#required-arguments-"></a>
+</h3>
+<ul>
+<li><p><strong>roi_sf:</strong> Region of interest; sf polygon. Must be in the <a href="https://epsg.io/4326" class="external-link">WGS 84 (epsg:4326)</a> coordinate reference system. For <code>bm_extract</code>, aggregates nighttime lights within each polygon of <code>roi_sf</code>.</p></li>
+<li>
+<p><strong>product_id:</strong> One of the following:</p>
+<ul>
+<li>
+<code>"VNP46A1"</code>: Daily (raw)</li>
+<li>
+<code>"VNP46A2"</code>: Daily (corrected)</li>
+<li>
+<code>"VNP46A3"</code>: Monthly</li>
+<li>
+<code>"VNP46A4"</code>: Annual</li>
+</ul>
+</li>
+<li>
+<p><strong>date:</strong> Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.</p>
+<ul>
+<li>For <code>product_id</code>s <code>"VNP46A1"</code> and <code>"VNP46A2"</code>, a date (eg, <code>"2021-10-03"</code>).</li>
+<li>For <code>product_id</code> <code>"VNP46A3"</code>, a date or year-month (e.g., <code>"2021-10-01"</code>, where the day will be ignored, or <code>"2021-10"</code>).</li>
+<li>For <code>product_id</code> <code>"VNP46A4"</code>, year or date (e.g., <code>"2021-10-01"</code>, where the month and day will be ignored, or <code>2021</code>).</li>
+</ul>
+</li>
+<li><p><strong>bearer:</strong> NASA bearer token. For instructions on how to create a token, see <a href="https://github.com/ramarty/blackmarbler#bearer-token-" class="external-link">here</a>.</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="optional-arguments-">Optional arguments <a name="args-optional"></a>
+<a class="anchor" aria-label="anchor" href="#optional-arguments-"></a>
+</h3>
+<ul>
+<li>
+<p><strong>variable:</strong> Variable to used to create raster (default: <code>NULL</code>). For information on all variable choices, see <a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf" class="external-link">here</a>; for <code>VNP46A1</code>, see Table 3; for <code>VNP46A2</code> see Table 6; for <code>VNP46A3</code> and <code>VNP46A4</code>, see Table 9. If <code>NULL</code>, uses the following default variables:</p>
+<ul>
+<li>For <code>product_id</code> <code>"VNP46A1"</code>, uses <code>DNB_At_Sensor_Radiance_500m</code>.</li>
+<li>For <code>product_id</code> <code>"VNP46A2"</code>, uses <code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>.</li>
+<li>For <code>product_id</code>s <code>"VNP46A3"</code> and <code>"VNP46A4"</code>, uses <code>NearNadir_Composite_Snow_Free</code>.</li>
+</ul>
+</li>
+<li>
+<p><strong>quality_flag_rm:</strong> Quality flag values to use to set values to <code>NA</code>. Each pixel has a quality flag value, where low quality values can be removed. Values are set to <code>NA</code> for each value in ther <code>quality_flag_rm</code> vector. (Default: <code>c(255)</code>).</p>
+<ul>
+<li>For <code>VNP46A1</code> and <code>VNP46A2</code> (daily data):
+<ul>
+<li>
+<code>0</code>: High-quality, Persistent nighttime lights</li>
+<li>
+<code>1</code>: High-quality, Ephemeral nighttime Lights</li>
+<li>
+<code>2</code>: Poor-quality, Outlier, potential cloud contamination, or other issues</li>
+<li>
+<code>255</code>: No retrieval, Fill value (masked out on ingestion)</li>
+</ul>
+</li>
+<li>For <code>VNP46A3</code> and <code>VNP46A4</code> (monthly and annual data):
+<ul>
+<li>
+<code>0</code>: Good-quality, The number of observations used for the composite is larger than 3</li>
+<li>
+<code>1</code>: Poor-quality, The number of observations used for the composite is less than or equal to 3</li>
+<li>
+<code>2</code>: Gap filled NTL based on historical data</li>
+<li>
+<code>255</code>: Fill value</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>output_location_type:</strong> Where output should be stored (default: <code>r_memory</code>). Either:</p>
+<ul>
+<li>
+<code>r_memory</code> where the function will return an output in R</li>
+<li>
+<code>file</code> where the function will export the data as a file. For <code>bm_raster</code>, a <code>.tif</code> file will be saved; for <code>bm_extract</code>, a <code>.Rds</code> file will be saved. A file is saved for each date. Consequently, if <code>date = c(2018, 2019, 2020)</code>, three datasets will be saved: one for each year. Saving a dataset for each date can facilitate re-running the function later and only downloading data for dates where data have not been downloaded.</li>
+</ul>
+</li>
+</ul>
+<p>If <code>output_location_type = "file"</code>, the following arguments can be used:</p>
+<ul>
+<li>
+<strong>file_dir:</strong> The directory where data should be exported (default: <code>NULL</code>, so the working directory will be used)</li>
+<li>
+<strong>file_prefix:</strong> Prefix to add to the file to be saved. The file will be saved as the following: <code>[file_prefix][product_id]_t[date].[tif/Rds]</code>
+</li>
+<li>
+<strong>file_skip_if_exists:</strong> Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>). If the function is first run with <code>date = c(2018, 2019, 2020)</code>, then is later run with <code>date = c(2018, 2019, 2020, 2021)</code>, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="argument-for-bm_extract-only-">Argument for <code>bm_extract</code> only <a name="args-extract"></a>
+<a class="anchor" aria-label="anchor" href="#argument-for-bm_extract-only-"></a>
+</h3>
+<ul>
+<li>
+<strong>aggregation_fun:</strong> A vector of functions to aggregate data (default: <code>"mean"</code>). The <code>exact_extract</code> function from the <code>exactextractr</code> package is used for aggregations; this parameter is passed to <code>fun</code> argument in <code><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exactextractr::exact_extract</a></code>.</li>
+</ul>
 </div>
 </div>
 </div>
