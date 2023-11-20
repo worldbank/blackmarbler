@@ -47,6 +47,7 @@ Before downloading and extracting Black Marble data, we first load packages, def
 library(blackmarbler)
 library(geodata)
 library(sf)
+library(raster)
 library(ggplot2)
 
 #### Define NASA bearer token
@@ -115,10 +116,10 @@ Using one of the rasters, we can make a map of nighttime lights
 ```r
 #### Make raster
 r <- bm_raster(roi_sf = roi_sf,
-               product_id = "VNP46A4",
-               date = 2021,
+               product_id = "VNP46A3",
+               date = "2021-10-01",
                bearer = bearer)
-
+               
 #### Prep data
 r <- r |> mask(roi_sf) 
 
@@ -140,7 +141,7 @@ p <- ggplot() +
                        mid = "yellow",
                        high = "red",
                        midpoint = 4.5) +
-  labs(title = "NTL, October 2021") +
+  labs(title = "Nighttime Lights: October 2021") +
   coord_quickmap() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),

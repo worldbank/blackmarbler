@@ -3,6 +3,7 @@
 library(blackmarbler)
 library(geodata)
 library(sf)
+library(raster)
 library(ggplot2)
 
 #### Define NASA bearer token
@@ -53,8 +54,8 @@ r_annual <- bm_raster(roi_sf = roi_sf,
 
 #### Make raster
 r <- bm_raster(roi_sf = roi_sf,
-               product_id = "VNP46A4",
-               date = 2021,
+               product_id = "VNP46A3",
+               date = "2021-10-01",
                bearer = bearer)
 
 #### Prep data

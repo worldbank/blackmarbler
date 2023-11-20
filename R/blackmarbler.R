@@ -227,7 +227,7 @@ file_to_raster <- function(f,
 read_bm_csv <- function(year,
                         day,
                         product_id){
-  #print(paste0("Reading: ", product_id, "/", year, "/", day))
+
   df_out <- tryCatch(
     {
       df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",product_id,"/",year,"/",day,".csv"),
@@ -347,28 +347,15 @@ download_raster <- function(file_name,
   headers <- c('Authorization' = paste('Bearer', bearer))
   download_path <- file.path(temp_dir, file_name)
   
-  if(quiet == FALSE) print(paste0("Downloading: ", file_name))
+  if(quiet == FALSE) message(paste0("Downloading: ", file_name))
   
   response <- GET(url, add_headers(headers), write_disk(download_path, overwrite = TRUE))
-  response <- GET(url, add_headers(headers), write_disk("~/Desktop/test.h5", overwrite = TRUE))
-  
+
   if(response$status_code != 200){
-    print("Error in downloading data")
-    print(response)
+    message("Error in downloading data")
+    message(response)
   }
 
-  # if (http_type(response) == "application/octet-stream") {
-  #   cat("Downloaded", file_name, "to", download_path, "\n")
-  # } else {
-  #   cat("Failed to download", file_name, ". Status code:", http_status(response), "\n")
-  # }
-  
-  #tmp <- system(wget_command, intern = T, ignore.stdout = TRUE, ignore.stderr = TRUE)
-
-  # r <- file_to_raster(file.path(temp_dir, product_id, year, day, file_name),
-  #                     variable,
-  #                     quality_flag_rm)
-  
   r <- file_to_raster(file.path(temp_dir, file_name),
                       variable,
                       quality_flag_rm)
@@ -891,8 +878,10 @@ bm_raster_i <- function(roi_sf,
 
   unlink(file.path(temp_dir, product_id), recursive = T)
 
+  if(quiet == F){
+    message(paste0("Downloading ", nrow(bm_files_df), " nighttime light tiles"))
+  }
   r_list <- lapply(bm_files_df$name, function(name_i){
-    #if(quiet == FALSE) print(paste0("Downloading ", nrow(bm_files_df), " tiles."))
     download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, quiet)
   })
 
