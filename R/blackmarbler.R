@@ -3,6 +3,7 @@
 #   file:///Users/robmarty/Downloads/Thesis_Zihao_Zheng.pdf
 
 if(F){
+  library(readr)
   library(purrr)
   library(stringr)
   library(hdf5r)
