@@ -128,6 +128,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://worldbank.github.io/blackmarbler/" class="external-link">blackmarbler</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">geodata</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/raster" class="external-link">raster</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">#### Define NASA bearer token</span></span>
@@ -195,14 +196,14 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Make raster</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
-<span>               product_id <span class="op">=</span> <span class="st">"VNP46A4"</span>,</span>
-<span>               date <span class="op">=</span> <span class="fl">2021</span>,</span>
+<span>               product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>,</span>
+<span>               date <span class="op">=</span> <span class="st">"2021-10-01"</span>,</span>
 <span>               bearer <span class="op">=</span> <span class="va">bearer</span><span class="op">)</span></span>
-<span></span>
+<span>               </span>
 <span><span class="co">#### Prep data</span></span>
-<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">|&gt;</span> <span class="fu">mask</span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
+<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
 <span></span>
-<span><span class="va">r_df</span> <span class="op">&lt;-</span> <span class="fu">rasterToPoints</span><span class="op">(</span><span class="va">r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">r_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">## Remove very low values of NTL; can be considered noise </span></span>
@@ -220,7 +221,7 @@
 <span>                       mid <span class="op">=</span> <span class="st">"yellow"</span>,</span>
 <span>                       high <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>                       midpoint <span class="op">=</span> <span class="fl">4.5</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"NTL, October 2021"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Nighttime Lights: October 2021"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">coord_quickmap</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">theme</span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu">element_text</span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
