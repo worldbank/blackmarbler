@@ -169,18 +169,20 @@ file_to_raster <- function(f,
         str_replace_all("_Std", "")
 
       qf_name <- paste0(variable_short, "_Quality")
+      
       if(qf_name %in% var_names){
 
         #qf <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[paste0(variable, "_Quality")]]
-        qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable, "_Quality")]][,]
+        qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", qf_name)]][,]
         
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
           out[qf == val] <- NA
         }
+        
       }
 
     }
-
+    
     if(class(out[1,1])[1] != "numeric"){
       out <- matrix(as.numeric(out),    # Convert to numeric matrix
                     ncol = ncol(out))
@@ -544,7 +546,7 @@ bm_extract <- function(roi_sf,
             saveRDS(r_agg, out_path)
 
           } else{
-            cat(paste0('"', out_path, '" already exists; skipping.\n'))
+            warning(paste0('"', out_path, '" already exists; skipping.\n'))
           }
 
           r_out <- NULL # Saving as file, so output from function should be NULL
@@ -743,7 +745,7 @@ bm_raster <- function(roi_sf,
             writeRaster(r, out_path)
 
           } else{
-            cat(paste0('"', out_path, '" already exists; skipping.\n'))
+            warning(paste0('"', out_path, '" already exists; skipping.\n'))
           }
 
           r_out <- NULL # Saving as tif file, so output from function should be NULL
@@ -863,10 +865,9 @@ bm_raster_i <- function(roi_sf,
       #stop(st_intersects(bm_tiles_sf, roi_sf, sparse = F))
     }
   )
-
-
+  
   grid_use_sf <- bm_tiles_sf[inter>0,]
-
+  
   # Make Raster ----------------------------------------------------------------
   tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
   bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
