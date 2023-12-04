@@ -137,8 +137,8 @@ file_to_raster <- function(f,
     qf  <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
     
     if(length(quality_flag_rm) > 0){
-      if(qf_name %in% c("DNB_BRDF-Corrected_NTL",
-                        "Gap_Filled_DNB_BRDF-Corrected_NTL")){
+      if(variable %in% c("DNB_BRDF-Corrected_NTL",
+                         "Gap_Filled_DNB_BRDF-Corrected_NTL")){
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
           out[qf == val] <- NA
         }
@@ -413,7 +413,7 @@ define_date_name <- function(date_i, product_id){
 #' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
 #' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `mean`).
-#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights metric (eg, number of pixels used to compute average of nighttime lights). (Default: `FALSE`).
+#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_ntl_pixels` (the number of nighttime lights pixels); `n_possible_ntl_pixels` (the number of possible nighttime lights pixels); and `prop_ntl_pixels` the proportion of the two. (Default: `FALSE`).
 #' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
 #' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
@@ -577,7 +577,21 @@ bm_extract <- function(roi_sf,
                                temp_dir = temp_dir)
           names(r_out) <- date_name_i
           
+          if(add_n_pixels){
+            
+            r_n_obs <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+              sum(!is.na(values)))
+            
+            r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+              length(values))
+            
+            roi_sf$n_possible_ntl_pixels <- r_n_obs_poss
+            roi_sf$n_ntl_pixels <- r_n_obs
+            roi_sf$prop_ntl_pixels <- roi_sf$n_ntl_pixels / roi_sf$n_possible_ntl_pixels 
+          }
+          
           r_out <- exact_extract(x = r_out, y = roi_sf, fun = aggregation_fun)
+          
           roi_df <- roi_sf
           roi_df$geometry <- NULL
           
@@ -589,6 +603,7 @@ bm_extract <- function(roi_sf,
             roi_df[[paste0("ntl_", aggregation_fun)]] <- r_out
             r_out <- roi_df
           }
+          
           r_out$date <- date_i
         }
         
@@ -895,6 +910,7 @@ bm_raster_i <- function(roi_sf,
   if(quiet == F){
     message(paste0("Downloading ", nrow(bm_files_df), " nighttime light tiles"))
   }
+  
   r_list <- lapply(bm_files_df$name, function(name_i){
     download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, quiet)
   })

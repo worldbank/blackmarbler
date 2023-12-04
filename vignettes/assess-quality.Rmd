@@ -53,6 +53,8 @@ library(raster)
 library(ggplot2)
 library(dplyr)
 library(exactextractr)
+library(lubridate)
+library(tidyr)
 ```
 
 ```{r}
@@ -116,7 +118,41 @@ n_obs <- function(values, coverage_fraction){
 exact_extract(ntl_r, roi_sf, n_obs)
 ```
 
-In a time-series analysis examining average daily nighttime lights across a country, we could observe both (1) average nighttime lights and (2) the number of pixels used to determine nighttime lights for each day.
+The `bm_extract` function facilitates computing the number of observations used to compute nighttime lights statistics. To obtain this variable, we set `add_n_pixels` to `TRUE`.
+
+```{r}
+ntl_df <- bm_extract(roi_sf = roi_sf,
+                     product_id = "VNP46A2",
+                   date = seq.Date(from = ymd("2023-01-01"),
+                                   to = ymd("2023-01-10"),
+                                   by = 1),
+                   bearer = bearer,
+                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                   add_n_pixels = T)
+
+print(ntl_df)
+```
+
+The below figure shows trends in average nighttime lights (left) and the proportion of the country with a value for nighttime lights (right). For some days, low number of pixels corresponds to low nighttime lights (eg, January 3 and 5th); however, for other days, low number of pixels corresponds to higher nighttime lights (eg, January 9 and 10). On January 3 and 5, missing pixels could have been over cities---while on January 9 and 10, missing pixels could have been over typically lower-lit areas. 
+
+<details>
+<summary>Show code to produce figure</summary>
+```{r, n_obs_figure, eval=FALSE}
+
+ntl_df %>%
+  dplyr::select(date, ntl_mean, prop_ntl_pixels) %>%
+  pivot_longer(cols = -date) %>%
+  
+  ggplot(aes(x = date,
+             y = value)) + 
+  geom_line() +
+  facet_wrap(~name,
+             scales = "free")
+```
+</details>
+
+```{r, n_obs_figure, echo=FALSE}
+```
 
 #### Quality <a name="daily-quality"></a>
 

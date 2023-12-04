@@ -284,6 +284,6 @@ If `output_location_type = "file"`, the following arguments can be used:
 ### Argument for `bm_extract` only <a name="args-extract">
 
 * __aggregation_fun:__ A vector of functions to aggregate data (default: `"mean"`). The `exact_extract` function from the `exactextractr` package is used for aggregations; this parameter is passed to `fun` argument in `exactextractr::exact_extract`.
-* __add_n_pixels__ Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights metric (eg, number of pixels used to compute average of nighttime lights). (Default: `FALSE`).
+* __add_n_pixels:__ Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_ntl_pixels` (the number of nighttime lights pixels); `n_possible_ntl_pixels` (the number of possible nighttime lights pixels); and `prop_ntl_pixels` the proportion of the two. (Default: `FALSE`).
 
 
