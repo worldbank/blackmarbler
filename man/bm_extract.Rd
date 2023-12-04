@@ -10,6 +10,7 @@ bm_extract(
   date,
   bearer,
   aggregation_fun = c("mean"),
+  add_n_pixels = FALSE,
   variable = NULL,
   quality_flag_rm = 255,
   check_all_tiles_exist = TRUE,
@@ -41,6 +42,8 @@ bm_extract(
 \item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/worldbank/blackmarbler#bearer-token-}{here}.}
 
 \item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
+
+\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_ntl_pixels} (the number of nighttime lights pixels); \code{n_possible_ntl_pixels} (the number of possible nighttime lights pixels); and \code{prop_ntl_pixels} the proportion of the two. (Default: \code{FALSE}).}
 
 \item{variable}{Variable to used to create raster (default: \code{NULL}). If \code{NULL}, uses the following default variables:
 \itemize{

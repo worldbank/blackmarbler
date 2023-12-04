@@ -547,11 +547,16 @@ bm_extract <- function(roi_sf,
             }
             
             if(add_n_pixels){
-              r_n_obs <- exact_extract(x = r, 
-                                       y = roi_sf, 
-                                       fun = function(values, coverage_fraction) length(unique(values)))
               
+              r_n_obs <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+                sum(!is.na(values)))
+              
+              r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+                length(values))
+              
+              r_agg$n_possible_ntl_pixels <- r_n_obs_poss
               r_agg$n_ntl_pixels <- r_n_obs
+              r_agg$prop_ntl_pixels <- roi_sf$n_ntl_pixels / roi_sf$n_possible_ntl_pixels 
             }
             
             r_agg$date <- date_i
