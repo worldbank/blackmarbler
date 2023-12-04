@@ -35,7 +35,7 @@ The function requires using a **Bearer Token**; to obtain a token, follow the be
 3. Click "See wget Download Command" (bottom near top, in the middle)
 4. After clicking, you will see text that can be used to download data. The "Bearer" token will be a long string in red.
 
-After logging in, the below will show the bearer token in red instead of `INSERT_DOWNLOAD_TOKEN_HERE`. Sometimes, after logging in, the NASA website will redirect to another part of the website. To obtain the bearer token, just navigate to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) after logging in.
+__After logging in, the below will show the bearer token in red instead of `INSERT_DOWNLOAD_TOKEN_HERE`.__ Sometimes, after logging in, the NASA website will redirect to another part of the website. To obtain the bearer token, just navigate to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) after logging in.
 
 <p align="center">
 <img src="man/figures/nasa_laads_login.png" alt="NASA LAADS Bearer Token" width="800"/>
