@@ -55,6 +55,7 @@ library(dplyr)
 library(exactextractr)
 library(lubridate)
 library(tidyr)
+library(geodata)
 
 bearer <- "BEARER-TOKEN-HERE"
 ```
