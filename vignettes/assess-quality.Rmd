@@ -10,7 +10,7 @@ output:
     toc_float: true
 vignette: >
   %\VignetteEngine{knitr::knitr}
-  %\VignetteIndexEntry{blackmarbler}
+  %\VignetteIndexEntry{Assess Quality}
   %\VignetteEncoding{UTF-8}
 ---
 
