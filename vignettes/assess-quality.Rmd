@@ -124,7 +124,7 @@ n_pixel <- function(values, coverage_fraction){
 }
 
 n_non_na_pixel <- function(values, coverage_fraction){
-  length(!is.na(values))
+  sum(!is.na(values))
 }
 
 n_pixel_num        <- exact_extract(ntl_r, roi_sf, n_pixel)
