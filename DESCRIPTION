@@ -25,4 +25,7 @@ Imports:
   hdf5r,
   httr
 Suggests: 
-  geodata
+  geodata,
+  ggplot2,
+  lubridate,
+  tidyr
