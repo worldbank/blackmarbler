@@ -556,7 +556,7 @@ bm_extract <- function(roi_sf,
               
               r_agg$n_pixels           <- r_n_obs_poss
               r_agg$n_non_na_pixels    <- r_n_obs
-              r_agg$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
+              r_agg$prop_non_na_pixels <- r_agg$n_non_na_pixels / r_agg$n_pixels 
             }
             
             r_agg$date <- date_i
@@ -590,9 +590,9 @@ bm_extract <- function(roi_sf,
             r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
               length(values))
             
-            r_agg$n_pixels           <- r_n_obs_poss
-            r_agg$n_non_na_pixels    <- r_n_obs
-            r_agg$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
+            roi_sf$n_pixels           <- r_n_obs_poss
+            roi_sf$n_non_na_pixels    <- r_n_obs
+            roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
           }
           
           r_out <- exact_extract(x = r_out, y = roi_sf, fun = aggregation_fun)
