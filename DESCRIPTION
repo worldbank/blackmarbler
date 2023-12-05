@@ -24,3 +24,5 @@ Imports:
   stringr,
   hdf5r,
   httr
+Suggests: 
+  geodata
