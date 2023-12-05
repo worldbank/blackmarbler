@@ -21,8 +21,6 @@ knitr::opts_chunk$set(
   message = FALSE,
   comment = "#>"
 )
-
-bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 ```
 
 ### Overview <a name="overview"></a>
@@ -57,6 +55,13 @@ library(dplyr)
 library(exactextractr)
 library(lubridate)
 library(tidyr)
+
+bearer <- "BEARER-TOKEN-HERE"
+```
+
+```{r bearer, include = FALSE}
+#bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
+bearer <- read.csv("https://www.dropbox.com/scl/fi/pipze9nvak5qo7pedvwb4/bearer_bm.csv?rlkey=bkpv62s657c5w9jbchpg2vvr7&dl=1")$token
 ```
 
 ```{r}
