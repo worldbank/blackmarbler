@@ -43,7 +43,7 @@ bm_extract(
 
 \item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
 
-\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_non_na_pixels} (the number of non-\code{NA} pixels used for computing nighttime light statistics); \code{n_pixels} (the total number of pixels); and \code{prop_ntl_pixels} the proportion of the two. (Default: \code{TRUE}).}
+\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_non_na_pixels} (the number of non-\code{NA} pixels used for computing nighttime light statistics); \code{n_pixels} (the total number of pixels); and \code{prop_non_na_pixels} the proportion of the two. (Default: \code{TRUE}).}
 
 \item{variable}{Variable to used to create raster (default: \code{NULL}). If \code{NULL}, uses the following default variables:
 \itemize{

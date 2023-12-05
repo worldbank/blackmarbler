@@ -142,7 +142,7 @@ The below figure shows trends in average nighttime lights (left) and the proport
 ```{r, n_obs_figure, eval=FALSE}
 
 ntl_df %>%
-  dplyr::select(date, ntl_mean, prop_ntl_pixels) %>%
+  dplyr::select(date, ntl_mean, prop_non_na_pixels) %>%
   pivot_longer(cols = -date) %>%
   
   ggplot(aes(x = date,
