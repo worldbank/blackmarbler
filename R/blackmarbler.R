@@ -413,7 +413,7 @@ define_date_name <- function(date_i, product_id){
 #' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
 #' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `mean`).
-#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_ntl_pixels` (the number of nighttime lights pixels); `n_possible_ntl_pixels` (the number of possible nighttime lights pixels); and `prop_ntl_pixels` the proportion of the two. (Default: `FALSE`).
+#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_non_na_pixels` (the number of non-`NA` pixels used for computing nighttime light statistics); `n_pixels` (the total number of pixels); and `prop_ntl_pixels` the proportion of the two. (Default: `TRUE`).
 #' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
 #' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
@@ -479,7 +479,7 @@ bm_extract <- function(roi_sf,
                        date,
                        bearer,
                        aggregation_fun = c("mean"),
-                       add_n_pixels = FALSE,
+                       add_n_pixels = TRUE,
                        variable = NULL,
                        quality_flag_rm = 255,
                        check_all_tiles_exist = TRUE,
@@ -554,9 +554,9 @@ bm_extract <- function(roi_sf,
               r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
                 length(values))
               
-              r_agg$n_possible_ntl_pixels <- r_n_obs_poss
-              r_agg$n_ntl_pixels <- r_n_obs
-              r_agg$prop_ntl_pixels <- roi_sf$n_ntl_pixels / roi_sf$n_possible_ntl_pixels 
+              r_agg$n_pixels           <- r_n_obs_poss
+              r_agg$n_non_na_pixels    <- r_n_obs
+              r_agg$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
             }
             
             r_agg$date <- date_i
@@ -590,9 +590,9 @@ bm_extract <- function(roi_sf,
             r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
               length(values))
             
-            roi_sf$n_possible_ntl_pixels <- r_n_obs_poss
-            roi_sf$n_ntl_pixels <- r_n_obs
-            roi_sf$prop_ntl_pixels <- roi_sf$n_ntl_pixels / roi_sf$n_possible_ntl_pixels 
+            r_agg$n_pixels           <- r_n_obs_poss
+            r_agg$n_non_na_pixels    <- r_n_obs
+            r_agg$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
           }
           
           r_out <- exact_extract(x = r_out, y = roi_sf, fun = aggregation_fun)

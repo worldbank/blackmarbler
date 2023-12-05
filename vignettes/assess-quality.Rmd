@@ -17,6 +17,8 @@ vignette: >
 ```{r init, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
+  warning = FALSE, 
+  message = FALSE,
   comment = "#>"
 )
 
@@ -520,17 +522,3 @@ ggplot() +
 ```{r, ntl_good_qual_map, echo=FALSE}
 ```
 
-```{r}
-
-ntl_r <- bm_raster(roi_sf = roi_sf,
-                   product_id = "VNP46A2",
-                   date = "2023-01-01",
-                   bearer = bearer)
-
-n_obs <- function(values, coverage_fraction){
-  length(unique(values))
-}
-
-exact_extract(ntl_r, roi_sf, n_obs)
-
-```
