@@ -190,7 +190,7 @@ non-<code>NA</code> pixels.</p>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">n_non_na_pixel</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">values</span>, <span class="va">coverage_fraction</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">n_pixel_num</span>        <span class="op">&lt;-</span> <span class="fu"><a href="https://isciences.gitlab.io/exactextractr/reference/exact_extract.html" class="external-link">exact_extract</a></span><span class="op">(</span><span class="va">ntl_r</span>, <span class="va">roi_sf</span>, <span class="va">n_pixel</span><span class="op">)</span></span>
@@ -199,9 +199,9 @@ non-<code>NA</code> pixels.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_pixel_num</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 282934</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 282934</span></span>
+<span><span class="co">#&gt; [1] 120703</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span> <span class="op">/</span> <span class="va">n_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.4266119</span></span></code></pre></div>
 <p>By default, the <code>bm_extract</code> function computes these
 values:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
