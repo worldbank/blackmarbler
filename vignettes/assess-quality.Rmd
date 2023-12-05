@@ -89,7 +89,7 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_daily_r_map, eval=FALSE}
 #### Prep data
-ntl_r <- ntl_r |> mask(roi_sf) 
+ntl_r <- ntl_r |> raster::mask(roi_sf) 
 
 ntl_df <- rasterToPoints(ntl_r, spatial = TRUE) |> as.data.frame()
 names(ntl_df) <- c("value", "x", "y")
