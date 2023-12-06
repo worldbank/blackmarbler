@@ -1,6 +1,8 @@
 if(F){
   setwd("~/Documents/Github/blackmarbler")
   
+  load("~/Documents/Github/blackmarbler/data/bm_tiles_sf.rda")
+  
   roxygen2::roxygenise("~/Documents/Github/blackmarbler")
   
   pkgdown::clean_site()
