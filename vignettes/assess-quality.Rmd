@@ -290,7 +290,7 @@ ntl_tmp_gap_r <- ntl_tmp_gap_r |> mask(roi_sf)
 ntl_tmp_gap_df <- rasterToPoints(ntl_tmp_gap_r, spatial = TRUE) |> as.data.frame()
 names(ntl_tmp_gap_df) <- c("value", "x", "y")
 
-ntl_tmp_gap_df$value[ntl_tmp_gap_df$value == 255] <- NA
+#ntl_tmp_gap_df$value[ntl_tmp_gap_df$value == 255] <- NA
 
 ##### Map 
 ggplot() +

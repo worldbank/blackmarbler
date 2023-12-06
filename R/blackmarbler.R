@@ -138,7 +138,8 @@ file_to_raster <- function(f,
     
     if(length(quality_flag_rm) > 0){
       if(variable %in% c("DNB_BRDF-Corrected_NTL",
-                         "Gap_Filled_DNB_BRDF-Corrected_NTL")){
+                         "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                         "Latest_High_Quality_Retrieval")){
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
           out[qf == val] <- NA
         }
@@ -352,7 +353,7 @@ download_raster <- function(file_name,
   headers <- c('Authorization' = paste('Bearer', bearer))
   download_path <- file.path(temp_dir, file_name)
   
-  if(quiet == FALSE) message(paste0("Downloading: ", file_name))
+  if(quiet == FALSE) message(paste0("Processing: ", file_name))
   
   response <- GET(url, add_headers(headers), write_disk(download_path, overwrite = TRUE))
   
