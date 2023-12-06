@@ -1,15 +1,3 @@
-#' Black Marble Tile Grid Shapefile
-#' A dataset containing black marble grid tiles.
-#'
-#' @name bm_tiles_sf
-#' @docType data
-#' @usage data(bm_tiles_sf)
-#' @format Sf polygon with 648 features
-#' @author Robert Marty \email{rmarty@worldbank.org}
-#' @references \url{https://blackmarble.gsfc.nasa.gov/}
-#' @keywords datasets
-NULL
-
 month_start_day_to_month <- function(x){
   
   month <- NA
@@ -876,7 +864,7 @@ bm_raster_i <- function(roi_sf,
   unlink(file.path(temp_dir, product_id), recursive = T)
   
   if(quiet == F){
-    message(paste0("Downloading ", nrow(bm_files_df), " nighttime light tiles"))
+    message(paste0("Processing ", nrow(bm_files_df), " nighttime light tiles"))
   }
   
   r_list <- lapply(bm_files_df$name, function(name_i){
