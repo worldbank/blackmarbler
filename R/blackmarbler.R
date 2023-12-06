@@ -1,21 +1,3 @@
-# TODO
-# 1. Cloud mask: https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.1_July_2020.pdf
-#   file:///Users/robmarty/Downloads/Thesis_Zihao_Zheng.pdf
-
-if(F){
-  library(readr)
-  library(purrr)
-  library(stringr)
-  library(hdf5r)
-  library(raster)
-  library(dplyr)
-  library(sf)
-  library(lubridate)
-  library(exactextractr)
-  library(httr)
-  library(progress)
-}
-
 #' Black Marble Tile Grid Shapefile
 #' A dataset containing black marble grid tiles.
 #'
@@ -93,17 +75,7 @@ file_to_raster <- function(f,
   # ARGS
   # --f: Filepath to h5 file
   
-  ## Boundaries
-  # Only works on later years
-  #spInfo <- h5readAttributes(f,"/")
-  
-  #xMin<-spInfo$WestBoundingCoord
-  #yMin<-spInfo$SouthBoundingCoord
-  #yMax<-spInfo$NorthBoundingCoord
-  #xMax<-spInfo$EastBoundingCoord
-  
   ## Data
-  #h5_data <- H5Fopen(f)
   h5_data <- h5file(f, "r+")
   
   #### Daily
@@ -131,9 +103,6 @@ file_to_raster <- function(f,
       ))
     }
     
-    #out <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`[[variable]]
-    #qf  <- h5_data$HDFEOS$GRIDS$VNP_Grid_DNB$`Data Fields`$Mandatory_Quality_Flag
-    
     out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable)]][,]
     qf  <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
     
@@ -149,9 +118,7 @@ file_to_raster <- function(f,
     
     #### Monthly/Annually
   } else{
-    #lat <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lat
-    #lon <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`$lon
-    
+
     lat <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lat"]][]
     lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
     
@@ -164,7 +131,6 @@ file_to_raster <- function(f,
       ))
     }
     
-    #out <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[variable]]
     out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable)]][,]
     
     if(length(quality_flag_rm) > 0){
@@ -177,7 +143,6 @@ file_to_raster <- function(f,
       
       if(qf_name %in% var_names){
         
-        #qf <- h5_data$HDFEOS$GRIDS$VIIRS_Grid_DNB_2d$`Data Fields`[[paste0(variable, "_Quality")]]
         qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", qf_name)]][,]
         
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
@@ -189,7 +154,7 @@ file_to_raster <- function(f,
     }
     
     if(class(out[1,1])[1] != "numeric"){
-      out <- matrix(as.numeric(out),    # Convert to numeric matrix
+      out <- matrix(as.numeric(out),  # Convert to numeric matrix
                     ncol = ncol(out))
     }
     
@@ -341,13 +306,6 @@ download_raster <- function(file_name,
   day        <- file_name %>% substring(14,16)
   product_id <- file_name %>% substring(1,7)
   
-  #wget_command <- paste0('wget -e robots=off -m -np .html,.tmp -nH --cut-dirs=3 ',
-  #                       '"https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',product_id,'/', year, '/', day, '/', file_name,'"',
-  #                       ' --header "Authorization: Bearer ',
-  #                       bearer,
-  #                       '" -P ',
-  #                       temp_dir)
-  
   url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
                 product_id, '/', year, '/', day, '/', file_name)
   
@@ -355,19 +313,11 @@ download_raster <- function(file_name,
   download_path <- file.path(temp_dir, file_name)
   
   if(quiet == FALSE) message(paste0("Processing: ", file_name))
-  
-  # progress_bar <- progress_bar$new(
-  #   format = "[:bar] :percent ETA: :eta",
-  #   total = 1, 
-  #   clear = FALSE
-  # )
-  
+
   response <- GET(url, 
                   add_headers(headers), 
                   write_disk(download_path, overwrite = TRUE),
                   progress())
-  
-  #progress_bar$close()
   
   if(response$status_code != 200){
     message("Error in downloading data")
