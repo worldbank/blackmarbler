@@ -83,8 +83,7 @@ file_to_raster <- function(f,
     
     tile_i <- f %>% str_extract("h\\d{2}v\\d{2}")
     
-    #bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
-    data("bm_tiles_sf")
+    bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
     grid_i_sf <- bm_tiles_sf[bm_tiles_sf$TileID %in% tile_i,]
     
     grid_i_sf_box <- grid_i_sf %>%
