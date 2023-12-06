@@ -13,6 +13,7 @@ if(F){
   library(lubridate)
   library(exactextractr)
   library(httr)
+  library(progress)
 }
 
 #' Black Marble Tile Grid Shapefile
@@ -355,7 +356,18 @@ download_raster <- function(file_name,
   
   if(quiet == FALSE) message(paste0("Processing: ", file_name))
   
-  response <- GET(url, add_headers(headers), write_disk(download_path, overwrite = TRUE))
+  # progress_bar <- progress_bar$new(
+  #   format = "[:bar] :percent ETA: :eta",
+  #   total = 1, 
+  #   clear = FALSE
+  # )
+  
+  response <- GET(url, 
+                  add_headers(headers), 
+                  write_disk(download_path, overwrite = TRUE),
+                  progress())
+  
+  #progress_bar$close()
   
   if(response$status_code != 200){
     message("Error in downloading data")
