@@ -1,5 +1,12 @@
 # blackmarbler <img src="man/figures/hex.png" align="right" width="200" />
 
+<!-- badges: start -->
+
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/blackmarbler)](https://cran.r-project.org/package=blackmarbler)
+[![R-CMD-check](https://github.com/dime-worldbank/googletraffic/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml)
+![downloads](http://cranlogs.r-pkg.org/badges/grand-total/blackmarbler)
+<!-- badges: end -->
+
 __BlackMarbleR__ is an R package for working with Black Marble data. [Black Marble](https://blackmarble.gsfc.nasa.gov/) is a [NASA Earth Observatory](https://earthobservatory.nasa.gov/) project that provides global nighttime lights data. The package automates the process of downloading all relevant tiles from the NASA LAADS archive to cover a region of interest, converting the raw files (in H5 format) to georeferenced rasters, and mosaicing rasters together when needed.
 
 * [Installation](#installation)
