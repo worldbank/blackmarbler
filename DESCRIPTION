@@ -1,5 +1,5 @@
 Package: blackmarbler
-Title: Black Marble R
+Title: BlackMarbleR
 Version: 0.1.0
 Authors@R: 
     c(person("Robert", "Marty", , "rmarty@worldbank.org", role = c("aut", "cre"),
