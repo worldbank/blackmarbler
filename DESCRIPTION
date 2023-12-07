@@ -5,7 +5,7 @@ Authors@R:
     c(person("Robert", "Marty", , "rmarty@worldbank.org", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3164-3813")),
     person("Gabriel", "Stefanini Vicente", , "gvicente@worldbank.org", role = c("aut")))
-Description: Create geographically referenced rasters of NASA Black Marble nighttime lights data <https://blackmarble.gsfc.nasa.gov/>.
+Description: Georeferenced Rasters and Statistics of Nighttime Lights from NASA Black Marble <https://blackmarble.gsfc.nasa.gov/>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
