@@ -8,13 +8,13 @@ Authors@R:
 Description: Create geographically referenced rasters of NASA Black Marble nighttime lights data <https://blackmarble.gsfc.nasa.gov/>.
 License: MIT + file LICENSE
 Encoding: UTF-8
-VignetteBuilder: utils
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 URL: https://worldbank.github.io/blackmarbler/
 BugReports: https://github.com/worldbank/blackmarbler/issues
 Imports:
   readr,
+  hdf5r,
   dplyr,
   purrr,
   lubridate,
@@ -22,9 +22,9 @@ Imports:
   sf,
   exactextractr,
   stringr,
-  hdf5r,
   httr
 Suggests: 
   geodata,
   ggplot2,
-  tidyr
+  tidyr,
+  knitr

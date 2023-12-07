@@ -45,7 +45,7 @@ This page illustrates how to examine the quality of nighttime lights data.
 
 We first load packages and obtain a polygon for a region of interest; for this example, we use Switzerland. 
 
-```{r}
+```{r, results='hide'}
 library(blackmarbler)
 library(geodata)
 library(sf)
@@ -56,6 +56,7 @@ library(exactextractr)
 library(lubridate)
 library(tidyr)
 library(geodata)
+library(knitr)
 
 bearer <- "BEARER-TOKEN-HERE"
 ```
@@ -77,7 +78,7 @@ Below shows an example examining quality for daily data (`VNP46A2`).
 
 We download data for January 1st, 2023. When the `variable` parameter is not specified, `bm_raster` creates a raster using the `Gap_Filled_DNB_BRDF-Corrected_NTL` variable for daily data.
 
-```{r}
+```{r, results='hide'}
 ntl_r <- bm_raster(roi_sf = roi_sf,
                    product_id = "VNP46A2",
                    date = "2023-01-01",
@@ -137,7 +138,7 @@ print(n_non_na_pixel_num / n_pixel_num)
 
 By default, the `bm_extract` function computes these values:
 
-```{r}
+```{r, results='hide'}
 ntl_df <- bm_extract(roi_sf = roi_sf,
                      product_id = "VNP46A2",
                    date = seq.Date(from = ymd("2023-01-01"),
@@ -184,7 +185,7 @@ For daily data, the quality values are:
 
 We can map quality by using the `Mandatory_Quality_Flag` variable.
 
-```{r}
+```{r, results='hide'}
 quality_r <- bm_raster(roi_sf = roi_sf,
                        product_id = "VNP46A2",
                        date = "2023-01-01",
@@ -229,7 +230,7 @@ ggplot() +
 
 The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, only pixels with a value of `255` are filtered out. However, if we only want data for good quality pixels, we can adjust the `quality_flag_rm` parameter.
 
-```{r}
+```{r, results='hide'}
 ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              product_id = "VNP46A2", 
                              date = "2023-01-01",
@@ -273,7 +274,7 @@ ggplot() +
 
 By default, the `bm_raster` function uses the `Gap_Filled_DNB_BRDF-Corrected_NTL` variable for daily data. Gap filling indicates that some poor quality pixels use data from a previous date; the `Latest_High_Quality_Retrieval` indicates the date the nighttime lights value came from.
 
-```{r}
+```{r, results='hide'}
 ntl_tmp_gap_r <- bm_raster(roi_sf = roi_sf,
                            product_id = "VNP46A2",
                            date = "2023-01-01",
@@ -289,8 +290,6 @@ ntl_tmp_gap_r <- ntl_tmp_gap_r |> mask(roi_sf)
 
 ntl_tmp_gap_df <- rasterToPoints(ntl_tmp_gap_r, spatial = TRUE) |> as.data.frame()
 names(ntl_tmp_gap_df) <- c("value", "x", "y")
-
-#ntl_tmp_gap_df$value[ntl_tmp_gap_df$value == 255] <- NA
 
 ##### Map 
 ggplot() +
@@ -311,7 +310,7 @@ ggplot() +
 
 Instead of using `Gap_Filled_DNB_BRDF-Corrected_NTL`, we could ignore gap filled observations---using the `DNB_BRDF-Corrected_NTL` variable. Here, we also remove poor quality pixels.
 
-```{r}
+```{r, results='hide'}
 ntl_r <- bm_raster(roi_sf = roi_sf,
                    product_id = "VNP46A2",
                    date = "2023-01-01",
@@ -359,7 +358,7 @@ Below shows an example examining quality for monthly data (`VNP46A3`). The same 
 
 We download data for January 2023. When the `variable` parameter is not specified, `bm_raster` creates a raster using the `NearNadir_Composite_Snow_Free` variable for monthly and annual data---which is nighttime lights, removing effects from snow cover. 
 
-```{r}
+```{r, results='hide'}
 ntl_r <- bm_raster(roi_sf = roi_sf,
                    product_id = "VNP46A3", 
                    date = "2023-01-01",
@@ -402,7 +401,7 @@ ggplot() +
 
 Black Marble removes poor quality observations, such as pixels covered by clouds. To determine the number of observations used to generate nighttime light values for each pixel, we add `_Num` to the variable name.
 
-```{r}
+```{r, results='hide'}
 cf_r <- bm_raster(roi_sf = roi_sf,
                   product_id = "VNP46A3",
                   date = "2023-01-01",
@@ -451,7 +450,7 @@ For monthly and annual data, the quality values are:
 
 We can map quality by adding `_Quality` to the variable name.
 
-```{r}
+```{r, results='hide'}
 quality_r <- bm_raster(roi_sf = roi_sf,
                        product_id = "VNP46A3",
                        date = "2023-01-01",
@@ -496,7 +495,7 @@ ggplot() +
 
 The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, only pixels with a value of `255` are filtered out. However, if we also want to remove poor quality pixels, we can adjust the `quality_flag_rm` parameter.
 
-```{r}
+```{r, results='hide'}
 ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              product_id = "VNP46A3", 
                              date = "2023-01-01",

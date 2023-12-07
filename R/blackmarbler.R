@@ -98,15 +98,21 @@ file_to_raster <- function(f,
       if(variable %in% c("DNB_BRDF-Corrected_NTL",
                          "Gap_Filled_DNB_BRDF-Corrected_NTL",
                          "Latest_High_Quality_Retrieval")){
+        
         for(val in quality_flag_rm){ # out[qf %in% quality_flag_rm] doesn't work, so loop
           out[qf == val] <- NA
         }
       }
     }
     
+    # Above doesn't fully capture
+    if(variable %in% "Latest_High_Quality_Retrieval"){
+      out[out == 255] <- NA
+    }
+    
     #### Monthly/Annually
   } else{
-
+    
     lat <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lat"]][]
     lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
     
@@ -275,10 +281,10 @@ create_dataset_name_df <- function(product_id,
   }
   
   #### Create data
-  files_df <- map2_dfr(param_df$year,
-                       param_df$day,
-                       read_bm_csv,
-                       product_id)
+  files_df <- purrr::map2_dfr(param_df$year,
+                              param_df$day,
+                              read_bm_csv,
+                              product_id)
   
   return(files_df)
 }
@@ -301,11 +307,11 @@ download_raster <- function(file_name,
   download_path <- file.path(temp_dir, file_name)
   
   if(quiet == FALSE) message(paste0("Processing: ", file_name))
-
-  response <- GET(url, 
-                  add_headers(headers), 
-                  write_disk(download_path, overwrite = TRUE),
-                  progress())
+  
+  response <- httr::GET(url, 
+                        add_headers(headers), 
+                        write_disk(download_path, overwrite = TRUE),
+                        progress())
   
   if(response$status_code != 200){
     message("Error in downloading data")
@@ -660,17 +666,17 @@ bm_extract <- function(roi_sf,
 #'
 #' @export
 #'
-#' @import purrr
-#' @import stringr
+#' @import readr
 #' @import hdf5r
 #' @import dplyr
 #' @import sf
-#' @import lubridate
-#' @import readr
 #' @import exactextractr
+#' @import stringr
 #' @import httr
-#' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head))
-
+#' @import lubridate
+#' @rawNamespace import(purrr, except = c(flatten_df, values))
+#' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head, values))
+#' 
 # @rawNamespace import(utils, except = c(stack, unstack))
 bm_raster <- function(roi_sf,
                       product_id,
