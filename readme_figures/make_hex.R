@@ -82,27 +82,27 @@ if(T){
           l_height = 3,
           filename="~/Documents/Github/blackmarbler/man/figures/hex.png")
   
-  sticker(p, 
-          package="blackmarblepy", 
-          spotlight = F,
-          #l_alpha = 1, #0.15,
-          p_size=20, #7 
-          p_y = 1.40,
-          p_family = "sans",
-          p_fontface = "italic",
-          s_x=1, 
-          s_y=0.9, 
-          s_width=2.5, 
-          s_height=2.5,
-          p_color = "white",
-          h_fill = "black",
-          h_color = "black",
-          white_around_sticker = T,
-          l_y = 1.4,
-          l_x = 0.93,
-          l_width = 3,
-          l_height = 3,
-          filename="~/Documents/Github/blackmarblepy/docs/images/logo.png")
+  # sticker(p, 
+  #         package="blackmarblepy", 
+  #         spotlight = F,
+  #         #l_alpha = 1, #0.15,
+  #         p_size=20, #7 
+  #         p_y = 1.40,
+  #         p_family = "sans",
+  #         p_fontface = "italic",
+  #         s_x=1, 
+  #         s_y=0.9, 
+  #         s_width=2.5, 
+  #         s_height=2.5,
+  #         p_color = "white",
+  #         h_fill = "black",
+  #         h_color = "black",
+  #         white_around_sticker = T,
+  #         l_y = 1.4,
+  #         l_x = 0.93,
+  #         l_width = 3,
+  #         l_height = 3,
+  #         filename="~/Documents/Github/blackmarblepy/docs/images/logo.png")
   
  
 }
