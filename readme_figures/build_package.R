@@ -3,6 +3,9 @@ if(F){
   
   roxygen2::roxygenise("~/Documents/Github/blackmarbler")
   
+  pkgdown::build_favicons(pkg = "~/Documents/Github/blackmarbler", 
+                          overwrite = FALSE)
+  
   pkgdown::clean_site()
   
   usethis::use_pkgdown()

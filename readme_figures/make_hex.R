@@ -80,7 +80,7 @@ if(T){
           l_x = 0.93,
           l_width = 3,
           l_height = 3,
-          filename="~/Documents/Github/blackmarbler/man/figures/hex.png")
+          filename="~/Documents/Github/blackmarbler/man/figures/logo.png")
   
   # sticker(p, 
   #         package="blackmarblepy", 
