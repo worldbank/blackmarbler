@@ -68,9 +68,9 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>BlackMarbleR</strong> is an R package for working with Black Marble data. <a href="https://blackmarble.gsfc.nasa.gov/" class="external-link">Black Marble</a> is a <a href="https://earthobservatory.nasa.gov/" class="external-link">NASA Earth Observatory</a> project that provides global nighttime lights data. The package automates the process of downloading all relevant tiles from the NASA LAADS archive to cover a region of interest, converting the raw files (in H5 format) to georeferenced rasters, and mosaicing rasters together when needed.</p>
+<!-- badges: end -->
+<p><strong>BlackMarbleR</strong> is an R package that provides a simple and efficient way to retrieve and extract nighttime lights data from NASA’s Black Marble project. <a href="https://blackmarble.gsfc.nasa.gov" class="external-link">Black Marble</a> is a <a href="https://earthobservatory.nasa.gov" class="external-link">NASA Earth Observatory</a> project that provides a product suite of daily, monthly and yearly global nighttime lights. This package automates the process of downloading all relevant tiles from the <a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/" class="external-link">NASA LAADS archive</a> to cover a region of interest, converting the raw files (in HDF5 format), to georeferenced rasters, and mosaicing rasters together when needed.</p>
 <ul>
-<li><a href="#installation">Installation</a></li>
 <li><a href="#token">Bearer token</a></li>
 <li>
 <a href="#usage">Usage</a>
@@ -141,7 +141,7 @@
 <span></span>
 <span><span class="co">### ROI</span></span>
 <span><span class="co"># Define region of interest (roi). The roi must be (1) an sf polygon and (2)</span></span>
-<span><span class="co"># in the WGS84 (epsg:4326) coordinate reference system. Here, we use the </span></span>
+<span><span class="co"># in the WGS84 (epsg:4326) coordinate reference system. Here, we use the</span></span>
 <span><span class="co"># getData function to load a polygon of Ghana</span></span>
 <span><span class="va">roi_sf</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/geodata/man/gadm.html" class="external-link">gadm</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">"GHA"</span>, level<span class="op">=</span><span class="fl">1</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html" class="external-link">st_as_sf</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -204,30 +204,30 @@
 <span>               product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>,</span>
 <span>               date <span class="op">=</span> <span class="st">"2021-10-01"</span>,</span>
 <span>               bearer <span class="op">=</span> <span class="va">bearer</span><span class="op">)</span></span>
-<span>               </span>
+<span></span>
 <span><span class="co">#### Prep data</span></span>
-<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
+<span><span class="va">r</span> <span class="op">&lt;-</span> <span class="va">r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">r_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">r_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">## Remove very low values of NTL; can be considered noise </span></span>
+<span><span class="co">## Remove very low values of NTL; can be considered noise</span></span>
 <span><span class="va">r_df</span><span class="op">$</span><span class="va">value</span><span class="op">[</span><span class="va">r_df</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;=</span> <span class="fl">2</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
 <span></span>
 <span><span class="co">## Distribution is skewed, so log</span></span>
 <span><span class="va">r_df</span><span class="op">$</span><span class="va">value_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">r_df</span><span class="op">$</span><span class="va">value</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">##### Map </span></span>
+<span><span class="co">##### Map</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">r_df</span>, </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">r_df</span>,</span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>,</span>
 <span>  fill <span class="op">=</span> <span class="va">value_adj</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient2</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"black"</span>,</span>
 <span>                       mid <span class="op">=</span> <span class="st">"yellow"</span>,</span>
 <span>                       high <span class="op">=</span> <span class="st">"red"</span>,</span>
 <span>                       midpoint <span class="op">=</span> <span class="fl">4.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Nighttime Lights: October 2021"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>  legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
@@ -257,7 +257,7 @@
 <span>       y <span class="op">=</span> <span class="st">"NTL Luminosity"</span>,</span>
 <span>       title <span class="op">=</span> <span class="st">"Ghana Admin Level 1: Annual Average Nighttime Lights"</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>strip.text <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p align="center">
 <img src="reference/figures/ntl_trends_gha.png" alt="Nighttime Lights Trends" width="800"></p>
 </div>
@@ -272,11 +272,11 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span>, <span class="st">"daily"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Extract daily-level nighttime lights data for Ghana's first administrative divisions. </span></span>
-<span><span class="co"># Save a separate dataset for each date in the `"~/Desktop/bm_files/daily"` directory. </span></span>
-<span><span class="co"># The code extracts data from January 1, 2023 to today. Given that daily nighttime lights </span></span>
-<span><span class="co"># data is produced on roughly a week delay, the function will only extract data that exists; </span></span>
-<span><span class="co"># it will skip extracting data for dates where data has not yet been produced by NASA Black Marble. </span></span>
+<span><span class="co"># Extract daily-level nighttime lights data for Ghana's first administrative divisions.</span></span>
+<span><span class="co"># Save a separate dataset for each date in the `"~/Desktop/bm_files/daily"` directory.</span></span>
+<span><span class="co"># The code extracts data from January 1, 2023 to today. Given that daily nighttime lights</span></span>
+<span><span class="co"># data is produced on roughly a week delay, the function will only extract data that exists;</span></span>
+<span><span class="co"># it will skip extracting data for dates where data has not yet been produced by NASA Black Marble.</span></span>
 <span><span class="fu"><a href="reference/bm_extract.html">bm_extract</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>           product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
 <span>           date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.Date.html" class="external-link">seq.Date</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu">ymd</span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>, to <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
@@ -453,6 +453,9 @@
 <ul class="list-unstyled">
 <li><a href="https://cran.r-project.org/package=blackmarbler" class="external-link"><img src="http://www.r-pkg.org/badges/version/blackmarbler" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/dime-worldbank/googletraffic/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+<li><a href="https://github.com/worldbank/blackmarbler" class="external-link"><img src="https://img.shields.io/github/stars/worldbank/blackmarbler" alt="GitHub Repo stars"></a></li>
+<li><a href="https://github.com/worldbank/blackmarbler/graphs/commit-activity" class="external-link"><img src="https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler" alt="activity"></a></li>
+<li><a href="https://opensource.org/licenses/MIT" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
 </ul>
 </div>
 
