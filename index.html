@@ -107,10 +107,13 @@
 <h2 id="installation-">Installation <a name="installation"></a>
 <a class="anchor" aria-label="anchor" href="#installation-"></a>
 </h2>
-<p>The package can be installed via devtools.</p>
+<p>The package can be installed via CRAN.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"blackmarbler"</span><span class="op">)</span></span></code></pre></div>
+<p>To install the development version from Github:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"worldbank/blackmarbler"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dime-worldbank/blackmarbler"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="bearer-token-">Bearer Token <a name="token"></a>
@@ -137,7 +140,7 @@
 <a class="anchor" aria-label="anchor" href="#setup-"></a>
 </h3>
 <p>Before downloading and extracting Black Marble data, we first load packages, define the NASA bearer token, and define a region of interest.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Setup</span></span>
 <span><span class="co"># Load packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://worldbank.github.io/blackmarbler/">blackmarbler</a></span><span class="op">)</span></span>
@@ -160,7 +163,7 @@
 <a class="anchor" aria-label="anchor" href="#make-raster-of-nighttime-lights-"></a>
 </h3>
 <p>The below example shows making daily, monthly, and annual rasters of nighttime lights for Ghana.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### Daily data: raster for February 5, 2021</span></span>
 <span><span class="va">r_20210205</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                        product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
@@ -184,7 +187,7 @@
 <a class="anchor" aria-label="anchor" href="#make-raster-stack-of-nighttime-lights-across-multiple-time-periods-"></a>
 </h3>
 <p>To extract data for multiple time periods, add multiple time periods to <code>date</code>. The function will return a raster stack, where each raster band corresponds to a different date. The below code provides examples getting data across multiple days, months, and years.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Daily data in March 2021</span></span>
 <span><span class="va">r_daily</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                     product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>,</span>
@@ -208,7 +211,7 @@
 <a class="anchor" aria-label="anchor" href="#map-of-nighttime-lights-"></a>
 </h3>
 <p>Using one of the rasters, we can make a map of nighttime lights</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Make raster</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>               product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>,</span>
@@ -249,7 +252,7 @@
 <a class="anchor" aria-label="anchor" href="#trends-over-time-"></a>
 </h3>
 <p>We can use the <code>bm_extract</code> function to observe changes in nighttime lights over time. The <code>bm_extract</code> function leverages the <a href="https://github.com/isciences/exactextractr" class="external-link"><code>exactextractr</code></a> package to aggregate nighttime lights data to polygons. Below we show trends in annual nighttime lights data across Ghana’s first administrative divisions.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Extract annual data</span></span>
 <span><span class="va">ntl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_extract.html">bm_extract</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                     product_id <span class="op">=</span> <span class="st">"VNP46A4"</span>,</span>
@@ -277,7 +280,7 @@
 </h3>
 <p>Some users may want to monitor near-real-time changes in nighttime lights. For example, daily Black Marble nighttime lights data is updated regularly, where data is available roughly on a week delay; same use cases may require examining trends in daily nighttime lights data as new data becomes available. Below shows example code that could be regularly run to produce an updated daily dataset of nighttime lights.</p>
 <p>The below code produces a dataframe of nighttime lights for each date, where average nighttime lights for Ghana’s 1st administrative division is produced. The code will check whether data has already been downloaded/extracted for a specific date, and only download/extract new data.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create directories to store data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span>, <span class="st">"daily"</span><span class="op">)</span><span class="op">)</span></span>
@@ -428,6 +431,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=blackmarbler" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/worldbank/blackmarbler/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/worldbank/blackmarbler/issues" class="external-link">Report a bug</a></li>
 </ul>
