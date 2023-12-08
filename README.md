@@ -1,4 +1,4 @@
-# blackmarbler <img src="man/figures/logo.png" align="right" width="200" />
+# BlackMarbleR <img src="man/figures/logo.png" align="right" width="200" />
 
 <!-- badges: start -->
 
