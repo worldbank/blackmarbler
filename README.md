@@ -28,13 +28,19 @@
   * [Optional Arguments](#args-optional)
   * [Argument only for `bm_extract`](#args-extract)
 
-## Installation <a name="installation">
+## Installation <a name="installation"></a>
 
-The package can be installed via devtools.
+The package can be installed via CRAN.
+
+```r  
+install.packages("blackmarbler")
+```
+
+To install the development version from Github:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("worldbank/blackmarbler")
+devtools::install_github("dime-worldbank/blackmarbler")
 ```
 
 ## Bearer Token <a name="token">
