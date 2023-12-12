@@ -13,6 +13,12 @@
 
 **BlackMarbleR** provides a simple and efficient way to retrieve and extract nighttime lights data from NASA's Black Marble project. [Black Marble](https://blackmarble.gsfc.nasa.gov) is a [NASA Earth Observatory](https://earthobservatory.nasa.gov) project that provides a product suite of daily, monthly and yearly global nighttime lights. This package automates the process of downloading all relevant tiles from the [NASA LAADS archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) to cover a region of interest, converting the raw files (in HDF5 format), to georeferenced rasters, and mosaicing rasters together when needed.
 
+For more information on NASA Black Marble, see:
+
+* [Academic paper](https://www.sciencedirect.com/science/article/pii/S003442571830110X)
+* [X Thread](https://twitter.com/yohaniddawela/status/1734542275630268811)
+* [Webinar](https://appliedsciences.nasa.gov/get-involved/training/english/arset-introduction-nasas-black-marble-night-lights-data)
+
 * [Installation](#installation)
 * [Bearer token](#token)
 * [Usage](#usage)
