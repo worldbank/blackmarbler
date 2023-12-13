@@ -58,6 +58,44 @@ pad3 <- function(x){
 }
 pad3 <- Vectorize(pad3)
 
+apply_scaling_factor <- function(x, variable){
+  # Apply scaling factor to variables according to Black Marble user guide
+  
+  # https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
+  # * Table 3 (page 12)
+  # * Table 6 (page 16)
+  # * Table 9 (page 18)
+  
+  if(variable %in% c(
+    
+    # VNP46A1
+    "DNB_At_Sensor_Radiance",
+    
+    # VNP46A2
+    "DNB_BRDF-Corrected_NTL",
+    "Gap_Filled_DNB_BRDFCorrected_NTL",
+    "DNB_Lunar_Irradiance",
+    
+    # VNP46A3/4
+    "AllAngle_Composite_Snow_Covered",
+    "AllAngle_Composite_Snow_Covered_Std",
+    "AllAngle_Composite_Snow_Free",
+    "AllAngle_Composite_Snow_Free_Std",
+    "NearNadir_Composite_Snow_Covered",
+    "NearNadir_Composite_Snow_Covered_Std",
+    "NearNadir_Composite_Snow_Free",
+    "NearNadir_Composite_Snow_Free_Std",
+    "OffNadir_Composite_Snow_Covered",
+    "OffNadir_Composite_Snow_Covered_Std",
+    "OffNadir_Composite_Snow_Free",
+    "OffNadir_Composite_Snow_Free_Std")
+  ){
+    x <- x * 0.1
+  }
+  
+  return(x)
+}
+
 file_to_raster <- function(f,
                            variable,
                            quality_flag_rm){
@@ -185,6 +223,9 @@ file_to_raster <- function(f,
   
   #assign the extents to the raster
   extent(outr) <- rasExt
+  
+  #apply scaling factor
+  outr <- apply_scaling_factor(outr, variable)
   
   #h5closeAll()
   h5_data$close_all()
@@ -687,6 +728,12 @@ bm_raster <- function(roi_sf,
                       variable = NULL,
                       quality_flag_rm = 255,
                       check_all_tiles_exist = TRUE,
+                      interpol_na = FALSE,
+                      interpol_na_method = "linear",
+                      interpol_na_rule = 1,
+                      interpol_na_f = 0,
+                      interpol_na_z = NULL,
+                      interpol_na_NArule = 1,
                       output_location_type = "memory", # memory, file
                       file_dir = NULL,
                       file_prefix = NULL,
@@ -779,6 +826,16 @@ bm_raster <- function(roi_sf,
     r <- NULL
   }
   
+  # Interpolate ----------------------------------------------------------------
+  if(interpol_na %in% T){
+    r <- approxNA(r,
+                  method = interpol_na_method,
+                  rule   = interpol_na_rule,
+                  f      = interpol_na_f,
+                  z      = interpol_na_z,
+                  NArule = interpol_na_NArule)
+  }
+
   unlink(temp_dir, recursive = T)
   
   return(r)
