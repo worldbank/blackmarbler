@@ -578,7 +578,7 @@ bm_extract <- function(roi_sf,
       paste0("ntl_", names(ntl_df)[names(ntl_df) != "date"])
     
     ntl_df$date <- NULL
-    ntl_df <- bind_cols(ntl_df, n_obs_df)
+    r <- bind_cols(ntl_df, n_obs_df)
     #r <- ntl_df %>%
     #  left_join(n_obs_df, by = "date")
     
