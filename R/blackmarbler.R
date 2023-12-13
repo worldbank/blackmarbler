@@ -566,9 +566,12 @@ bm_extract <- function(roi_sf,
       dplyr::mutate(prop_non_na_pixels = n_non_na_pixels / n_pixels)
     
     ntl_df <- exact_extract(bm_r, roi_sf, aggregation_fun) %>%
-      pivot_longer(cols = everything(),
-                   names_to = c(".value", "date"),
-                   names_sep = "\\.t")
+      tidyr::pivot_longer(cols = everything(),
+                          names_to = c(".value", "date"),
+                          names_sep = "\\.t")
+    
+    names(ntl_df)[names(ntl_df) != "date"] <- 
+      paste0("ntl_", names(ntl_df)[names(ntl_df) != "date"])
     
     r <- ntl_df %>%
       left_join(n_obs_df, by = "date")
