@@ -534,15 +534,17 @@ bm_extract <- function(roi_sf,
                       variable = variable,
                       quality_flag_rm = quality_flag_rm,
                       check_all_tiles_exist = check_all_tiles_exist,
-                      interpol_na = T,
-                      method = method,
-                      rule = rule,
-                      f = f,
-                      ties = ties,
-                      z = z,
-                      NArule = NArule,
+                      interpol_na = F,
                       quiet = quiet,
                       temp_dir = temp_dir)
+    
+    r <- raster::approxNA(r,
+                          method = method,
+                          rule   = rule,
+                          f      = f,
+                          ties   = ties,
+                          z      = z,
+                          NArule = NArule)
     
     #### Extract
     
@@ -919,7 +921,6 @@ bm_raster <- function(roi_sf,
   
   # Interpolate ----------------------------------------------------------------
   if(interpol_na %in% T){
-    print(r)
     r <- raster::approxNA(r,
                           method = method,
                           rule   = rule,
