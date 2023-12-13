@@ -6,6 +6,8 @@ library(sf)
 library(raster)
 library(ggplot2)
 
+devtools::install_github("worldbank/blackmarbler@new-version")
+
 #### Define NASA bearer token
 bearer <- "BEARER-TOKEN-HERE"
 bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
@@ -15,6 +17,99 @@ bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 # in the WGS84 (epsg:4326) coordinate reference system. Here, we use the 
 # getData function to load a polygon of Ghana
 roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
+
+#########
+roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) |> st_as_sf()
+
+ro <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-02-01",
+                        "2021-03-01"),
+               bearer = bearer,
+               quality_flag_rm = c(255,2))
+
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-02-01",
+                        "2021-03-01"),
+               bearer = bearer,
+               interpol_na = T,
+               method = "linear",
+               quality_flag_rm = c(255,2))
+
+bm_r <- raster::approxNA(r)
+
+ro_df <- bm_extract(roi_sf = roi_sf,
+                   product_id = "VNP46A3",
+                   date = c("2021-01-01",
+                            "2021-02-01",
+                            "2021-03-01"),
+                   bearer = bearer,
+                   quality_flag_rm = c(255,2))
+
+r_df <- bm_extract(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-02-01",
+                        "2021-03-01"),
+               bearer = bearer,
+               interpol_na = T,
+               method = "linear",
+               quality_flag_rm = c(255,2))
+
+r_df <- r_df %>%
+  arrange(date, NAME_1)
+
+ro_df <- ro_df %>%
+  arrange(date, NAME_1)
+
+count_n_obs <- function(values, coverage_fraction) {
+  
+  orig_vars <- names(values)
+  
+  values %>%
+    dplyr::mutate(across(orig_vars, ~ as.numeric(!is.na(.)) )) %>%
+    dplyr::summarise(across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
+                     across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
+}
+
+roi_df <- roi_sf %>% st_drop_geometry()
+roi_df$date <- NULL
+
+n_obs_df <- exact_extract(r, roi_sf, count_n_obs) %>%
+  bind_cols(roi_df) %>%
+  tidyr::pivot_longer(cols = -c(names(roi_df)),
+               names_to = c(".value", "date"),
+               names_sep = "\\.t") %>%
+  dplyr::mutate(prop_non_na_pixels = n_non_na_pixels / n_pixels)
+
+
+df <- exact_extract(r, roi_sf, "mean")
+
+df %>%
+  pivot_longer(cols = everything(),
+               names_to = c(".value", "date"),
+               names_sep = "\\.t")
+
+
+
+
+
+r_n_obs <- exact_extract(r, roi_sf, function(values, coverage_fraction)
+  sum(!is.na(values)))
+
+r_n_obs_poss <- exact_extract(r, roi_sf, function(values, coverage_fraction)
+  length(values))
+
+roi_sf$n_pixels           <- r_n_obs_poss
+roi_sf$n_non_na_pixels    <- r_n_obs
+roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
+
+plot(r)
+
+#########
 
 ### Daily data: raster for February 5, 2021
 r_20210205 <- bm_raster(roi_sf = roi_sf,

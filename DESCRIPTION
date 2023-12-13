@@ -18,6 +18,7 @@ Imports:
   dplyr,
   purrr,
   lubridate,
+  tidyr,
   raster,
   sf,
   exactextractr,
