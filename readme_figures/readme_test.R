@@ -59,6 +59,12 @@ r_df <- bm_extract(roi_sf = roi_sf,
                method = "linear",
                quality_flag_rm = c(255,2))
 
+r_df <- r_df %>%
+  arrange(date, NAME_1)
+
+ro_df <- ro_df %>%
+  arrange(date, NAME_1)
+
 count_n_obs <- function(values, coverage_fraction) {
   
   orig_vars <- names(values)
