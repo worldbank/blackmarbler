@@ -435,13 +435,14 @@ define_date_name <- function(date_i, product_id){
 #' - `2`: Gap filled NTL based on historical data
 #' - `255`: Fill value
 #' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
-#' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a raster in R. If `file`, function exports a `.tif` file and returns `NULL`.
-#'
-#' For `output_location_type = file`:
-#' @param file_dir The directory where data should be exported (default: `NULL`, so the working directory will be used)
-#' @param file_prefix Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].tif`
-#' @param file_skip_if_exists Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
+#' @param interpol_na When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
+#' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a dataframe in R. If `file`, function exports a `.csv` file and returns `NULL`.
+#' @param file_dir (If `output_location_type = file`). The directory where data should be exported (default: `NULL`, so the working directory will be used)
+#' @param file_prefix (If `output_location_type = file`). Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].csv`
+#' @param file_skip_if_exists (If `output_location_type = file`). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
+#'
+#' @param ... Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
 #'
 #' @return Raster
 #'
@@ -484,18 +485,14 @@ bm_extract <- function(roi_sf,
                        quality_flag_rm = 255,
                        check_all_tiles_exist = TRUE,
                        interpol_na = FALSE,
-                       interpol_na_method = "linear",
-                       interpol_na_rule = 1,
-                       interpol_na_f = 0,
-                       interpol_na_z = NULL,
-                       interpol_na_NArule = 1,
                        output_location_type = "memory", # memory, file
                        file_dir = NULL,
                        file_prefix = NULL,
                        file_skip_if_exists = TRUE,
-                       quiet = FALSE){
+                       quiet = FALSE,
+                       ...){
   
-  # Errors ---------------------------------------------------------------------
+  # Errors & Warnings ----------------------------------------------------------
   if( (interpol_na == T) & (length(date) == 1) ){
     stop("If interpol_na = TRUE, then must have more than one date")
   }
@@ -503,6 +500,16 @@ bm_extract <- function(roi_sf,
   if( (interpol_na == T) & (output_location_type == "file") ){
     interpol_na <- F
     warning("interpol_na ignored. Interpolation only occurs when output_location_type = 'memory'")
+  }
+  
+  # Assign interpolation variables ---------------------------------------------
+  if(interpol_na == T){
+    if(!exists("method")) method <- "linear"
+    if(!exists("rule"))   rule   <- 1
+    if(!exists("f"))      f      <- 0
+    if(!exists("ties"))   ties   <- mean
+    if(!exists("z"))      z      <- NULL
+    if(!exists("NArule")) NArule <- 1
   }
   
   # Define Tempdir -------------------------------------------------------------
@@ -527,6 +534,13 @@ bm_extract <- function(roi_sf,
                       variable = variable,
                       quality_flag_rm = quality_flag_rm,
                       check_all_tiles_exist = check_all_tiles_exist,
+                      interpol_na = T,
+                      method = method,
+                      rule = rule,
+                      f = f,
+                      ties = ties,
+                      z = z,
+                      NArules = NArule,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
@@ -729,12 +743,14 @@ bm_extract <- function(roi_sf,
 #' - `2`: Gap filled NTL based on historical data
 #' - `255`: Fill value
 #' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
-#' @param interpol_na When data for more than one date is downloaded, whether interpolate NA values using the raster::approxNA function. (Default: `FALSE`).
+#' @param interpol_na When data for more than one date is downloaded, whether to interpolate `NA` values using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_raster` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
+#' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a raster in R. If `file`, function exports a `.tif` file and returns `NULL`.
 #' For `output_location_type = file`:
 #' @param file_dir The directory where data should be exported (default: `NULL`, so the working directory will be used)
 #' @param file_prefix Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].tif`
 #' @param file_skip_if_exists Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
+#' @param ... Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
 #'
 #' @return Raster
 #'
@@ -795,7 +811,7 @@ bm_raster <- function(roi_sf,
                       quiet = FALSE,
                       ...){
   
-  # Errors ---------------------------------------------------------------------
+  # Errors & Warnings ----------------------------------------------------------
   if( (interpol_na == T) & (length(date) == 1) ){
     stop("If interpol_na = TRUE, then must have more than one date")
   }
@@ -905,7 +921,12 @@ bm_raster <- function(roi_sf,
   if(interpol_na %in% T){
     print(r)
     r <- raster::approxNA(r,
-                          method = method)
+                          method = method,
+                          rule   = rule,
+                          f      = f,
+                          ties   = ties,
+                          z      = z,
+                          NArule = NArule)
   }
   
   unlink(temp_dir, recursive = T)

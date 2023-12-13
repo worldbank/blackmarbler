@@ -36,6 +36,7 @@ r <- bm_raster(roi_sf = roi_sf,
                         "2021-03-01"),
                bearer = bearer,
                interpol_na = T,
+               method = "constant",
                quality_flag_rm = c(255,2))
 
 count_n_obs <- function(values, coverage_fraction) {
