@@ -39,6 +39,8 @@ r <- bm_raster(roi_sf = roi_sf,
                method = "linear",
                quality_flag_rm = c(255,2))
 
+bm_r <- raster::approxNA(r)
+
 ro_df <- bm_extract(roi_sf = roi_sf,
                    product_id = "VNP46A3",
                    date = c("2021-01-01",

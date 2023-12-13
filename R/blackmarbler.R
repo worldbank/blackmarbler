@@ -538,8 +538,6 @@ bm_extract <- function(roi_sf,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
-    print(bm_r)
-    
     bm_r <- raster::approxNA(bm_r,
                              method = method,
                              rule   = rule,
@@ -547,8 +545,6 @@ bm_extract <- function(roi_sf,
                              ties   = ties,
                              z      = z,
                              NArule = NArule)
-    
-    print(bm_r)
     
     #### Extract
     
@@ -563,9 +559,10 @@ bm_extract <- function(roi_sf,
                          across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
     }
     
-    n_obs_df <- exact_extract(bm_r = everything(),
-                              names_to = c(".value", "date"),
-                              names_sep = "\\.t") %>%
+    n_obs_df <- exact_extract(bm_r, roi_sf, count_n_obs) %>%
+      tidyr::pivot_longer(cols = everything(),
+                          names_to = c(".value", "date"),
+                          names_sep = "\\.t") %>%
       dplyr::mutate(prop_non_na_pixels = n_non_na_pixels / n_pixels)
     
     ntl_df <- exact_extract(bm_r, roi_sf, aggregation_fun) %>%
