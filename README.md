@@ -288,6 +288,9 @@ Both functions take the following arguments:
     * `2`: Gap filled NTL based on historical data
     * `255`: Fill value
 
+* **check_all_tiles_exist:** Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
+* **interpol_na:** When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_raster`/`bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
+
 * **output_location_type:** Where output should be stored (default: `r_memory`). Either:
 
   * `r_memory` where the function will return an output in R
@@ -295,9 +298,12 @@ Both functions take the following arguments:
 
 If `output_location_type = "file"`, the following arguments can be used:
 
-* **file_dir:** The directory where data should be exported (default: `NULL`, so the working directory will be used)
-* **file_prefix:** Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].[tif/Rds]`
-* **file_skip_if_exists:** Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`). If the function is first run with `date = c(2018, 2019, 2020)`, then is later run with `date = c(2018, 2019, 2020, 2021)`, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.
+  * **file_dir:** The directory where data should be exported (default: `NULL`, so the working directory will be used)
+  * **file_prefix:** Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].[tif/Rds]`
+  * **file_skip_if_exists:** Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`). If the function is first run with `date = c(2018, 2019, 2020)`, then is later run with `date = c(2018, 2019, 2020, 2021)`, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.
+  
+* **...:** Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
+
 
 ### Argument for `bm_extract` only <a name="args-extract">
 
