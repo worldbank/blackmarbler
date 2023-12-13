@@ -538,13 +538,17 @@ bm_extract <- function(roi_sf,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
+    print(bm_r)
+    
     bm_r <- raster::approxNA(bm_r,
-                          method = method,
-                          rule   = rule,
-                          f      = f,
-                          ties   = ties,
-                          z      = z,
-                          NArule = NArule)
+                             method = method,
+                             rule   = rule,
+                             f      = f,
+                             ties   = ties,
+                             z      = z,
+                             NArule = NArule)
+    
+    print(bm_r)
     
     #### Extract
     
@@ -794,6 +798,7 @@ bm_extract <- function(roi_sf,
 #' @import stringr
 #' @import httr
 #' @import lubridate
+#' @import tidyr
 #' @rawNamespace import(purrr, except = c(flatten_df, values))
 #' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head, values))
 #' 
