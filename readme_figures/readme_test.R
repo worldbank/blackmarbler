@@ -39,6 +39,24 @@ r <- bm_raster(roi_sf = roi_sf,
                method = "linear",
                quality_flag_rm = c(255,2))
 
+ro_df <- bm_extract(roi_sf = roi_sf,
+                   product_id = "VNP46A3",
+                   date = c("2021-01-01",
+                            "2021-02-01",
+                            "2021-03-01"),
+                   bearer = bearer,
+                   quality_flag_rm = c(255,2))
+
+r_df <- bm_extract(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-02-01",
+                        "2021-03-01"),
+               bearer = bearer,
+               interpol_na = T,
+               method = "linear",
+               quality_flag_rm = c(255,2))
+
 count_n_obs <- function(values, coverage_fraction) {
   
   orig_vars <- names(values)

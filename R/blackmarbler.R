@@ -540,7 +540,7 @@ bm_extract <- function(roi_sf,
                       f = f,
                       ties = ties,
                       z = z,
-                      NArules = NArule,
+                      NArule = NArule,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
