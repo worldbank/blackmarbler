@@ -397,6 +397,18 @@ define_date_name <- function(date_i, product_id){
   return(date_name_i)
 }
 
+
+count_n_obs <- function(values, coverage_fraction) {
+  ## Function to count observations, for exact_extract
+  
+  orig_vars <- names(values)
+  
+  values %>%
+    dplyr::mutate(across(orig_vars, ~ as.numeric(!is.na(.)) )) %>%
+    dplyr::summarise(across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
+                     across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
+}
+
 #' Extract and Aggregate Black Marble Data
 #'
 #' Extract and aggregate nighttime lights data from [NASA Black Marble data](https://blackmarble.gsfc.nasa.gov/)
@@ -547,18 +559,6 @@ bm_extract <- function(roi_sf,
                              NArule = NArule)
     
     #### Extract
-    
-    ## Function to count observations
-    count_n_obs <- function(values, coverage_fraction) {
-      
-      orig_vars <- names(values)
-      
-      values %>%
-        dplyr::mutate(across(orig_vars, ~ as.numeric(!is.na(.)) )) %>%
-        dplyr::summarise(across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
-                         across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
-    }
-    
     roi_df <- roi_sf %>% st_drop_geometry()
     roi_df$date <- NULL
     
@@ -567,7 +567,7 @@ bm_extract <- function(roi_sf,
       tidyr::pivot_longer(cols = -c(names(roi_df)),
                           names_to = c(".value", "date"),
                           names_sep = "\\.t") %>%
-      dplyr::mutate(prop_non_na_pixels = n_non_na_pixels / n_pixels)
+      dplyr::mutate(prop_non_na_pixels = .data$n_non_na_pixels / .data$n_pixels)
     
     ntl_df <- exact_extract(bm_r, roi_sf, aggregation_fun) %>%
       tidyr::pivot_longer(cols = everything(),
@@ -804,7 +804,7 @@ bm_extract <- function(roi_sf,
 #' @import stringr
 #' @import httr
 #' @import lubridate
-#' @import tidyr
+#' @rawNamespace import(tidyr, except = c(extract))
 #' @rawNamespace import(purrr, except = c(flatten_df, values))
 #' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head, values))
 #' 

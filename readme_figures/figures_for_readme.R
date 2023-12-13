@@ -7,6 +7,7 @@ if(F){
   library(ggplot2)
   library(dplyr)
   library(sf)
+  library(raster)
   
   # Setup ------------------------------------------------------------------------
   bearer <- read_csv("~/Desktop/bearer_bm.csv") %>%
@@ -32,8 +33,6 @@ if(F){
   names(r_df) <- c("value", "x", "y")
   
   ## Transform NTL
-  r_df$value[r_df$value <= 1] <- 0
-  
   r_df$value_adj <- log(r_df$value+1)
   
   ##### Map 
@@ -44,7 +43,7 @@ if(F){
     scale_fill_gradient2(low = "black",
                          mid = "yellow",
                          high = "red",
-                         midpoint = 4.5) +
+                         midpoint = 3.1) +
     labs(title = "Nighttime Lights: October 2021") +
     coord_quickmap() + 
     theme_void() +
@@ -58,7 +57,7 @@ if(F){
   # Extract timeseries -----------------------------------------------------------
   ntl_df <- bm_extract(roi_sf = roi_sf,
                        product_id = "VNP46A4",
-                       date = 2012:2021,
+                       date = 2012:2022,
                        bearer = bearer,
                        aggregation_fun = c("mean"))
   
