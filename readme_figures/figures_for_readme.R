@@ -61,7 +61,7 @@ if(F){
                        bearer = bearer,
                        aggregation_fun = c("mean"))
   
-  ntl_df %>%
+  p <- ntl_df %>%
     ggplot() +
     geom_col(aes(x = date,
                  y = ntl_mean),
