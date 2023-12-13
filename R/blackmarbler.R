@@ -538,7 +538,7 @@ bm_extract <- function(roi_sf,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
-    r <- raster::approxNA(r,
+    bm_r <- raster::approxNA(bm_r,
                           method = method,
                           rule   = rule,
                           f      = f,
