@@ -62,11 +62,13 @@
 <span>  variable <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quality_flag_rm <span class="op">=</span> <span class="fl">255</span>,</span>
 <span>  check_all_tiles_exist <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  interpol_na <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  output_location_type <span class="op">=</span> <span class="st">"memory"</span>,</span>
 <span>  file_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file_prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file_skip_if_exists <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -120,9 +122,13 @@ For information on other variable choices, see <a href="https://ladsweb.modaps.e
 <dd><p>Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If <code>TRUE</code>, skips cases where not all tiles are available. (Default: <code>TRUE</code>).</p></dd>
 
 
+<dt>interpol_na</dt>
+<dd><p>When data for more than one date is downloaded, whether to interpolate <code>NA</code> values using the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function. Additional arguments for the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function can also be passed into <code>bm_raster</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></dd>
+
+
 <dt>output_location_type</dt>
-<dd><p>Where to produce output; either <code>memory</code> or <code>file</code>. If <code>memory</code>, functions returns a raster in R. If <code>file</code>, function exports a <code>.tif</code> file and returns <code>NULL</code>.</p>
-<p>For <code>output_location_type = file</code>:</p></dd>
+<dd><p>Where to produce output; either <code>memory</code> or <code>file</code>. If <code>memory</code>, functions returns a raster in R. If <code>file</code>, function exports a <code>.tif</code> file and returns <code>NULL</code>.
+For <code>output_location_type = file</code>:</p></dd>
 
 
 <dt>file_dir</dt>
@@ -139,6 +145,10 @@ For information on other variable choices, see <a href="https://ladsweb.modaps.e
 
 <dt>quiet</dt>
 <dd><p>Suppress output that show downloading progress and other messages. (Default: <code>FALSE</code>).</p></dd>
+
+
+<dt>...</dt>
+<dd><p>Additional arguments for <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code>, if <code>interpol_na = TRUE</code></p></dd>
 
 </dl></div>
     <div class="section level2">

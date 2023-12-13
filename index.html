@@ -114,7 +114,7 @@
 <p>To install the development version from Github:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
-<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"dime-worldbank/blackmarbler"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"worldbank/blackmarbler"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="bearer-token-">Bearer Token <a name="token"></a>
@@ -395,6 +395,8 @@
 </li>
 </ul>
 </li>
+<li><p><strong>check_all_tiles_exist:</strong> Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If <code>TRUE</code>, skips cases where not all tiles are available. (Default: <code>TRUE</code>).</p></li>
+<li><p><strong>interpol_na:</strong> When data for more than one date is downloaded, whether to interpolate <code>NA</code> values in rasters using the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function. Additional arguments for the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function can also be passed into <code>bm_raster</code>/<code>bm_extract</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></li>
 <li>
 <p><strong>output_location_type:</strong> Where output should be stored (default: <code>r_memory</code>). Either:</p>
 <ul>
@@ -407,13 +409,10 @@
 </ul>
 <p>If <code>output_location_type = "file"</code>, the following arguments can be used:</p>
 <ul>
-<li>
-<strong>file_dir:</strong> The directory where data should be exported (default: <code>NULL</code>, so the working directory will be used)</li>
-<li>
-<strong>file_prefix:</strong> Prefix to add to the file to be saved. The file will be saved as the following: <code>[file_prefix][product_id]_t[date].[tif/Rds]</code>
-</li>
-<li>
-<strong>file_skip_if_exists:</strong> Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>). If the function is first run with <code>date = c(2018, 2019, 2020)</code>, then is later run with <code>date = c(2018, 2019, 2020, 2021)</code>, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.</li>
+<li><p><strong>file_dir:</strong> The directory where data should be exported (default: <code>NULL</code>, so the working directory will be used)</p></li>
+<li><p><strong>file_prefix:</strong> Prefix to add to the file to be saved. The file will be saved as the following: <code>[file_prefix][product_id]_t[date].[tif/Rds]</code></p></li>
+<li><p><strong>file_skip_if_exists:</strong> Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>). If the function is first run with <code>date = c(2018, 2019, 2020)</code>, then is later run with <code>date = c(2018, 2019, 2020, 2021)</code>, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.</p></li>
+<li><p><strong>…:</strong> Additional arguments for <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code>, if <code>interpol_na = TRUE</code></p></li>
 </ul>
 </div>
 <div class="section level3">
