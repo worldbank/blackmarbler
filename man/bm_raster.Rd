@@ -12,11 +12,13 @@ bm_raster(
   variable = NULL,
   quality_flag_rm = 255,
   check_all_tiles_exist = TRUE,
+  interpol_na = FALSE,
   output_location_type = "memory",
   file_dir = NULL,
   file_prefix = NULL,
   file_skip_if_exists = TRUE,
-  quiet = FALSE
+  quiet = FALSE,
+  ...
 )
 }
 \arguments{
@@ -67,8 +69,9 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 
 \item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}
 
-\item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a raster in R. If \code{file}, function exports a \code{.tif} file and returns \code{NULL}.
+\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate \code{NA} values using the \code{raster::approxNA} function. Additional arguments for the \code{raster::approxNA} function can also be passed into \code{bm_raster} (eg, \code{method}, \code{rule}, \code{f}, \code{ties}, \code{z}, \code{NA_rule}). (Default: \code{FALSE}).}
 
+\item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a raster in R. If \code{file}, function exports a \code{.tif} file and returns \code{NULL}.
 For \code{output_location_type = file}:}
 
 \item{file_dir}{The directory where data should be exported (default: \code{NULL}, so the working directory will be used)}
@@ -78,6 +81,8 @@ For \code{output_location_type = file}:}
 \item{file_skip_if_exists}{Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
 
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
+
+\item{...}{Additional arguments for \code{raster::approxNA}, if \code{interpol_na = TRUE}}
 }
 \value{
 Raster
