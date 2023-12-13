@@ -197,6 +197,8 @@ ntl_df |>
   labs(x = NULL,
        y = "NTL Luminosity",
        title = "Ghana Admin Level 1: Annual Average Nighttime Lights") +
+  scale_x_continuous(labels = seq(2012, 2022, 4),
+                     breaks = seq(2012, 2022, 4)) +
   theme_minimal() +
   theme(strip.text = element_text(face = "bold"))
 ```
