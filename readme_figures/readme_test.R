@@ -6,6 +6,8 @@ library(sf)
 library(raster)
 library(ggplot2)
 
+devtools::install_github("worldbank/blackmarbler@new-version")
+
 #### Define NASA bearer token
 bearer <- "BEARER-TOKEN-HERE"
 bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
@@ -15,6 +17,29 @@ bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 # in the WGS84 (epsg:4326) coordinate reference system. Here, we use the 
 # getData function to load a polygon of Ghana
 roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
+
+#########
+roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) |> st_as_sf()
+
+ro <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-02-01",
+                        "2021-03-01"),
+               bearer = bearer,
+               quality_flag_rm = c(255,2))
+
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01",
+                        "2021-01-02"),
+               bearer = bearer,
+               interpol_na = T,
+               quality_flag_rm = c(255,2))
+
+plot(r)
+
+#########
 
 ### Daily data: raster for February 5, 2021
 r_20210205 <- bm_raster(roi_sf = roi_sf,

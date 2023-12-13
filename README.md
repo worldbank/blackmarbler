@@ -41,7 +41,7 @@ To install the development version from Github:
 
 ```r
 # install.packages("devtools")
-devtools::install_github("dime-worldbank/blackmarbler")
+devtools::install_github("worldbank/blackmarbler")
 ```
 
 ## Bearer Token <a name="token">

@@ -740,6 +740,11 @@ bm_raster <- function(roi_sf,
                       file_skip_if_exists = TRUE,
                       quiet = FALSE){
   
+  # Errors ---------------------------------------------------------------------
+  if( (interpol_na == T) & (length(date) == 1) ){
+    stop("If interpol_na = TRUE, then must have more than one date")
+  }
+  
   # Define Tempdir -------------------------------------------------------------
   temp_main_dir = tempdir()
   
