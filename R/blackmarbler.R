@@ -562,7 +562,7 @@ bm_extract <- function(roi_sf,
     roi_df <- roi_sf %>% st_drop_geometry()
     roi_df$date <- NULL
     
-    n_obs_df <- exact_extract(r, roi_sf, count_n_obs) %>%
+    n_obs_df <- exact_extract(bm_r, roi_sf, count_n_obs) %>%
       bind_cols(roi_df) %>%
       tidyr::pivot_longer(cols = -c(names(roi_df)),
                           names_to = c(".value", "date"),
