@@ -11,7 +11,7 @@
 
 <!-- badges: end -->
 
-**BlackMarbleR** provides a simple and efficient way to retrieve and extract nighttime lights data from NASA's Black Marble project. [Black Marble](https://blackmarble.gsfc.nasa.gov) is a [NASA Earth Observatory](https://earthobservatory.nasa.gov) project that provides a product suite of daily, monthly and yearly global nighttime lights. This package automates the process of downloading all relevant tiles from the [NASA LAADS archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) to cover a region of interest, converting the raw files (in HDF5 format), to georeferenced rasters, and mosaicing rasters together when needed.
+**BlackMarbleR** is a R package that provides a simple way to use nighttime lights data from NASA's Black Marble. [Black Marble](https://blackmarble.gsfc.nasa.gov) is a [NASA Earth Science Data Systems (ESDS)](https://www.earthdata.nasa.gov) project that provides a product suite of daily, monthly and yearly global [nighttime lights](https://www.earthdata.nasa.gov/learn/backgrounders/nighttime-lights). This package automates the process of downloading all relevant tiles from the [NASA LAADS DAAC](https://www.earthdata.nasa.gov/eosdis/daacs/laads) to cover a region of interest, converting and mosaicing the raw files (in HDF5 format) to georeferenced rasters.
 
 * [Installation](#installation)
 * [Bearer token](#token)
@@ -300,12 +300,11 @@ Both functions take the following arguments:
 
 If `output_location_type = "file"`, the following arguments can be used:
 
-  * **file_dir:** The directory where data should be exported (default: `NULL`, so the working directory will be used)
-  * **file_prefix:** Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].[tif/Rds]`
-  * **file_skip_if_exists:** Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`). If the function is first run with `date = c(2018, 2019, 2020)`, then is later run with `date = c(2018, 2019, 2020, 2021)`, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.
+* **file_dir:** The directory where data should be exported (default: `NULL`, so the working directory will be used)
+* **file_prefix:** Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].[tif/Rds]`
+* **file_skip_if_exists:** Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`). If the function is first run with `date = c(2018, 2019, 2020)`, then is later run with `date = c(2018, 2019, 2020, 2021)`, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.
   
 * **...:** Additional arguments for [`raster::approxNA`](https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA), if `interpol_na = TRUE`
-
 
 ### Argument for `bm_extract` only <a name="args-extract">
 
@@ -319,4 +318,3 @@ For more information on NASA Black Marble, see:
 * [Academic paper](https://www.sciencedirect.com/science/article/pii/S003442571830110X)
 * [X Thread](https://twitter.com/yohaniddawela/status/1734542275630268811)
 * [Webinar](https://appliedsciences.nasa.gov/get-involved/training/english/arset-introduction-nasas-black-marble-night-lights-data)
-
