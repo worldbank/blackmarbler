@@ -83,7 +83,8 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
                    product_id = "VNP46A2",
                    date = "2023-01-01",
                    bearer = bearer,
-                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL")
+                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                   quality = NULL)
 ```
 
 <details>
@@ -181,8 +182,6 @@ For daily data, the quality values are:
 
 * 2: Poor-quality, Outlier, potential cloud contamination, or other issues
 
-* 255: No retrieval, Fill value (masked out on ingestion)
-
 We can map quality by using the `Mandatory_Quality_Flag` variable.
 
 ```{r, results='hide'}
@@ -206,8 +205,7 @@ quality_df <- quality_df %>%
   dplyr::mutate(value_str = case_when(
     value == 0 ~ "0: High-quality, persistent",
     value == 1 ~ "1: High-quality, ephemeral",
-    value == 2 ~ "2: Poor-quality",
-    value == 255 ~ "255: Fill value"
+    value == 2 ~ "2: Poor-quality"
   ))
 
 ##### Map 
@@ -228,7 +226,7 @@ ggplot() +
 
 #### Nighttime lights for good quality observations <a name="daily-goodq"></a>
 
-The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, only pixels with a value of `255` are filtered out. However, if we only want data for good quality pixels, we can adjust the `quality_flag_rm` parameter.
+The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, no pixels are filtered out (except for those that are assigned a "fill value" by BlackMarble, which are always removed). However, if we only want data for good quality pixels, we can adjust the `quality_flag_rm` parameter.
 
 ```{r, results='hide'}
 ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
@@ -236,7 +234,7 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              date = "2023-01-01",
                              bearer = bearer,
                              variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
-                             quality_flag_rm = c(2, 255))
+                             quality_flag_rm = 2)
 ```
 
 <details>
@@ -316,7 +314,7 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
                    date = "2023-01-01",
                    bearer = bearer,
                    variable = "DNB_BRDF-Corrected_NTL",
-                   quality_flag_rm = c(2, 255))
+                   quality_flag_rm = 2)
 ```
 
 <details>
@@ -446,8 +444,6 @@ For monthly and annual data, the quality values are:
 
 * 2: Gap filled NTL based on historical data
 
-* 255: Fill value
-
 We can map quality by adding `_Quality` to the variable name.
 
 ```{r, results='hide'}
@@ -471,8 +467,7 @@ quality_df <- quality_df %>%
   dplyr::mutate(value_str = case_when(
     value == 0 ~ "0: Good quality",
     value == 1 ~ "1: Poor quality",
-    value == 2 ~ "2: Gap filled",
-    value == 255 ~ "255: Fill value"
+    value == 2 ~ "2: Gap filled"
   ))
 
 ##### Map 
@@ -493,7 +488,7 @@ ggplot() +
 
 #### Nighttime lights for good quality observations <a name="ma-ntl_gq"></a>
 
-The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, only pixels with a value of `255` are filtered out. However, if we also want to remove poor quality pixels, we can adjust the `quality_flag_rm` parameter.
+The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, no pixels are filtered out (except for those that are assigned a "fill value" by BlackMarble, which are always removed). However, if we also want to remove poor quality pixels, we can adjust the `quality_flag_rm` parameter.
 
 ```{r, results='hide'}
 ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
@@ -501,7 +496,7 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              date = "2023-01-01",
                              bearer = bearer,
                              variable = "NearNadir_Composite_Snow_Free",
-                             quality_flag_rm = c(1, 255))
+                             quality_flag_rm = 1)
 ```
 
 <details>

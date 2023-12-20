@@ -59,42 +59,93 @@ pad3 <- function(x){
 pad3 <- Vectorize(pad3)
 
 remove_fill_value <- function(x, variable){
-  # Apply scaling factor to variables according to Black Marble user guide
+  # Remove fill values
   
   # https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
   # * Table 3 (page 12)
   # * Table 6 (page 16)
   # * Table 9 (page 18)
   
+  #### 255
   if(variable %in% c(
-    
-    # VNP46A1
-    "DNB_At_Sensor_Radiance",
-    
-    # VNP46A2
-    "DNB_BRDF-Corrected_NTL",
-    "Gap_Filled_DNB_BRDF-Corrected_NTL",
-    "DNB_Lunar_Irradiance",
-    
-    # VNP46A3/4
-    "AllAngle_Composite_Snow_Covered",
-    "AllAngle_Composite_Snow_Covered_Std",
-    "AllAngle_Composite_Snow_Free",
-    "AllAngle_Composite_Snow_Free_Std",
-    "NearNadir_Composite_Snow_Covered",
-    "NearNadir_Composite_Snow_Covered_Std",
-    "NearNadir_Composite_Snow_Free",
-    "NearNadir_Composite_Snow_Free_Std",
-    "OffNadir_Composite_Snow_Covered",
-    "OffNadir_Composite_Snow_Covered_Std",
-    "OffNadir_Composite_Snow_Free",
-    "OffNadir_Composite_Snow_Free_Std")
-  ){
-    
-    x[][x[] == 65535] <- NA
-    
+    "Granule",
+    "Mandatory_Quality_Flag",
+    "Latest_High_Quality_Retrieval",
+    "Snow_Flag",
+    "DNB_Platform",
+    "Land_Water_Mask",
+    "AllAngle_Composite_Snow_Covered_Quality",
+    "AllAngle_Composite_Snow_Free_Quality",
+    "NearNadir_Composite_Snow_Covered_Quality",
+    "NearNadir_Composite_Snow_Free_Quality",
+    "OffNadir_Composite_Snow_Covered_Quality",
+    "OffNadir_Composite_Snow_Free_Quality"
+  )){
+    x[][x[] == 255] <- NA
   }
   
+  #### -999.9 
+  if(variable %in% c("UTC_Time")){
+    x[][x[] == -999.9] <- NA
+  }
+  
+  #### -32768 
+  if(variable %in% c("Sensor_Azimuth",
+                     "Sensor_Zenith",
+                     "Solar_Azimuth",
+                     "Solar_Zenith",
+                     "Lunar_Azimuth",
+                     "Lunar_Zenith",
+                     "Glint_Angle",
+                     "Moon_Illumination_Fraction",
+                     "Moon_Phase_Angle")){
+    x[][x[] == -32768] <- NA
+  }
+  
+  
+  #### 65535
+  if(variable %in% c(
+    "DNB_At_Sensor_Radiance_500m",
+    "BrightnessTemperature_M12",
+    "BrightnessTemperature_M13",
+    "BrightnessTemperature_M15",
+    "BrightnessTemperature_M16",
+    "QF_Cloud_Mask",
+    "QF_DNB",
+    "QF_VIIRS_M10",
+    "QF_VIIRS_M11",
+    "QF_VIIRS_M12",
+    "QF_VIIRS_M13",
+    "QF_VIIRS_M15",
+    "QF_VIIRS_M16",
+    "Radiance_M10",
+    "Radiance_M11",
+    "QF_Cloud_Mask",
+    "DNB_BRDF-Corrected_NTL",
+    "DNB_Lunar_Irradiance",
+    "Gap_Filled_DNB_BRDF-Corrected_NTL",
+    "AllAngle_Composite_Snow_Covered",
+    "AllAngle_Composite_Snow_Covered_Num",
+    "AllAngle_Composite_Snow_Free",
+    "AllAngle_Composite_Snow_Free_Num",
+    "NearNadir_Composite_Snow_Covered",
+    "NearNadir_Composite_Snow_Covered_Num",
+    "NearNadir_Composite_Snow_Free",
+    "NearNadir_Composite_Snow_Free_Num",
+    "OffNadir_Composite_Snow_Covered",
+    "OffNadir_Composite_Snow_Covered_Num",
+    "OffNadir_Composite_Snow_Free",
+    "OffNadir_Composite_Snow_Free_Num",
+    "AllAngle_Composite_Snow_Covered_Std",
+    "AllAngle_Composite_Snow_Free_Std",
+    "NearNadir_Composite_Snow_Covered_Std",
+    "NearNadir_Composite_Snow_Free_Std",
+    "OffNadir_Composite_Snow_Covered_Std",
+    "OffNadir_Composite_Snow_Free_Std"
+  )){
+    x[][x[] == 65535] <- NA
+  }
+
   return(x)
 }
 
@@ -187,10 +238,10 @@ file_to_raster <- function(f,
       }
     }
     
-    # Above doesn't fully capture
-    if(variable %in% "Latest_High_Quality_Retrieval"){
-      out[out == 255] <- NA
-    }
+    # # Above doesn't fully capture
+    # if(variable %in% "Latest_High_Quality_Retrieval"){
+    #   out[out == 255] <- NA
+    # }
     
     #### Monthly/Annually
   } else{
@@ -476,21 +527,19 @@ count_n_obs <- function(values, coverage_fraction) {
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
 #' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
 #' For information on other variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
-#' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `c(255)`).
+#' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `NULL`).
 #'
 #'
 #' For `VNP46A1` and `VNP46A2` (daily data):
 #' - `0`: High-quality, Persistent nighttime lights
 #' - `1`: High-quality, Ephemeral nighttime Lights
 #' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
-#' - `255`: No retrieval, Fill value (masked out on ingestion)
 #'
 #'
 #' For `VNP46A3` and `VNP46A4` (monthly and annual data):
 #' - `0`: Good-quality, The number of observations used for the composite is larger than 3
 #' - `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
 #' - `2`: Gap filled NTL based on historical data
-#' - `255`: Fill value
 #' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
 #' @param interpol_na When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
 #' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a dataframe in R. If `file`, function exports a `.csv` file and returns `NULL`.
@@ -539,7 +588,7 @@ bm_extract <- function(roi_sf,
                        aggregation_fun = c("mean"),
                        add_n_pixels = TRUE,
                        variable = NULL,
-                       quality_flag_rm = 255,
+                       quality_flag_rm = NULL,
                        check_all_tiles_exist = TRUE,
                        interpol_na = FALSE,
                        output_location_type = "memory", # memory, file
@@ -784,21 +833,19 @@ bm_extract <- function(roi_sf,
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
 #' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
 #' For information on other variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
-#' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `c(255)`).
+#' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `NULL`).
 #'
 #'
 #' For `VNP46A1` and `VNP46A2` (daily data):
 #' - `0`: High-quality, Persistent nighttime lights
 #' - `1`: High-quality, Ephemeral nighttime Lights
 #' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
-#' - `255`: No retrieval, Fill value (masked out on ingestion)
 #'
 #'
 #' For `VNP46A3` and `VNP46A4` (monthly and annual data):
 #' - `0`: Good-quality, The number of observations used for the composite is larger than 3
 #' - `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
 #' - `2`: Gap filled NTL based on historical data
-#' - `255`: Fill value
 #' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
 #' @param interpol_na When data for more than one date is downloaded, whether to interpolate `NA` values using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_raster` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
 #' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a raster in R. If `file`, function exports a `.tif` file and returns `NULL`.
@@ -859,7 +906,7 @@ bm_raster <- function(roi_sf,
                       date,
                       bearer,
                       variable = NULL,
-                      quality_flag_rm = 255,
+                      quality_flag_rm = NULL,
                       check_all_tiles_exist = TRUE,
                       interpol_na = FALSE,
                       output_location_type = "memory", # memory, file
