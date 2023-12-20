@@ -91,7 +91,7 @@ remove_fill_value <- function(x, variable){
     "OffNadir_Composite_Snow_Free_Std")
   ){
     
-    if(x %in% 65535) x <- NA
+    x[][x[] == 65535] <- NA
     
   }
   
