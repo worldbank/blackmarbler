@@ -159,7 +159,8 @@ data.</p>
 <span>                   product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
 <span>                   date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                   variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span><span class="op">)</span></span></code></pre></div>
+<span>                   variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span>,</span>
+<span>                   quality <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -207,9 +208,9 @@ non-<code>NA</code> pixels.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_pixel_num</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 282934</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 122035</span></span>
+<span><span class="co">#&gt; [1] 282934</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span> <span class="op">/</span> <span class="va">n_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 0.4313197</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
 <p>By default, the <code>bm_extract</code> function computes these
 values:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -254,7 +255,6 @@ Show code to produce figure
 <li><p>1: High-quality, Ephemeral nighttime Lights</p></li>
 <li><p>2: Poor-quality, Outlier, potential cloud contamination, or other
 issues</p></li>
-<li><p>255: No retrieval, Fill value (masked out on ingestion)</p></li>
 </ul>
 <p>We can map quality by using the <code>Mandatory_Quality_Flag</code>
 variable.</p>
@@ -277,8 +277,7 @@ Show code to produce map
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value_str <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="st">"0: High-quality, persistent"</span>,</span>
 <span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"1: High-quality, ephemeral"</span>,</span>
-<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2: Poor-quality"</span>,</span>
-<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">255</span> <span class="op">~</span> <span class="st">"255: Fill value"</span></span>
+<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2: Poor-quality"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">##### Map </span></span>
@@ -299,8 +298,9 @@ Show code to produce map
 </h4>
 <p>The <code>quality_flag_rm</code> parameter determines which pixels
 are set to <code>NA</code> based on the quality indicator. By default,
-only pixels with a value of <code>255</code> are filtered out. However,
-if we only want data for good quality pixels, we can adjust the
+no pixels are filtered out (except for those that are assigned a “fill
+value” by BlackMarble, which are always removed). However, if we only
+want data for good quality pixels, we can adjust the
 <code>quality_flag_rm</code> parameter.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_good_qual_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
@@ -308,7 +308,7 @@ if we only want data for good quality pixels, we can adjust the
 <span>                             date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                             bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
 <span>                             variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span>,</span>
-<span>                             quality_flag_rm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">255</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                             quality_flag_rm <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
@@ -382,7 +382,7 @@ quality pixels.</p>
 <span>                   date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
 <span>                   variable <span class="op">=</span> <span class="st">"DNB_BRDF-Corrected_NTL"</span>,</span>
-<span>                   quality_flag_rm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">255</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                   quality_flag_rm <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
@@ -505,7 +505,6 @@ composite is larger than 3</p></li>
 <li><p>1: Poor-quality, The number of observations used for the
 composite is less than or equal to 3</p></li>
 <li><p>2: Gap filled NTL based on historical data</p></li>
-<li><p>255: Fill value</p></li>
 </ul>
 <p>We can map quality by adding <code>_Quality</code> to the variable
 name.</p>
@@ -528,8 +527,7 @@ Show code to produce map
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>value_str <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">0</span> <span class="op">~</span> <span class="st">"0: Good quality"</span>,</span>
 <span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"1: Poor quality"</span>,</span>
-<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2: Gap filled"</span>,</span>
-<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">255</span> <span class="op">~</span> <span class="st">"255: Fill value"</span></span>
+<span>    <span class="va">value</span> <span class="op">==</span> <span class="fl">2</span> <span class="op">~</span> <span class="st">"2: Gap filled"</span></span>
 <span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co">##### Map </span></span>
@@ -550,8 +548,9 @@ Show code to produce map
 </h4>
 <p>The <code>quality_flag_rm</code> parameter determines which pixels
 are set to <code>NA</code> based on the quality indicator. By default,
-only pixels with a value of <code>255</code> are filtered out. However,
-if we also want to remove poor quality pixels, we can adjust the
+no pixels are filtered out (except for those that are assigned a “fill
+value” by BlackMarble, which are always removed). However, if we also
+want to remove poor quality pixels, we can adjust the
 <code>quality_flag_rm</code> parameter.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_good_qual_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
@@ -559,7 +558,7 @@ if we also want to remove poor quality pixels, we can adjust the
 <span>                             date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                             bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
 <span>                             variable <span class="op">=</span> <span class="st">"NearNadir_Composite_Snow_Free"</span>,</span>
-<span>                             quality_flag_rm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">255</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>                             quality_flag_rm <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
