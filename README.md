@@ -317,6 +317,6 @@ If `output_location_type = "file"`, the following arguments can be used:
 For more information on NASA Black Marble, see:
 
 * [Academic paper](https://www.sciencedirect.com/science/article/pii/S003442571830110X)
-* [X Thread](https://twitter.com/yohaniddawela/status/1734542275630268811)
+* [Substack Post](https://yohaniddawela.substack.com/p/not-all-nightlight-datasets-are-the)
 * [Webinar](https://appliedsciences.nasa.gov/get-involved/training/english/arset-introduction-nasas-black-marble-night-lights-data)
 
