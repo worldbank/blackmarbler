@@ -369,7 +369,7 @@
 </ul>
 </li>
 <li>
-<p><strong>quality_flag_rm:</strong> Quality flag values to use to set values to <code>NA</code>. Each pixel has a quality flag value, where low quality values can be removed. Values are set to <code>NA</code> for each value in ther <code>quality_flag_rm</code> vector. (Default: <code>c(255)</code>).</p>
+<p><strong>quality_flag_rm:</strong> Quality flag values to use to set values to <code>NA</code>. Each pixel has a quality flag value, where low quality values can be removed. Values are set to <code>NA</code> for each value in ther <code>quality_flag_rm</code> vector. (Default: <code>NULL</code>).</p>
 <ul>
 <li>For <code>VNP46A1</code> and <code>VNP46A2</code> (daily data):
 <ul>
@@ -379,8 +379,6 @@
 <code>1</code>: High-quality, Ephemeral nighttime Lights</li>
 <li>
 <code>2</code>: Poor-quality, Outlier, potential cloud contamination, or other issues</li>
-<li>
-<code>255</code>: No retrieval, Fill value (masked out on ingestion)</li>
 </ul>
 </li>
 <li>For <code>VNP46A3</code> and <code>VNP46A4</code> (monthly and annual data):
@@ -391,8 +389,6 @@
 <code>1</code>: Poor-quality, The number of observations used for the composite is less than or equal to 3</li>
 <li>
 <code>2</code>: Gap filled NTL based on historical data</li>
-<li>
-<code>255</code>: Fill value</li>
 </ul>
 </li>
 </ul>
@@ -471,7 +467,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Robert Marty <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3164-3813" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Gabriel Stefanini Vicente <br><small class="roles"> Author </small>  </li>
+<li>Gabriel Stefanini Vicente <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-6530-3780" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 

@@ -99,12 +99,12 @@ data.</p>
 <li>
 <a href="#daily">Daily data</a>
 <ul>
-<li><a href="#daily-ntl">Nighttime lights</a></li>
+<li><a href="#daily-ntl-gap">Nighttime lights: Gap Filled</a></li>
+<li><a href="#daily-ntl-nongap">Nighttime lights: Non Gap
+Filled</a></li>
 <li><a href="#daily-quality">Quality flag</a></li>
 <li><a href="#daily-goodq">Nighttime lights using good quality
 observations</a></li>
-<li><a href="#daily-nogap">Nighttime lights using good quality
-observations without gap filling</a></li>
 </ul>
 </li>
 <li>
@@ -147,20 +147,20 @@ for this example, we use Switzerland.</p>
 <p>Below shows an example examining quality for daily data
 (<code>VNP46A2</code>).</p>
 <div class="section level4">
-<h4 id="nighttime-lights">Nighttime Lights <a name="daily-ntl"></a><a class="anchor" aria-label="anchor" href="#nighttime-lights"></a>
+<h4 id="gap-filled-nighttime-lights">Gap filled nighttime lights <a name="daily-ntl-gap"></a><a class="anchor" aria-label="anchor" href="#gap-filled-nighttime-lights"></a>
 </h4>
 <p>We download data for January 1st, 2023. When the
 <code>variable</code> parameter is not specified, <code>bm_raster</code>
 creates a raster using the
-<code>Gap_Filled_DNB_BRDF-Corrected_NTL</code> variable for daily
-data.</p>
+<code>Gap_Filled_DNB_BRDF-Corrected_NTL</code> variable for daily data.
+This variable “gap fills” poor quality observations (ie, pixels with
+cloud cover) using data from previous days.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                   product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
 <span>                   date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                   variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span>,</span>
-<span>                   quality <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<span>                   variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -186,14 +186,82 @@ Show code to produce map
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
 <span>        legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-</details><p><img src="assess-quality_files/figure-html/ntl_daily_r_map-1.png" width="700"></p>
-<p>We notice that a number of observations are missing, that are poor
-quality and are not gap-filled. To understand the extent of missing
-date, we can use the following code to determine (1) the total number of
-pixels that cover Switzerland, (2) the total number of
-non-<code>NA</code> nighttime light pixels, and (3) the proportion of
-non-<code>NA</code> pixels.</p>
+</details><p><img src="assess-quality_files/figure-html/ntl_gap_daily_r_map-1.png" width="700"></p>
+<p>The <code>Latest_High_Quality_Retrieval</code> indicates the number
+of days since the current date that the nighttime lights value comes
+from for gap filling.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ntl_tmp_gap_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
+<span>                           product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
+<span>                           date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
+<span>                           bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
+<span>                           variable <span class="op">=</span> <span class="st">"Latest_High_Quality_Retrieval"</span><span class="op">)</span></span></code></pre></div>
+<details><summary>
+Show code to produce map
+</summary><div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
+<span><span class="va">ntl_tmp_gap_r</span> <span class="op">&lt;-</span> <span class="va">ntl_tmp_gap_r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">ntl_tmp_gap_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">ntl_tmp_gap_r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ntl_tmp_gap_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##### Map </span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ntl_tmp_gap_df</span>, </span>
+<span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
+<span>                  fill <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Spectral"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Temporal\nGap\n(Days)"</span>,</span>
+<span>       title <span class="op">=</span> <span class="st">"Temporal gap between date (Jan 1, 2023)\nand date of high quality pixel used"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</details><p><img src="assess-quality_files/figure-html/ntl_tmp_gap_map-1.png" width="700"></p>
+</div>
+<div class="section level4">
+<h4 id="non-gap-filled-nighttime-lights">Non gap filled nighttime lights <a name="daily-ntl-nongap"></a><a class="anchor" aria-label="anchor" href="#non-gap-filled-nighttime-lights"></a>
+</h4>
+<p>Instead of using gap-filled data, we could also just use nighttime
+light values from the date selected using the
+<code>DNB_BRDF-Corrected_NTL</code> variable.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ntl_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
+<span>                   product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
+<span>                   date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
+<span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
+<span>                   variable <span class="op">=</span> <span class="st">"DNB_BRDF-Corrected_NTL"</span><span class="op">)</span></span></code></pre></div>
+<details><summary>
+Show code to produce map
+</summary><div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
+<span><span class="va">ntl_m_r</span> <span class="op">&lt;-</span> <span class="va">ntl_r</span> <span class="op">|&gt;</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
+<span></span>
+<span><span class="va">ntl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">ntl_m_r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ntl_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">## Distribution is skewed, so log</span></span>
+<span><span class="va">ntl_df</span><span class="op">$</span><span class="va">value_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">ntl_df</span><span class="op">$</span><span class="va">value</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co">##### Map </span></span>
+<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ntl_df</span>, </span>
+<span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
+<span>                  fill <span class="op">=</span> <span class="va">value_adj</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient2</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"black"</span>,</span>
+<span>                       mid <span class="op">=</span> <span class="st">"yellow"</span>,</span>
+<span>                       high <span class="op">=</span> <span class="st">"red"</span>,</span>
+<span>                       midpoint <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
+<span>        legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
+</details><p><img src="assess-quality_files/figure-html/ntl_daily_r_map-1.png" width="700"></p>
+<p>We notice that a number of observations are missing. To understand
+the extent of missing date, we can use the following code to determine
+(1) the total number of pixels that cover Switzerland, (2) the total
+number of non-<code>NA</code> nighttime light pixels, and (3) the
+proportion of non-<code>NA</code> pixels.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">n_pixel</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">values</span>, <span class="va">coverage_fraction</span><span class="op">)</span><span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">values</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
@@ -208,19 +276,19 @@ non-<code>NA</code> pixels.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_pixel_num</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 282934</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 282934</span></span>
+<span><span class="co">#&gt; [1] 122035</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">n_non_na_pixel_num</span> <span class="op">/</span> <span class="va">n_pixel_num</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] 1</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 0.4313197</span></span></code></pre></div>
 <p>By default, the <code>bm_extract</code> function computes these
 values:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_extract.html">bm_extract</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                     product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
 <span>                   date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.Date.html" class="external-link">seq.Date</a></span><span class="op">(</span>from <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2023-01-01"</span><span class="op">)</span>,</span>
 <span>                                   to <span class="op">=</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html" class="external-link">ymd</a></span><span class="op">(</span><span class="st">"2023-01-10"</span><span class="op">)</span>,</span>
 <span>                                   by <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>,</span>
 <span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                   variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span><span class="op">)</span></span>
+<span>                   variable <span class="op">=</span> <span class="st">"DNB_BRDF-Corrected_NTL"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="va">ntl_df</span><span class="op">)</span></span></code></pre></div>
 <p>The below figure shows trends in average nighttime lights (left) and
@@ -233,7 +301,7 @@ areas (eg, cities)—while on January 9 and 10, missing pixels could have
 been over typically lower-lit areas.</p>
 <details><summary>
 Show code to produce figure
-</summary><div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ntl_df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">date</span>, <span class="va">ntl_mean</span>, <span class="va">prop_non_na_pixels</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -258,7 +326,7 @@ issues</p></li>
 </ul>
 <p>We can map quality by using the <code>Mandatory_Quality_Flag</code>
 variable.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">quality_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                       product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
 <span>                       date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
@@ -266,7 +334,7 @@ variable.</p>
 <span>                       variable <span class="op">=</span> <span class="st">"Mandatory_Quality_Flag"</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
-</summary><div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
 <span><span class="va">quality_r</span> <span class="op">&lt;-</span> <span class="va">quality_r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
 <span></span>
@@ -302,16 +370,16 @@ no pixels are filtered out (except for those that are assigned a “fill
 value” by BlackMarble, which are always removed). However, if we only
 want data for good quality pixels, we can adjust the
 <code>quality_flag_rm</code> parameter.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_good_qual_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                             product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>, </span>
 <span>                             date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                             bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                             variable <span class="op">=</span> <span class="st">"Gap_Filled_DNB_BRDF-Corrected_NTL"</span>,</span>
+<span>                             variable <span class="op">=</span> <span class="st">"DNB_BRDF-Corrected_NTL"</span>,</span>
 <span>                             quality_flag_rm <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
-</summary><div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+</summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
 <span><span class="va">ntl_good_qual_r</span> <span class="op">&lt;-</span> <span class="va">ntl_good_qual_r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
 <span></span>
@@ -336,80 +404,6 @@ Show code to produce map
 <span>        legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
 </details><p><img src="assess-quality_files/figure-html/ntl_daily_good_qual_map-1.png" width="700"></p>
 </div>
-<div class="section level4">
-<h4 id="nighttime-lights-for-good-quality-observations-without-gap-filling">Nighttime lights for good quality observations, without gap filling
-<a name="daily-nogap"></a><a class="anchor" aria-label="anchor" href="#nighttime-lights-for-good-quality-observations-without-gap-filling"></a>
-</h4>
-<p>By default, the <code>bm_raster</code> function uses the
-<code>Gap_Filled_DNB_BRDF-Corrected_NTL</code> variable for daily data.
-Gap filling indicates that some poor quality pixels use data from a
-previous date; the <code>Latest_High_Quality_Retrieval</code> indicates
-the date the nighttime lights value came from.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ntl_tmp_gap_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
-<span>                           product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
-<span>                           date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
-<span>                           bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                           variable <span class="op">=</span> <span class="st">"Latest_High_Quality_Retrieval"</span><span class="op">)</span></span></code></pre></div>
-<details><summary>
-Show code to produce map
-</summary><div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
-<span><span class="va">ntl_tmp_gap_r</span> <span class="op">&lt;-</span> <span class="va">ntl_tmp_gap_r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="va">ntl_tmp_gap_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">ntl_tmp_gap_r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ntl_tmp_gap_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">##### Map </span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ntl_tmp_gap_df</span>, </span>
-<span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                  fill <span class="op">=</span> <span class="va">value</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_brewer.html" class="external-link">scale_fill_distiller</a></span><span class="op">(</span>palette <span class="op">=</span> <span class="st">"Spectral"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"Temporal\nGap\n(Days)"</span>,</span>
-<span>       title <span class="op">=</span> <span class="st">"Temporal gap between date (Jan 1, 2023)\nand date of high quality pixel used"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</details><p><img src="assess-quality_files/figure-html/ntl_tmp_gap_map-1.png" width="700"></p>
-<p>Instead of using <code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>, we
-could ignore gap filled observations—using the
-<code>DNB_BRDF-Corrected_NTL</code> variable. Here, we also remove poor
-quality pixels.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ntl_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
-<span>                   product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
-<span>                   date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
-<span>                   bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
-<span>                   variable <span class="op">=</span> <span class="st">"DNB_BRDF-Corrected_NTL"</span>,</span>
-<span>                   quality_flag_rm <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
-<details><summary>
-Show code to produce map
-</summary><div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#### Prep data</span></span>
-<span><span class="va">ntl_r</span> <span class="op">&lt;-</span> <span class="va">ntl_r</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/mask.html" class="external-link">mask</a></span><span class="op">(</span><span class="va">roi_sf</span><span class="op">)</span> </span>
-<span></span>
-<span><span class="va">ntl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/raster/man/rasterToPoints.html" class="external-link">rasterToPoints</a></span><span class="op">(</span><span class="va">ntl_r</span>, spatial <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">ntl_df</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## Distribution is skewed, so log</span></span>
-<span><span class="va">ntl_df</span><span class="op">$</span><span class="va">value_adj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log</a></span><span class="op">(</span><span class="va">ntl_df</span><span class="op">$</span><span class="va">value</span><span class="op">+</span><span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">##### Map </span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_raster</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ntl_df</span>, </span>
-<span>              <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">x</span>, y <span class="op">=</span> <span class="va">y</span>, </span>
-<span>                  fill <span class="op">=</span> <span class="va">value_adj</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient2</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"black"</span>,</span>
-<span>                       mid <span class="op">=</span> <span class="st">"yellow"</span>,</span>
-<span>                       high <span class="op">=</span> <span class="st">"red"</span>,</span>
-<span>                       midpoint <span class="op">=</span> <span class="fl">4</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_map.html" class="external-link">coord_quickmap</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>plot.title <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_text</a></span><span class="op">(</span>face <span class="op">=</span> <span class="st">"bold"</span>, hjust <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
-<span>        legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
-</details><p><img src="assess-quality_files/figure-html/ntl_daily_nogap_r_map-1.png" width="700"></p>
-</div>
 </div>
 <div class="section level3">
 <h3 id="monthlyannual-data">Monthly/Annual Data <a name="ma"></a><a class="anchor" aria-label="anchor" href="#monthlyannual-data"></a>
@@ -419,7 +413,7 @@ Show code to produce map
 (<code>VNP46A4</code>); the variables are the same for both monthly and
 annual data.</p>
 <div class="section level4">
-<h4 id="nighttime-lights-1">Nighttime Lights <a name="ma-ntl"></a><a class="anchor" aria-label="anchor" href="#nighttime-lights-1"></a>
+<h4 id="nighttime-lights">Nighttime Lights <a name="ma-ntl"></a><a class="anchor" aria-label="anchor" href="#nighttime-lights"></a>
 </h4>
 <p>We download data for January 2023. When the <code>variable</code>
 parameter is not specified, <code>bm_raster</code> creates a raster
@@ -550,15 +544,15 @@ Show code to produce map
 are set to <code>NA</code> based on the quality indicator. By default,
 no pixels are filtered out (except for those that are assigned a “fill
 value” by BlackMarble, which are always removed). However, if we also
-want to remove poor quality pixels, we can adjust the
-<code>quality_flag_rm</code> parameter.</p>
+want to remove poor quality pixels and remove pixels that are gap
+filled, we can adjust the <code>quality_flag_rm</code> parameter.</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ntl_good_qual_r</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                             product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>, </span>
 <span>                             date <span class="op">=</span> <span class="st">"2023-01-01"</span>,</span>
 <span>                             bearer <span class="op">=</span> <span class="va">bearer</span>,</span>
 <span>                             variable <span class="op">=</span> <span class="st">"NearNadir_Composite_Snow_Free"</span>,</span>
-<span>                             quality_flag_rm <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span>                             quality_flag_rm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="co"># 1 = poor quality; 2 = gap filled based on historical data</span></span></code></pre></div>
 <details><summary>
 Show code to produce map
 </summary><div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
