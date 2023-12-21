@@ -12,7 +12,7 @@ bm_extract(
   aggregation_fun = c("mean"),
   add_n_pixels = TRUE,
   variable = NULL,
-  quality_flag_rm = 255,
+  quality_flag_rm = NULL,
   check_all_tiles_exist = TRUE,
   interpol_na = FALSE,
   output_location_type = "memory",
@@ -55,14 +55,13 @@ bm_extract(
 For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for \code{VNP46A1}, see Table 3; for \code{VNP46A2} see Table 6; for \code{VNP46A3} and \code{VNP46A4}, see Table 9.
 }}
 
-\item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in ther \code{quality_flag_rm} vector. (Default: \code{c(255)}).
+\item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in ther \code{quality_flag_rm} vector. (Default: \code{NULL}).
 
 For \code{VNP46A1} and \code{VNP46A2} (daily data):
 \itemize{
 \item \code{0}: High-quality, Persistent nighttime lights
 \item \code{1}: High-quality, Ephemeral nighttime Lights
 \item \code{2}: Poor-quality, Outlier, potential cloud contamination, or other issues
-\item \code{255}: No retrieval, Fill value (masked out on ingestion)
 }
 
 For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
@@ -70,7 +69,6 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 \item \code{0}: Good-quality, The number of observations used for the composite is larger than 3
 \item \code{1}: Poor-quality, The number of observations used for the composite is less than or equal to 3
 \item \code{2}: Gap filled NTL based on historical data
-\item \code{255}: Fill value
 }}
 
 \item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}

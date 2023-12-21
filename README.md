@@ -276,19 +276,17 @@ Both functions take the following arguments:
   * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
   * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
 
-* **quality_flag_rm:** Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `c(255)`).
+* **quality_flag_rm:** Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `NULL`).
 
   * For `VNP46A1` and `VNP46A2` (daily data):
     * `0`: High-quality, Persistent nighttime lights
     * `1`: High-quality, Ephemeral nighttime Lights
     * `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
-    * `255`: No retrieval, Fill value (masked out on ingestion)
 
   * For `VNP46A3` and `VNP46A4` (monthly and annual data):
     * `0`: Good-quality, The number of observations used for the composite is larger than 3
     * `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
     * `2`: Gap filled NTL based on historical data
-    * `255`: Fill value
 
 * **check_all_tiles_exist:** Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
 * **interpol_na:** When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the [`raster::approxNA`](https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA) function. Additional arguments for the [`raster::approxNA`](https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA) function can also be passed into `bm_raster`/`bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).

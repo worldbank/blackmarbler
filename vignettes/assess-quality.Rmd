@@ -31,10 +31,10 @@ This page illustrates how to examine the quality of nighttime lights data.
 
 * [Setup](#setup)
 * [Daily data](#daily)
-  * [Nighttime lights](#daily-ntl)
+  * [Nighttime lights: Gap Filled](#daily-ntl-gap)
+  * [Nighttime lights: Non Gap Filled](#daily-ntl-nongap)
   * [Quality flag](#daily-quality)
   * [Nighttime lights using good quality observations](#daily-goodq)
-  * [Nighttime lights using good quality observations without gap filling](#daily-nogap)
 * [Monthly/annual data](#ma)
   * [Nighttime lights](#ma-ntl)
   * [Number of observations](#ma-numobs)
@@ -74,17 +74,95 @@ roi_sf <- gadm(country = "CHE", level=0, path = tempdir()) |> st_as_sf()
 
 Below shows an example examining quality for daily data (`VNP46A2`).
 
-#### Nighttime Lights <a name="daily-ntl"></a>
+#### Gap filled nighttime lights <a name="daily-ntl-gap"></a>
 
-We download data for January 1st, 2023. When the `variable` parameter is not specified, `bm_raster` creates a raster using the `Gap_Filled_DNB_BRDF-Corrected_NTL` variable for daily data.
+We download data for January 1st, 2023. When the `variable` parameter is not specified, `bm_raster` creates a raster using the `Gap_Filled_DNB_BRDF-Corrected_NTL` variable for daily data. This variable "gap fills" poor quality observations (ie, pixels with cloud cover) using data from previous days. 
 
 ```{r, results='hide'}
 ntl_r <- bm_raster(roi_sf = roi_sf,
                    product_id = "VNP46A2",
                    date = "2023-01-01",
                    bearer = bearer,
-                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
-                   quality = NULL)
+                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL")
+```
+
+<details>
+<summary>Show code to produce map</summary>
+```{r, ntl_gap_daily_r_map, eval=FALSE}
+#### Prep data
+ntl_m_r <- ntl_r |> raster::mask(roi_sf) 
+
+ntl_df <- rasterToPoints(ntl_m_r, spatial = TRUE) |> as.data.frame()
+names(ntl_df) <- c("value", "x", "y")
+
+## Distribution is skewed, so log
+ntl_df$value_adj <- log(ntl_df$value+1)
+
+##### Map 
+ggplot() +
+  geom_raster(data = ntl_df, 
+              aes(x = x, y = y, 
+                  fill = value_adj)) +
+  scale_fill_gradient2(low = "black",
+                       mid = "yellow",
+                       high = "red",
+                       midpoint = 4) +
+  coord_quickmap() + 
+  theme_void() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        legend.position = "none")
+```
+</details>
+
+```{r, ntl_gap_daily_r_map, echo=FALSE}
+```
+
+The `Latest_High_Quality_Retrieval` indicates the number of days since the current date that the nighttime lights value comes from for gap filling.
+
+```{r, results='hide'}
+ntl_tmp_gap_r <- bm_raster(roi_sf = roi_sf,
+                           product_id = "VNP46A2",
+                           date = "2023-01-01",
+                           bearer = bearer,
+                           variable = "Latest_High_Quality_Retrieval")
+```
+
+<details>
+<summary>Show code to produce map</summary>
+```{r, ntl_tmp_gap_map, eval=FALSE}
+#### Prep data
+ntl_tmp_gap_r <- ntl_tmp_gap_r |> mask(roi_sf) 
+
+ntl_tmp_gap_df <- rasterToPoints(ntl_tmp_gap_r, spatial = TRUE) |> as.data.frame()
+names(ntl_tmp_gap_df) <- c("value", "x", "y")
+
+##### Map 
+ggplot() +
+  geom_raster(data = ntl_tmp_gap_df, 
+              aes(x = x, y = y, 
+                  fill = value)) +
+  scale_fill_distiller(palette = "Spectral") +
+  coord_quickmap() + 
+  theme_void() +
+  labs(fill = "Temporal\nGap\n(Days)",
+       title = "Temporal gap between date (Jan 1, 2023)\nand date of high quality pixel used") +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+```
+</details>
+
+```{r, ntl_tmp_gap_map, echo=FALSE}
+```
+
+#### Non gap filled nighttime lights <a name="daily-ntl-nongap"></a>
+
+Instead of using gap-filled data, we could also just use nighttime light values from the date selected using the `DNB_BRDF-Corrected_NTL` variable.
+
+```{r, results='hide'}
+ntl_r <- bm_raster(roi_sf = roi_sf,
+                   product_id = "VNP46A2",
+                   date = "2023-01-01",
+                   bearer = bearer,
+                   variable = "DNB_BRDF-Corrected_NTL")
 ```
 
 <details>
@@ -118,7 +196,7 @@ ggplot() +
 ```{r, ntl_daily_r_map, echo=FALSE}
 ```
 
-We notice that a number of observations are missing, that are poor quality and are not gap-filled. To understand the extent of missing date, we can use the following code to determine (1) the total number of pixels that cover Switzerland, (2) the total number of non-`NA` nighttime light pixels, and (3) the proportion of non-`NA` pixels.
+We notice that a number of observations are missing. To understand the extent of missing date, we can use the following code to determine (1) the total number of pixels that cover Switzerland, (2) the total number of non-`NA` nighttime light pixels, and (3) the proportion of non-`NA` pixels.
 
 ```{r}
 n_pixel <- function(values, coverage_fraction){
@@ -146,7 +224,7 @@ ntl_df <- bm_extract(roi_sf = roi_sf,
                                    to = ymd("2023-01-10"),
                                    by = 1),
                    bearer = bearer,
-                   variable = "Gap_Filled_DNB_BRDF-Corrected_NTL")
+                   variable = "DNB_BRDF-Corrected_NTL")
 
 knitr::kable(ntl_df)
 ```
@@ -233,7 +311,7 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              product_id = "VNP46A2", 
                              date = "2023-01-01",
                              bearer = bearer,
-                             variable = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                             variable = "DNB_BRDF-Corrected_NTL",
                              quality_flag_rm = 2)
 ```
 
@@ -266,86 +344,6 @@ ggplot() +
 </details>
 
 ```{r, ntl_daily_good_qual_map, echo=FALSE}
-```
-
-#### Nighttime lights for good quality observations, without gap filling <a name="daily-nogap"></a>
-
-By default, the `bm_raster` function uses the `Gap_Filled_DNB_BRDF-Corrected_NTL` variable for daily data. Gap filling indicates that some poor quality pixels use data from a previous date; the `Latest_High_Quality_Retrieval` indicates the date the nighttime lights value came from.
-
-```{r, results='hide'}
-ntl_tmp_gap_r <- bm_raster(roi_sf = roi_sf,
-                           product_id = "VNP46A2",
-                           date = "2023-01-01",
-                           bearer = bearer,
-                           variable = "Latest_High_Quality_Retrieval")
-```
-
-<details>
-<summary>Show code to produce map</summary>
-```{r, ntl_tmp_gap_map, eval=FALSE}
-#### Prep data
-ntl_tmp_gap_r <- ntl_tmp_gap_r |> mask(roi_sf) 
-
-ntl_tmp_gap_df <- rasterToPoints(ntl_tmp_gap_r, spatial = TRUE) |> as.data.frame()
-names(ntl_tmp_gap_df) <- c("value", "x", "y")
-
-##### Map 
-ggplot() +
-  geom_raster(data = ntl_tmp_gap_df, 
-              aes(x = x, y = y, 
-                  fill = value)) +
-  scale_fill_distiller(palette = "Spectral") +
-  coord_quickmap() + 
-  theme_void() +
-  labs(fill = "Temporal\nGap\n(Days)",
-       title = "Temporal gap between date (Jan 1, 2023)\nand date of high quality pixel used") +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5))
-```
-</details>
-
-```{r, ntl_tmp_gap_map, echo=FALSE}
-```
-
-Instead of using `Gap_Filled_DNB_BRDF-Corrected_NTL`, we could ignore gap filled observations---using the `DNB_BRDF-Corrected_NTL` variable. Here, we also remove poor quality pixels.
-
-```{r, results='hide'}
-ntl_r <- bm_raster(roi_sf = roi_sf,
-                   product_id = "VNP46A2",
-                   date = "2023-01-01",
-                   bearer = bearer,
-                   variable = "DNB_BRDF-Corrected_NTL",
-                   quality_flag_rm = 2)
-```
-
-<details>
-<summary>Show code to produce map</summary>
-```{r, ntl_daily_nogap_r_map, eval=FALSE}
-#### Prep data
-ntl_r <- ntl_r |> mask(roi_sf) 
-
-ntl_df <- rasterToPoints(ntl_r, spatial = TRUE) |> as.data.frame()
-names(ntl_df) <- c("value", "x", "y")
-
-## Distribution is skewed, so log
-ntl_df$value_adj <- log(ntl_df$value+1)
-
-##### Map 
-ggplot() +
-  geom_raster(data = ntl_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
-  scale_fill_gradient2(low = "black",
-                       mid = "yellow",
-                       high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
-  theme_void() +
-  theme(plot.title = element_text(face = "bold", hjust = 0.5),
-        legend.position = "none")
-```
-</details>
-
-```{r, ntl_daily_nogap_r_map, echo=FALSE}
 ```
 
 ### Monthly/Annual Data <a name="ma"></a>
@@ -488,7 +486,7 @@ ggplot() +
 
 #### Nighttime lights for good quality observations <a name="ma-ntl_gq"></a>
 
-The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, no pixels are filtered out (except for those that are assigned a "fill value" by BlackMarble, which are always removed). However, if we also want to remove poor quality pixels, we can adjust the `quality_flag_rm` parameter.
+The `quality_flag_rm` parameter determines which pixels are set to `NA` based on the quality indicator. By default, no pixels are filtered out (except for those that are assigned a "fill value" by BlackMarble, which are always removed). However, if we also want to remove poor quality pixels and remove pixels that are gap filled, we can adjust the `quality_flag_rm` parameter.
 
 ```{r, results='hide'}
 ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
@@ -496,7 +494,7 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
                              date = "2023-01-01",
                              bearer = bearer,
                              variable = "NearNadir_Composite_Snow_Free",
-                             quality_flag_rm = 1)
+                             quality_flag_rm = c(1,2)) # 1 = poor quality; 2 = gap filled based on historical data
 ```
 
 <details>
