@@ -1,12 +1,24 @@
 #### Setup
 # Load packages
-library(blackmarbler)
+#library(blackmarbler)
 library(geodata)
 library(sf)
 library(raster)
 library(ggplot2)
 
-devtools::install_github("worldbank/blackmarbler@new-version")
+library(readr)
+library(hdf5r)
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(tidyr)
+library(raster)
+library(sf)
+library(exactextractr)
+library(stringr)
+library(httr)
+
+#devtools::install_github("worldbank/blackmarbler@new-version")
 
 #### Define NASA bearer token
 bearer <- "BEARER-TOKEN-HERE"
@@ -16,18 +28,23 @@ bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 # Define region of interest (roi). The roi must be (1) an sf polygon and (2)
 # in the WGS84 (epsg:4326) coordinate reference system. Here, we use the 
 # getData function to load a polygon of Ghana
-roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
+#roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
 
 #########
 roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) |> st_as_sf()
 
-ro <- bm_raster(roi_sf = roi_sf,
+########
+r <- bm_raster(roi_sf = roi_sf,
                product_id = "VNP46A3",
-               date = c("2021-01-01",
-                        "2021-02-01",
-                        "2021-03-01"),
+               date = c("2021-01-01"),
                bearer = bearer,
-               quality_flag_rm = c(255,2))
+               quiet = T)
+
+r <- bm_extract(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = c("2021-01-01"),
+               bearer = bearer,
+               quiet = F)
 
 r <- bm_raster(roi_sf = roi_sf,
                product_id = "VNP46A3",

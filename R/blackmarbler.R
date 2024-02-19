@@ -447,10 +447,17 @@ download_raster <- function(file_name,
   
   if(quiet == FALSE) message(paste0("Processing: ", file_name))
   
-  response <- httr::GET(url, 
-                        add_headers(headers), 
-                        write_disk(download_path, overwrite = TRUE),
-                        progress())
+  if(quiet == TRUE){
+    response <- httr::GET(url, 
+                          add_headers(headers), 
+                          write_disk(download_path, overwrite = TRUE))
+  } else{
+    response <- httr::GET(url, 
+                          add_headers(headers), 
+                          write_disk(download_path, overwrite = TRUE),
+                          progress())
+  }
+
   
   if(response$status_code != 200){
     message("Error in downloading data")
@@ -656,14 +663,14 @@ bm_extract <- function(roi_sf,
     roi_df <- roi_sf %>% st_drop_geometry()
     roi_df$date <- NULL
     
-    n_obs_df <- exact_extract(bm_r, roi_sf, count_n_obs) %>%
+    n_obs_df <- exact_extract(bm_r, roi_sf, count_n_obs, progress = !quiet) %>%
       bind_cols(roi_df) %>%
       tidyr::pivot_longer(cols = -c(names(roi_df)),
                           names_to = c(".value", "date"),
                           names_sep = "\\.t") %>%
       dplyr::mutate(prop_non_na_pixels = .data$n_non_na_pixels / .data$n_pixels)
     
-    ntl_df <- exact_extract(bm_r, roi_sf, aggregation_fun) %>%
+    ntl_df <- exact_extract(bm_r, roi_sf, aggregation_fun, progress = !quiet) %>%
       tidyr::pivot_longer(cols = everything(),
                           names_to = c(".value", "date"),
                           names_sep = "\\.t")
@@ -712,7 +719,8 @@ bm_extract <- function(roi_sf,
               names(r) <- date_name_i
               
               #### Extract
-              r_agg <- exact_extract(x = r, y = roi_sf, fun = aggregation_fun)
+              r_agg <- exact_extract(x = r, y = roi_sf, fun = aggregation_fun, 
+                                     progress = !quiet)
               roi_df <- roi_sf
               roi_df$geometry <- NULL
               
@@ -727,10 +735,12 @@ bm_extract <- function(roi_sf,
               if(add_n_pixels){
                 
                 r_n_obs <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
-                  sum(!is.na(values)))
+                  sum(!is.na(values)),
+                  progress = !quiet)
                 
                 r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
-                  length(values))
+                  length(values),
+                  progress = !quiet)
                 
                 r_agg$n_pixels           <- r_n_obs_poss
                 r_agg$n_non_na_pixels    <- r_n_obs
@@ -763,17 +773,20 @@ bm_extract <- function(roi_sf,
             if(add_n_pixels){
               
               r_n_obs <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
-                sum(!is.na(values)))
+                sum(!is.na(values)),
+                progress = !quiet)
               
               r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
-                length(values))
+                length(values),
+                progress = !quiet)
               
               roi_sf$n_pixels           <- r_n_obs_poss
               roi_sf$n_non_na_pixels    <- r_n_obs
               roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels 
             }
             
-            r_out <- exact_extract(x = r_out, y = roi_sf, fun = aggregation_fun)
+            r_out <- exact_extract(x = r_out, y = roi_sf, fun = aggregation_fun,
+                                   progress = !quiet)
             
             roi_df <- roi_sf
             roi_df$geometry <- NULL
