@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/404.html</loc>
+    <loc>/404.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/LICENSE-text.html</loc>
+    <loc>/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/articles/assess-quality.html</loc>
+    <loc>/articles/assess-quality.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/articles/index.html</loc>
+    <loc>/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/authors.html</loc>
+    <loc>/authors.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/index.html</loc>
+    <loc>/index.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/reference/bm_extract.html</loc>
+    <loc>/reference/bm_extract.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/reference/bm_raster.html</loc>
+    <loc>/reference/bm_raster.html</loc>
   </url>
   <url>
-    <loc>https://worldbank.github.io/blackmarbler/reference/index.html</loc>
+    <loc>/reference/index.html</loc>
   </url>
 </urlset>
