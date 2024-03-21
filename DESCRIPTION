@@ -19,16 +19,18 @@ Imports:
   dplyr,
   purrr,
   lubridate,
-  tidyr,
   raster,
   sf,
   exactextractr,
   stringr,
-  httr
+  httr,
+  httr2,
+  terra
 Suggests: 
   geodata,
   ggplot2,
-  knitr
+  knitr,
+  leaflet
 Depends: 
     R (>= 2.10)
 LazyData: true
