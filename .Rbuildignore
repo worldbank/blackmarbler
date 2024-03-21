@@ -1,0 +1,6 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^\\.Renviron$
+^\\.Rprofile$
+^\\.github$
+^readme_figures$
