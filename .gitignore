@@ -1,7 +1,10 @@
 *.DS_Store
-*.Rbuildignore
+#*.Rbuildignore
 *.Rhistory
 .Rhistory
+.Rprofile
+.Renviron
+
 docs
 blackmarbler-vignette.html
 
@@ -9,3 +12,4 @@ blackmarbler-vignette.html
 
 inst/doc
 .Rproj.user
+
