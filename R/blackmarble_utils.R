@@ -56,13 +56,13 @@ map_black_marble_tiles <- function() {
 #' This function translates Julian dates to regular month representations.
 #'
 #' @param julian_date A character string representing the day of the year in Julian format (e.g., "001" for January 1st).
-#' @return A character string representing the month corresponding to the given Julian date (e.g., "01" for January).
+#' @return A number representing the month corresponding to the given Julian date (e.g., 1 for January).
 #' @examples
 #' julian_to_month("001")
-#' # [1] "01"
+#' # [1] 1
 #'
 #' julian_to_month("032")
-#' # [1] "02"
+#' # [1] 2
 #' @references
 #' For more information on the Julian day system, see: https://en.wikipedia.org/wiki/Julian_day
 #' @export
@@ -141,7 +141,6 @@ remove_fill_value_from_satellite_data <- function(data, variable) {
   return(data)
 }
 
-
 #' Apply Scaling Factor to VIIRS Data
 #'
 #' Apply scaling factor to variables according to Black Marble user guide.
@@ -149,6 +148,7 @@ remove_fill_value_from_satellite_data <- function(data, variable) {
 #'
 #' @param x A numeric vector or matrix representing the VIIRS data.
 #' @param variable A character string specifying the variable name.
+#' @param quiet Logical, if TRUE, suppresses warnings when the variable is not found in scaling variables.
 #'
 #' @return A numeric vector or matrix with the scaling factor applied to the specified variables.
 #'
@@ -180,7 +180,7 @@ remove_fill_value_from_satellite_data <- function(data, variable) {
 #' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
 #'
 #' @export
-apply_scaling_factor_to_viirs_data <- function(x, variable) {
+apply_scaling_factor_to_viirs_data <- function(x, variable, quiet = TRUE) {
   # Apply scaling factor to VIIRS data
   scaling_variables <- c(
     "DNB_At_Sensor_Radiance",
@@ -203,69 +203,149 @@ apply_scaling_factor_to_viirs_data <- function(x, variable) {
 
   if (variable %in% scaling_variables) {
     x <- x * 0.1
+  } else {
+    if (!quiet) {
+      warning(paste("Variable", variable, "not found in scaling variables. No scaling applied."))
+    }
   }
 
   return(x)
 }
-#' Convert HDF5 File to Raster
+
+#' Download VIIRS Satellite Image in HDF5 Format
 #'
-#' Converts an HDF5 file to a raster object.
+#' Downloads a VIIRS satellite image in HDF5 format from NASA's LADSWeb and saves it to a temporary directory or persistent location.
 #'
-#' @param file_path A character string representing the filepath to the HDF5 file.
-#' @param variable_name A character string specifying the variable name to extract from the HDF5 file.
+#' @param file_name A character string representing the name of the file to download.
+#' @param temp_dir A character string specifying the temporary directory where the file will be saved.
+#' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
+#' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
 #'
-#' @return A raster object containing the extracted variable data from the HDF5 file.
 #'
-#' @details
-#' This function converts an HDF5 file to a raster object. It extracts the specified variable
-#' from the HDF5 file and optionally removes specific quality flag values from the data.
+#' @details This function downloads a VIIRS satellite image in HDF5 format from NASA's LADSWeb
+#' based on the provided file name. It then processes the downloaded data, removing quality flag values
+#' if specified. The function also provides an option to suppress progress messages.
 #'
 #' @references
 #' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
 #'
 #' @export
-convert_h5_to_raster <- function(file_path,
-                                 variable_name,
-                                 quality_flags_to_remove = numeric()) {
+download_h5_viirs_sat_image <- function(file_name,
+                                        temp_dir,
+                                        bearer,
+                                        quality_flags_to_remove = numeric(),
+                                        quiet = FALSE) {
 
-  # Load HDF5 file
-  h5_data <- h5file(file_path, "r+")
+  # Extract file metadata
+  year <- substr(file_name, 10, 13)
+  day <- substr(file_name, 14, 16)
+  product_id <- substr(file_name, 1, 7)
 
-  # Extract data and metadata
-  print("extract_data_and_metadata_from_hdf5")
 
-  result_list <- extract_data_and_metadata_from_hdf5(h5_data,
-                                                     file_path,
-                                                     variable_name,
-                                                     quality_flags_to_remove)
+  # Construct download URL
+  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
+                product_id, '/', year, '/', day, '/', file_name)
 
-  data <- result_list$data
+  # Define url request
+  # This is because regular httr2 setting doesn't return an integer in libcurl version, generating an API error related to versioning
 
-  metadata <- result_list$metadata
+  versions <- c(
+    httr2 = utils::packageVersion("httr2"),
+    `r-curl` = utils::packageVersion("curl"),
+    libcurl = sub("-DEV", "", curl::curl_version()$version)
+  )
+  string <- paste0(names(versions), "/", versions, collapse = " ")
 
-  print("create_raster")
-  # Convert data to raster
+  request <- request(url) |>
+    req_headers(
+      'Authorization' = paste('Bearer', bearer)
+    ) |>
+    req_user_agent(string)
 
-  raster_obj <- create_raster(data, metadata)
+  # Define download path
+  download_path <- file.path(temp_dir, file_name)
 
-  print("clean_raster_data")
+  # Display processing message if not quiet
+  if (!quiet) message(paste0("Processing: ", file_name))
 
-  # Clean raster data
-  raster_obj <- clean_raster_data(raster_obj, variable_name)
+  # Perform the download
+  if (quiet) {
+    response <- request |>
+      req_perform(
+        path = download_path
+      )
+  } else {
+    response <- request |>
+      req_progress(type = "down") |>
+      req_perform(
+        path = download_path
+      )
+  }
 
-  # Close HDF5 file
-  h5_data$close_all()
+  # Check for successful download
+  if (resp_status(response) != 200) {
+    message("Error in downloading data")
+    message(response |>
+              resp_status_desc()
+    )
+  }
 
-  return(raster_obj)
+
+}
+#' Extracts bounding box coordinates based on tile ID from the file path
+#'
+#' This code snippet extracts the bounding box coordinates (minimum longitude, minimum latitude, maximum longitude, maximum latitude)
+#' based on the tile ID extracted from the file path. It uses the `file_path` to extract the tile ID, then retrieves the corresponding
+#' grid from the `black_marble_tiles_sf` dataset. Finally, it calculates the bounding box of the grid and rounds the coordinates.
+#'
+#' @param file_path A character string specifying the file path.
+#' @param black_marble_tiles_sf The spatial dataset containing the grid tiles information.
+#'
+#' @return A list containing the minimum and maximum longitude and latitude coordinates of the bounding box.
+#'
+#' @export
+extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
+  tile_i <- file_path |>
+    str_extract("h\\d{2}v\\d{2}")
+
+  grid_i_sf <- black_marble_tiles_sf[black_marble_tiles_sf$TileID %in% tile_i,]
+
+  grid_i_sf_box <- grid_i_sf |>
+    st_bbox()
+
+  min_lon <- min(grid_i_sf_box$xmin) |> round()
+  min_lat <- min(grid_i_sf_box$ymin) |> round()
+  max_lon <- max(grid_i_sf_box$xmax) |> round()
+  max_lat <- max(grid_i_sf_box$ymax) |> round()
+
+  return(list(min_lon = min_lon, min_lat = min_lat, max_lon = max_lon, max_lat = max_lat))
 }
 
 #' Extract Daily Data from HDF5 File
+#'
+#' This function extracts daily data from an HDF5 file based on the provided file path and variable name.
+#'
+#' @param file_path A character string specifying the file path.
+#' @param h5_data The HDF5 file data.
+#' @param variable_name A character string specifying the variable name.
+#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data.
+#'
+#' @return A list containing the extracted data and metadata.
+#'
+#' @details This function extracts daily data from an HDF5 file for the specified variable.
+#' It retrieves the data and applies quality flag removal if specified.
+#' Additionally, it calculates the bounding box coordinates based on the tile ID extracted from the file path.
+#'
+#' @references
+#' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
+#'
+#' @export
 extract_daily_data <- function(file_path,
                                h5_data,
                                variable_name, quality_flags_to_remove) {
-  # Extracting daily data logic from the original function
-  if(variable_name %in% c(
+
+  allowed_variables_for_daily_data <- c(
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
     "Gap_Filled_DNB_BRDF-Corrected_NTL",
@@ -282,40 +362,38 @@ extract_daily_data <- function(file_path,
     "OffNadir_Composite_Snow_Covered_Std",
     "OffNadir_Composite_Snow_Free",
     "OffNadir_Composite_Snow_Free_Std"
-  )) {
-    out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable_name)]][,]
-    qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
+  )
 
-    if(length(quality_flags_to_remove) > 0) {
-      if(variable_name %in% c("DNB_BRDF-Corrected_NTL",
-                              "Gap_Filled_DNB_BRDF-Corrected_NTL",
-                              "Latest_High_Quality_Retrieval")) {
-        for(val in quality_flags_to_remove) {
-          out[qf == val] <- NA
-        }
-      }
-    }
-
-    tile_i <- file_path |>
-      str_extract("h\\d{2}v\\d{2}")
-
-    bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
-
-    grid_i_sf <- bm_tiles_sf[bm_tiles_sf$TileID %in% tile_i,]
-
-    grid_i_sf_box <- grid_i_sf |>
-      st_bbox()
-
-    min_lon <- min(grid_i_sf_box$xmin) |> round()
-    min_lat <- min(grid_i_sf_box$ymin) |> round()
-    max_lon <- max(grid_i_sf_box$xmax) |> round()
-    max_lat <- max(grid_i_sf_box$ymax) |> round()
-
-
-
+  if(!(variable_name %in% allowed_variables_for_daily_data)) {
+    stop("Variable name must be one of the specified values.")
   }
 
+  out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable_name)]][,]
+  qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
+
+  # Check if there are quality flags to remove and if the variable is applicable
+  if (length(quality_flags_to_remove) > 0 && variable_name %in% c("DNB_BRDF-Corrected_NTL",
+                                                                  "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                                                                  "Latest_High_Quality_Retrieval")) {
+    # Iterate over each quality flag value to remove
+    for (flag_value in quality_flags_to_remove) {
+      # Set values to NA where quality flag matches the specified value
+      out[qf == flag_value] <- NA
+    }
+  }
+
+  # Call the extract_bounding_box function to get the bounding box coordinates
+  bounding_box <- extract_bounding_box(file_path, black_marble_tiles_sf)
+
+  # Extract the coordinates from the bounding box list
+  min_lon <- bounding_box$min_lon
+  min_lat <- bounding_box$min_lat
+  max_lon <- bounding_box$max_lon
+  max_lat <- bounding_box$max_lat
+
+  # Return the extracted data and bounding box coordinates
   return(list(data = out, min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat))
+
 }
 
 #' Extract Monthly Data from HDF5 File
@@ -326,27 +404,38 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
 
   out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable_name)]][,]
 
-  if(length(quality_flags_to_remove) > 0) {
+  # Check if there are quality flags to remove
+  if (length(quality_flags_to_remove) > 0) {
+    # Extract the base variable name without "_Num" or "_Std"
     variable_short <- variable_name |>
-      str_replace_all("_Num", "") |>
-      str_replace_all("_Std", "")
+      str_remove_all("_Num") |>
+      str_remove_all("_Std")
 
+    # Construct the quality flag variable name
     qf_name <- paste0(variable_short, "_Quality")
 
-    if(qf_name %in% variable_name) {
+    # Check if the quality flag variable exists in the data
+    if (qf_name %in% names(h5_data)) {
+      # Extract the quality flag data
       qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", qf_name)]][,]
 
-      for(val in quality_flags_to_remove) {
+      # Set values to NA where quality flag matches the specified value
+      for (val in quality_flags_to_remove) {
         out[qf == val] <- NA
       }
     }
   }
 
-  if(class(out[1,1])[1] != "numeric") {
-    out <- matrix(as.numeric(out), ncol = ncol(out))
+
+  # Check if the data type of the first element is not numeric
+  if (class(out[1, 1]) != "numeric") {
+    # Convert the entire matrix to numeric
+    out <- as.matrix(as.numeric(out))
   }
 
+
   # Extract lon/lat if available
+  # if not i think the rest fails. so we need to check if it is available
   if ("lon" %in% colnames(out) && "lat" %in% colnames(out)) {
     min_lon <- min(out$lon)
     max_lon <- max(out$lon)
@@ -362,8 +451,26 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
   return(list(data = out, min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat))
 }
 
+
 #' Extract Data and Metadata from HDF5 File
-#' Extract Data and Metadata from HDF5 File
+#'
+#' This function extracts data and metadata from an HDF5 file.
+#'
+#' @param h5_data The HDF5 file data.
+#' @param file_path A character string specifying the file path.
+#' @param variable_name A character string specifying the variable name.
+#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data.
+#'
+#' @return A list containing the extracted data and metadata.
+#'
+#' @details This function extracts data and metadata from an HDF5 file based on the specified file path and variable name.
+#' Depending on the file path pattern (daily or monthly/annually), it calls different functions to extract the data.
+#' Quality flag values specified in \code{quality_flags_to_remove} are removed from the data.
+#'
+#' @references
+#' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
+#'
+#' @export
 extract_data_and_metadata_from_hdf5 <- function(h5_data,
                                                 file_path,
                                                 variable_name,
@@ -395,37 +502,68 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
   }
 
   # Construct metadata
-  metadata <- list(nRows = nrow(data), nCols = ncol(data), res = nrow(data), nodata_val = NA, myCrs = "+proj=longlat +datum=WGS84",
-                   min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat)
+  metadata <-
+    list(
+      nRows = nrow(data),
+      nCols = ncol(data),
+      res = nrow(data),
+      nodata_val = NA,
+      myCrs = "+proj=longlat +datum=WGS84", # default crs for VIIRS data
+      min_lon = min_lon,
+      max_lon = max_lon,
+      min_lat = min_lat,
+      max_lat = max_lat
+    )
+
   return(list(data = data, metadata = metadata))
 }
-
-#' Create Raster Object using terra
-create_raster <- function(data, metadata) {
+#' Create Raster Object from Data and Metadata using terra
+#'
+#' This function creates a raster object from the provided data and metadata using the terra package.
+#'
+#' @param data The data matrix for the raster.
+#' @param metadata A list containing metadata information including nodata value, bounding box coordinates, and coordinate reference system (CRS).
+#'
+#' @return A raster object created from the input data and metadata.
+#'
+#' @details This function transposes the input data, assigns nodata values to NA, creates an extent class from bounding box coordinates, and finally creates a raster object with the given data, extent, and CRS.
+#'
+#' @export
+create_raster_from_data_metadata <- function(data, metadata) {
 
   # Transpose data
   transposed_data <- t(data)
 
-  # Assign data ignore values to NA
+  # Assign nodata values to NA
   transposed_data[transposed_data == metadata$nodata_val] <- NA
 
-  # Create extents class
+  # Create extent class
   rasExt <- ext(c(metadata$min_lon,
                   metadata$max_lon,
                   metadata$min_lat,
-                  metadata$max_lat)
-  )
+                  metadata$max_lat))
 
-  # Turn the out object into a raster
+  # Create raster object
   my_raster <- rast(transposed_data,
                     extent = rasExt,
                     crs = metadata$myCrs)
 
-
   return(my_raster)
 }
-
 #' Clean Raster Data
+#'
+#' This function cleans raster data by removing fill values and applying scaling factors.
+#'
+#' @param raster_obj The raster object to be cleaned.
+#' @param variable_name A character string specifying the variable name.
+#'
+#' @return A cleaned raster object.
+#'
+#' @details This function removes fill values and applies scaling factors to the specified variable in the raster object.
+#'
+#' @seealso \code{\link{remove_fill_value_from_satellite_data}}, \code{\link{apply_scaling_factor_to_viirs_data}}
+#'
+#' @export
 clean_raster_data <- function(raster_obj, variable_name) {
   # Remove fill values
   raster_obj <- remove_fill_value_from_satellite_data(raster_obj, variable_name)
@@ -435,6 +573,108 @@ clean_raster_data <- function(raster_obj, variable_name) {
 
   return(raster_obj)
 }
+
+#' Convert HDF5 File to Raster
+#'
+#' Converts an HDF5 file to a raster object.
+#'
+#' @param file_path A character string representing the filepath to the HDF5 file.
+#' @param variable_name A character string specifying the variable name to extract from the HDF5 file.
+#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
+#'
+#' @return A raster object containing the extracted variable data from the HDF5 file.
+#'
+#' @details
+#' This function converts an HDF5 file to a raster object. It extracts the specified variable
+#' from the HDF5 file and optionally removes specific quality flag values from the data.
+#'
+#' @references
+#' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
+#'
+#' @export
+convert_h5_to_raster <- function(file_path,
+                                 variable_name,
+                                 quality_flags_to_remove = numeric()) {
+
+  # Load HDF5 file
+  h5_data <- h5file(file_path, "r+")
+
+  # Extract data and metadata
+  #print("extract_data_and_metadata_from_hdf5")
+
+  result_metadata_list <- extract_data_and_metadata_from_hdf5(h5_data,
+                                                     file_path,
+                                                     variable_name,
+                                                     quality_flags_to_remove)
+
+  data <- result_metadata_list$data
+
+  metadata <- result_metadata_list$metadata
+
+  print("create_raster")
+  # Convert data to raster
+
+  raster_obj <- create_raster_from_data_metadata(data, metadata)
+
+  print("clean_raster_data")
+
+  # Clean raster data
+  clean_raster_obj <- clean_raster_data(raster_obj, variable_name)
+
+  # Close HDF5 file
+  h5_data$close_all()
+
+  return(clean_raster_obj)
+}
+#' Download and Convert Raster Data
+#'
+#' Downloads raster data from NASA's LADSWeb and converts it to a raster object.
+#'
+#' @param file_name A character string representing the name of the file to download.
+#' @param temp_dir A character string specifying the temporary directory where the file will be saved.
+#' @param variable A character string specifying the variable to extract from the raster data.
+#' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
+#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
+#' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
+#'
+#' @return A raster object containing the downloaded and processed raster data.
+#'
+#' @details This function downloads raster data from NASA's LADSWeb based on the provided file name.
+#' It then converts the downloaded data to a raster object, extracting the specified variable and removing
+#' quality flag values if specified. The function also provides an option to suppress progress messages.
+#'
+#' @references
+#' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
+#'
+#' @export
+download_and_convert_raster <- function(file_name,
+                                        temp_dir,
+                                        variable,
+                                        bearer,
+                                        quality_flags_to_remove = numeric(),
+                                        quiet = FALSE) {
+
+  # Define download path
+  download_path <- file.path(temp_dir, file_name)
+
+  # Download VIIRS satellite image in HDF5 format
+  download_h5_viirs_sat_image(file_name,
+                                                 download_path,
+                                                 bearer,
+                                                 quality_flags_to_remove,
+                                                 quiet)
+
+  # Convert downloaded file to raster
+  raster_data <- convert_h5_to_raster(download_path,
+                                      variable,
+                                      quality_flags_to_remove)
+
+  return(raster_data)
+}
+
+
+# stopped here ------------------------------------------------------------
+
 
 
 #' Read Black Marble CSV Data
@@ -588,10 +828,7 @@ download_and_convert_raster <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
-  # Extract file metadata
-  year <- substr(file_name, 10, 13)
-  day <- substr(file_name, 14, 16)
-  product_id <- substr(file_name, 1, 7)
+
 
   # Construct download URL
   url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
@@ -613,8 +850,7 @@ download_and_convert_raster <- function(file_name,
     ) |>
     req_user_agent(string)
 
-  # Define download path
-  download_path <- file.path(temp_dir, file_name)
+
 
   # Display processing message if not quiet
   if (!quiet) message(paste0("Processing: ", file_name))
@@ -808,8 +1044,6 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
     stop("roi must be an sf object")
   }
 
-  # Fetch Black marble grid ----------------------------------------------------------
-  bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
 
   # Prep dates -----------------------------------------------------------------
   date <- switch(product_id,
@@ -831,12 +1065,12 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
   # Intersecting tiles ---------------------------------------------------------
   # Remove grid along edges, which causes st_intersects to fail
 
-  bm_tiles_sf <- bm_tiles_sf[!(str_detect(bm_tiles_sf$TileID, "h00") | str_detect(bm_tiles_sf$TileID, "v00")), ]
+  black_marble_tiles_sf <- black_marble_tiles_sf[!(str_detect(black_marble_tiles_sf$TileID, "h00") | str_detect(black_marble_tiles_sf$TileID, "v00")), ]
 
 
   inter <- tryCatch(
     {
-      inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) |>
+      inter <- st_intersects(black_marble_tiles_sf, roi_sf, sparse = F) |>
         apply(1, sum)
 
       inter
@@ -847,7 +1081,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
     }
   )
 
-  grid_use_sf <- bm_tiles_sf[inter > 0,]
+  grid_use_sf <- black_marble_tiles_sf[inter > 0,]
 
   # Make Raster ----------------------------------------------------------------
   print("processing tiles...")
