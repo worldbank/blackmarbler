@@ -204,8 +204,7 @@ file_to_raster <- function(f,
 
     tile_i <- f %>% str_extract("h\\d{2}v\\d{2}")
 
-    bm_tiles_sf <- black_marble_tiles_sf
-    grid_i_sf <- bm_tiles_sf[bm_tiles_sf$TileID %in% tile_i,]
+    grid_i_sf <- black_marble_tiles_sf[black_marble_tiles_sf$TileID %in% tile_i,]
 
     grid_i_sf_box <- grid_i_sf %>%
       st_bbox()
@@ -1066,8 +1065,6 @@ bm_raster_i <- function(roi_sf,
     stop("roi must be an sf object")
   }
 
-  # Black marble grid ----------------------------------------------------------
-  bm_tiles_sf <- black_marble_tiles_sf
 
   # Prep dates -----------------------------------------------------------------
   ## For monthly, allow both yyyy-mm and yyyy-mm-dd (where -dd is ignored)
@@ -1104,16 +1101,16 @@ bm_raster_i <- function(roi_sf,
 
   # Intersecting tiles ---------------------------------------------------------
   # Remove grid along edges, which causes st_intersects to fail
-  bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
-  bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
+  black_marble_tiles_sf <- black_marble_tiles_sf[!(black_marble_tiles_sf$TileID %>% str_detect("h00")),]
+  black_marble_tiles_sf <- black_marble_tiles_sf[!(black_marble_tiles_sf$TileID %>% str_detect("v00")),]
 
-  #inter <- st_intersects(bm_tiles_sf, roi_1row_sf, sparse = F) %>% as.vector()
-  # inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+  #inter <- st_intersects(black_marble_tiles_sf, roi_1row_sf, sparse = F) %>% as.vector()
+  # inter <- st_intersects(black_marble_tiles_sf, roi_sf, sparse = F) %>%
   #   apply(1, sum)
 
   inter <- tryCatch(
     {
-      inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+      inter <- st_intersects(black_marble_tiles_sf, roi_sf, sparse = F) %>%
         apply(1, sum)
 
       inter
@@ -1121,11 +1118,11 @@ bm_raster_i <- function(roi_sf,
     error = function(e){
       warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
       stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-      #stop(st_intersects(bm_tiles_sf, roi_sf, sparse = F))
+      #stop(st_intersects(black_marble_tiles_sf, roi_sf, sparse = F))
     }
   )
 
-  grid_use_sf <- bm_tiles_sf[inter>0,]
+  grid_use_sf <- black_marble_tiles_sf[inter>0,]
 
   # Make Raster ----------------------------------------------------------------
   tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
