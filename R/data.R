@@ -31,7 +31,5 @@
 #' \url{https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf}
 #'
 #' @examples
-#' library(sf)
-#' black_marble_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
 #' head(black_marble_tiles_sf)
 "black_marble_tiles_sf"

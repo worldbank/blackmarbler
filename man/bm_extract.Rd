@@ -2,7 +2,7 @@
 % Please edit documentation in R/blackmarbler.R
 \name{bm_extract}
 \alias{bm_extract}
-\title{Extract and Aggregate Black Marble Data}
+\title{Extracts raster data for specified region of interest}
 \usage{
 bm_extract(
   roi_sf,
@@ -12,7 +12,7 @@ bm_extract(
   aggregation_fun = c("mean"),
   add_n_pixels = TRUE,
   variable = NULL,
-  quality_flag_rm = NULL,
+  quality_flags_to_remove = NULL,
   check_all_tiles_exist = TRUE,
   interpol_na = FALSE,
   output_location_type = "memory",
@@ -24,101 +24,39 @@ bm_extract(
 )
 }
 \arguments{
-\item{roi_sf}{Region of interest; sf polygon. Must be in the \href{https://epsg.io/4326}{WGS 84 (epsg:4326)} coordinate reference system.}
+\item{roi_sf}{Spatial object representing the region of interest.}
 
-\item{product_id}{One of the following:
-\itemize{
-\item \code{"VNP46A1"}: Daily (raw)
-\item \code{"VNP46A2"}: Daily (corrected)
-\item \code{"VNP46A3"}: Monthly
-\item \code{"VNP46A4"}: Annual
-}}
+\item{product_id}{Identifier for the product.}
 
-\item{date}{Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.
-\itemize{
-\item For \code{product_id}s \code{"VNP46A1"} and \code{"VNP46A2"}, a date (eg, \code{"2021-10-03"}).
-\item For \code{product_id} \code{"VNP46A3"}, a date or year-month (e.g., \code{"2021-10-01"}, where the day will be ignored, or \code{"2021-10"}).
-\item For \code{product_id} \code{"VNP46A4"}, year or date  (e.g., \code{"2021-10-01"}, where the month and day will be ignored, or \code{2021}).
-}}
+\item{date}{Dates for which raster data is to be extracted.}
 
-\item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/worldbank/blackmarbler#bearer-token-}{here}.}
+\item{bearer}{Authentication token for accessing the data.}
 
-\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
+\item{aggregation_fun}{Aggregation function to summarize raster values (default is "mean").}
 
-\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_non_na_pixels} (the number of non-\code{NA} pixels used for computing nighttime light statistics); \code{n_pixels} (the total number of pixels); and \code{prop_non_na_pixels} the proportion of the two. (Default: \code{TRUE}).}
+\item{add_n_pixels}{Logical indicating whether to add pixel count information (default is TRUE).}
 
-\item{variable}{Variable to used to create raster (default: \code{NULL}). If \code{NULL}, uses the following default variables:
-\itemize{
-\item For \code{product_id} \verb{:VNP46A1"}, uses \code{DNB_At_Sensor_Radiance_500m}.
-\item For \code{product_id} \code{"VNP46A2"}, uses \code{Gap_Filled_DNB_BRDF-Corrected_NTL}.
-\item For \code{product_id}s \code{"VNP46A3"} and \code{"VNP46A4"}, uses \code{NearNadir_Composite_Snow_Free}.
-For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for \code{VNP46A1}, see Table 3; for \code{VNP46A2} see Table 6; for \code{VNP46A3} and \code{VNP46A4}, see Table 9.
-}}
+\item{variable}{Variable to extract from the product (default is NULL).}
 
-\item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in ther \code{quality_flag_rm} vector. (Default: \code{NULL}).
+\item{quality_flags_to_remove}{Quality flag removal options (default is NULL).}
 
-For \code{VNP46A1} and \code{VNP46A2} (daily data):
-\itemize{
-\item \code{0}: High-quality, Persistent nighttime lights
-\item \code{1}: High-quality, Ephemeral nighttime Lights
-\item \code{2}: Poor-quality, Outlier, potential cloud contamination, or other issues
-}
+\item{check_all_tiles_exist}{Logical indicating whether to check if all tiles exist (default is TRUE).}
 
-For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
-\itemize{
-\item \code{0}: Good-quality, The number of observations used for the composite is larger than 3
-\item \code{1}: Poor-quality, The number of observations used for the composite is less than or equal to 3
-\item \code{2}: Gap filled NTL based on historical data
-}}
+\item{interpol_na}{Logical indicating whether to interpolate missing values (default is FALSE).}
 
-\item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}
+\item{output_location_type}{Output location type ("memory" or "file", default is "memory").}
 
-\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate \code{NA} values in rasters using the \code{raster::approxNA} function. Additional arguments for the \code{raster::approxNA} function can also be passed into \code{bm_extract} (eg, \code{method}, \code{rule}, \code{f}, \code{ties}, \code{z}, \code{NA_rule}). (Default: \code{FALSE}).}
+\item{file_dir}{Directory for saving output files (used if output_location_type is "file", default is NULL).}
 
-\item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a dataframe in R. If \code{file}, function exports a \code{.csv} file and returns \code{NULL}.}
+\item{file_prefix}{Prefix for output file names (default is NULL).}
 
-\item{file_dir}{(If \code{output_location_type = file}). The directory where data should be exported (default: \code{NULL}, so the working directory will be used)}
+\item{file_skip_if_exists}{Logical indicating whether to skip file creation if output file already exists (default is TRUE).}
 
-\item{file_prefix}{(If \code{output_location_type = file}). Prefix to add to the file to be saved. The file will be saved as the following: \verb{[file_prefix][product_id]_t[date].csv}}
-
-\item{file_skip_if_exists}{(If \code{output_location_type = file}). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
-
-\item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
-
-\item{...}{Additional arguments for \code{raster::approxNA}, if \code{interpol_na = TRUE}}
+\item{quiet}{Logical indicating whether to suppress progress messages (default is FALSE).}
 }
 \value{
-Raster
+A data frame containing extracted raster data.
 }
 \description{
-Extract and aggregate nighttime lights data from \href{https://blackmarble.gsfc.nasa.gov/}{NASA Black Marble data}
-}
-\examples{
-\dontrun{
-# Define bearer token
-bearer <- "BEARER-TOKEN-HERE"
-
-# sf polygon of Ghana
-library(geodata)
-roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) \%>\% st_as_sf()
-
-# Daily data: raster for October 3, 2021
-ken_20210205_r <- bm_extract(roi_sf = roi_sf,
-                            product_id = "VNP46A2",
-                            date = "2021-10-03",
-                            bearer = bearer)
-
-# Monthly data: raster for March 2021
-ken_202103_r <- bm_extract(roi_sf = roi_sf,
-                          product_id = "VNP46A3",
-                          date = "2021-03-01",
-                          bearer = bearer)
-
-# Annual data: raster for 2021
-ken_2021_r <- bm_extract(roi_sf = roi_sf,
-                        product_id = "VNP46A4",
-                        date = 2021,
-                        bearer = bearer)
-}
-
+Extracts raster data for specified region of interest
 }
