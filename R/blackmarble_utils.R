@@ -1043,3 +1043,78 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
   return(raster)
 }
 
+# Helper functions ------------------------------------------------------------
+
+#' Extract and process raster data
+extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet) {
+  extracted_data <- exact_extract(raster, roi_sf, fun, progress = !quiet)
+  roi_df <- st_drop_geometry(roi_sf)
+  roi_df$date <- NULL
+
+  if (add_n_pixels) {
+    # Compute additional pixel information if add_n_pixels is TRUE
+    roi_df$n_pixels <-  exact_extract(raster, roi_sf, function(values, coverage_fraction)
+      sum(!is.na(values)),
+      progress = !quiet)
+    roi_df$n_non_na_pixels <- exact_extract(raster, roi_sf, function(values, coverage_fraction)
+      length(values),
+      progress = !quiet)
+    roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
+  }
+
+  if (length(fun) > 1) {
+    names(extracted_data) <- paste0("ntl_", names(extracted_data))
+    extracted_data <- bind_cols(extracted_data, roi_df)
+  } else {
+    roi_df[[paste0("ntl_", fun)]] <- extracted_data
+    extracted_data <- roi_df
+  }
+
+  return(extracted_data)
+}
+
+#' Extract and process raster data for individual dates
+extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
+                                  quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
+  bm_r <- retrieve_and_process_nightlight_data(roi_sf = roi_sf,
+                                               product_id = product_id,
+                                               date = date_i,
+                                               bearer = bearer,
+                                               variable = variable,
+                                               quality_flags_to_remove = quality_flags_to_remove,
+                                               check_all_tiles_exist = check_all_tiles_exist,
+                                               quiet = quiet,
+                                               temp_dir = temp_dir)
+
+  r_agg <- exact_extract(x = bm_r, y = roi_sf, fun = aggregation_fun,
+                         progress = !quiet)
+
+  if (add_n_pixels) {
+    # Compute additional pixel information if add_n_pixels is TRUE
+    roi_sf$n_pixels <- exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
+      sum(!is.na(values)),
+      progress = !quiet)
+    roi_sf$n_non_na_pixels <- exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
+      length(values),
+      progress = !quiet)
+    roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels
+  }
+
+  return(r_agg)
+}
+
+#' Bind extracted data
+bind_extracted_data <- function(n_obs_df, ntl_df) {
+  names(ntl_df)[names(ntl_df) != "date"] <- paste0("ntl_", names(ntl_df)[names(ntl_df) != "date"])
+  ntl_df$date <- NULL
+
+  r <- bind_cols(n_obs_df, ntl_df)
+  return(r)
+}
+
+#' Bind extracted data list
+bind_extracted_data_list <- function(r_list) {
+  r_list <- r_list[!sapply(r_list, is.null)]
+  r <- bind_rows(r_list)
+  return(r)
+}
