@@ -3,7 +3,7 @@
 #   sf[read_sf, st_intersects, st_drop_geometry],
 #   purrr[list_rbind, map2],
 #   hdf5r[h5file],
-#   stringr[str_replace_all, str_detect, str_extract],
+#   stringr[stringr::str_replace_all, str_detect, str_extract],
 #   readr[read_csv],
 #   dplyr[mutate, across, summarise, bind_cols, bind_rows],
 #   httr2[req_headers, request, req_perform, req_user_agent, resp_status, req_progress],
@@ -36,16 +36,16 @@ map_black_marble_tiles <- function() {
 
   zoom <- 2  # Adjust the zoom level as needed
 
-  map <- leaflet() |>
-    addProviderTiles("Stadia.AlidadeSmooth") |>
-    addPolygons(data = black_marble_tiles_sf,
+  map <- leaflet::leaflet() |>
+    leaflet::addProviderTiles("Stadia.AlidadeSmooth") |>
+    leaflet::addPolygons(data = black_marble_tiles_sf,
                          color = "#35B779",
                          weight = 3,
                          fillOpacity = 0,
                          opacity = 1) |>
-   addProviderTiles("NASAGIBS.ViirsEarthAtNight2012", options = providerTileOptions(opacity = 0.5)) |>
-    addMarkers(lng = center[2], lat = center[1], popup = paste("Latitude:", center[1], "<br>Longitude:", center[2])) |>  # Add marker with lat lon info
-    setView(lng = center[2], lat = center[1], zoom = zoom)
+    leaflet::addProviderTiles("NASAGIBS.ViirsEarthAtNight2012", options = leaflet::providerTileOptions(opacity = 0.5)) |>
+    leaflet::addMarkers(lng = center[2], lat = center[1], popup = paste("Latitude:", center[1], "<br>Longitude:", center[2])) |>  # Add marker with lat lon info
+    leaflet::setView(lng = center[2], lat = center[1], zoom = zoom)
 
   return(map)
 }
@@ -257,11 +257,11 @@ download_h5_viirs_sat_image <- function(file_name,
   )
   string <- paste0(names(versions), "/", versions, collapse = " ")
 
-  request <- request(url) |>
-    req_headers(
+  request <- httr2::request(url) |>
+    httr2::req_headers(
       'Authorization' = paste('Bearer', bearer)
     ) |>
-    req_user_agent(string)
+    httr2::req_user_agent(string)
 
   # Define download path
   download_path <- file.path(temp_dir, file_name)
@@ -272,22 +272,22 @@ download_h5_viirs_sat_image <- function(file_name,
   # Perform the download
   if (quiet) {
     response <- request |>
-      req_perform(
+      httr2::req_perform(
         path = download_path
       )
   } else {
     response <- request |>
-      req_progress(type = "down") |>
-      req_perform(
+      httr2::req_progress(type = "down") |>
+      httr2::req_perform(
         path = download_path
       )
   }
 
   # Check for successful download
-  if (resp_status(response) != 200) {
+  if (httr2::resp_status(response) != 200) {
     message("Error in downloading data")
     message(response |>
-              resp_status_desc()
+              httr2::resp_status_desc()
     )
   }
 
@@ -307,12 +307,12 @@ download_h5_viirs_sat_image <- function(file_name,
 #' @export
 extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
   tile_i <- file_path |>
-    str_extract("h\\d{2}v\\d{2}")
+    stringr::str_extract("h\\d{2}v\\d{2}")
 
   grid_i_sf <- black_marble_tiles_sf[black_marble_tiles_sf$TileID %in% tile_i,]
 
   grid_i_sf_box <- grid_i_sf |>
-    st_bbox()
+    sf::st_bbox()
 
   min_lon <- min(grid_i_sf_box$xmin) |> round()
   min_lat <- min(grid_i_sf_box$ymin) |> round()
@@ -408,8 +408,8 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
   if (length(quality_flags_to_remove) > 0) {
     # Extract the base variable name without "_Num" or "_Std"
     variable_short <- variable_name |>
-      str_remove_all("_Num") |>
-      str_remove_all("_Std")
+      stringr::str_remove_all("_Num") |>
+      stringr::str_remove_all("_Std")
 
     # Construct the quality flag variable name
     qf_name <- paste0(variable_short, "_Quality")
@@ -538,13 +538,13 @@ create_raster_from_data_metadata <- function(data, metadata) {
   transposed_data[transposed_data == metadata$nodata_val] <- NA
 
   # Create extent class
-  rasExt <- ext(c(metadata$min_lon,
+  rasExt <- terra::ext(c(metadata$min_lon,
                   metadata$max_lon,
                   metadata$min_lat,
                   metadata$max_lat))
 
   # Create raster object
-  my_raster <- rast(transposed_data,
+  my_raster <- terra::rast(transposed_data,
                     extent = rasExt,
                     crs = metadata$myCrs)
 
@@ -597,7 +597,7 @@ convert_h5_to_raster <- function(file_path,
                                  quality_flags_to_remove = numeric()) {
 
   # Load HDF5 file
-  h5_data <- h5file(file_path, "r+")
+  h5_data <- hdf5r::h5file(file_path, "r+")
 
   # Extract data and metadata
   #print("extract_data_and_metadata_from_hdf5")
@@ -703,7 +703,7 @@ read_black_marble_csv <- function(year, day, product_id) {
 
   df_out <- tryCatch(
     {
-      df <- read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/", product_id, "/", year, "/", day, ".csv"),
+      df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/", product_id, "/", year, "/", day, ".csv"),
                      show_col_types = FALSE)
 
       df$year <- year
@@ -776,7 +776,7 @@ create_black_marble_dataset_df <- function(product_id,
   # Add month if required
   if (params$add_month) {
     param_df <- param_df |>
-      mutate(month = day |>
+      dplyr::mutate(month = day |>
                julian_to_month()
       )
   }
@@ -795,11 +795,11 @@ create_black_marble_dataset_df <- function(product_id,
   }
 
   # Create data
-  files_df <- map2(param_df$year,
+  files_df <- purrr::map2(param_df$year,
                    param_df$day,
                    read_black_marble_csv,
                    product_id) |>
-    list_rbind()
+    purrr::list_rbind()
 
   return(files_df)
 }
@@ -840,9 +840,9 @@ define_blackmarble_variable <- function(variable, product_id) {
 #' @export
 define_raster_name <- function(date_string, product_id) {
   raster_name <- switch(product_id,
-                        "VNP46A1", "VNP46A2" = paste0("t", str_replace_all(date_string, "-", "_")),
-                        "VNP46A3" = paste0("t", str_replace_all(date_string, "-", "_") |> substring(1, 7)),
-                        "VNP46A4" = paste0("t", str_replace_all(date_string, "-", "_") |> substring(1, 4))
+                        "VNP46A1", "VNP46A2" = paste0("t", stringr::str_replace_all(date_string, "-", "_")),
+                        "VNP46A3" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 7)),
+                        "VNP46A4" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 4))
   )
 
   return(raster_name)
@@ -884,7 +884,7 @@ process_tiles <-
       paste(collapse = "|")
 
     selected_bm_files_df <- bm_files_df[bm_files_df$name |>
-                                          str_detect(tile_ids_rx), ]
+                                          stringr::str_detect(tile_ids_rx), ]
 
 
     if ((nrow(selected_bm_files_df) < nrow(grid_use_sf)) && check_all_tiles_exist) {
@@ -1004,9 +1004,9 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
                  date)
 
   # Grab tile dataframe --------------------------------------------------------
-  year  <- date |>  year()
-  month <- date |>  month()
-  day   <- date |>  yday()
+  year  <- date |>  lubridate::year()
+  month <- date |>  lubridate::month()
+  day   <- date |>  lubridate::yday()
 
   bm_files_df <- create_black_marble_dataset_df(product_id = product_id,
                                                 all = T,
@@ -1036,7 +1036,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 
   ## Crop
   raster <- raster |>
-    crop(roi_sf)
+    raster::crop(roi_sf)
 
   unlink(file.path(temp_dir, product_id), recursive = T)
 
@@ -1047,16 +1047,16 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 
 #' Extract and process raster data
 extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet) {
-  extracted_data <- exact_extract(raster, roi_sf, fun, progress = !quiet)
-  roi_df <- st_drop_geometry(roi_sf)
+  extracted_data <- exactextractr::exact_extract(raster, roi_sf, fun, progress = !quiet)
+  roi_df <- sf::st_drop_geometry(roi_sf)
   roi_df$date <- NULL
 
   if (add_n_pixels) {
     # Compute additional pixel information if add_n_pixels is TRUE
-    roi_df$n_pixels <-  exact_extract(raster, roi_sf, function(values, coverage_fraction)
+    roi_df$n_pixels <-  exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction)
       sum(!is.na(values)),
       progress = !quiet)
-    roi_df$n_non_na_pixels <- exact_extract(raster, roi_sf, function(values, coverage_fraction)
+    roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction)
       length(values),
       progress = !quiet)
     roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
@@ -1064,7 +1064,7 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 
   if (length(fun) > 1) {
     names(extracted_data) <- paste0("ntl_", names(extracted_data))
-    extracted_data <- bind_cols(extracted_data, roi_df)
+    extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
   } else {
     roi_df[[paste0("ntl_", fun)]] <- extracted_data
     extracted_data <- roi_df
@@ -1086,15 +1086,15 @@ extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
                                                quiet = quiet,
                                                temp_dir = temp_dir)
 
-  r_agg <- exact_extract(x = bm_r, y = roi_sf, fun = aggregation_fun,
+  r_agg <- exactextractr::exact_extract(x = bm_r, y = roi_sf, fun = aggregation_fun,
                          progress = !quiet)
 
   if (add_n_pixels) {
     # Compute additional pixel information if add_n_pixels is TRUE
-    roi_sf$n_pixels <- exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
+    roi_sf$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
       sum(!is.na(values)),
       progress = !quiet)
-    roi_sf$n_non_na_pixels <- exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
+    roi_sf$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
       length(values),
       progress = !quiet)
     roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels
@@ -1108,13 +1108,13 @@ bind_extracted_data <- function(n_obs_df, ntl_df) {
   names(ntl_df)[names(ntl_df) != "date"] <- paste0("ntl_", names(ntl_df)[names(ntl_df) != "date"])
   ntl_df$date <- NULL
 
-  r <- bind_cols(n_obs_df, ntl_df)
+  r <- dplyr::bind_cols(n_obs_df, ntl_df)
   return(r)
 }
 
 #' Bind extracted data list
 bind_extracted_data_list <- function(r_list) {
   r_list <- r_list[!sapply(r_list, is.null)]
-  r <- bind_rows(r_list)
+  r <- dplyr::bind_rows(r_list)
   return(r)
 }
