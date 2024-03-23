@@ -143,7 +143,7 @@ bm_raster <- function(roi_sf,
                                                   temp_dir = temp_dir)
 
         if (output_location_type == "file") {
-          writeRaster(r, out_path)
+          terra::writeRaster(r, out_path)
           return(NULL) # Saving as tif file, so output from function should be NULL
         } else {
           names(r) <- date_name_i
@@ -160,12 +160,12 @@ bm_raster <- function(roi_sf,
   # Clean output ---------------------------------------------------------------
   r_list <- r_list[!sapply(r_list,is.null)]
 
-  r <- if (length(r_list) == 1) r_list[[1]] else rast(r_list)
+  r <- if (length(r_list) == 1) r_list[[1]] else terra::rast(r_list)
 
   # Interpolate ----------------------------------------------------------------
   if (interpol_na) {
     r <-
-      approximate(
+      terra::approximate(
         r,
         method = method,
         rule = rule,
@@ -248,7 +248,7 @@ bm_extract <- function(roi_sf,
                       temp_dir = temp_dir)
 
     # Interpolate
-    bm_r <- approximate(bm_r,
+    bm_r <- terra::approximate(bm_r,
                         method = "linear",
                         rule = 1,
                         f = 0,

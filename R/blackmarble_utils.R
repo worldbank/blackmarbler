@@ -32,7 +32,7 @@
 map_black_marble_tiles <- function() {
 
   # Define the center coordinates and zoom level
-  #center <- c(19.432608, -99.133209)  # Mexico City coordinates
+  center <- c(19.432608, -99.133209)  # Mexico City coordinates
 
   zoom <- 2  # Adjust the zoom level as needed
 
@@ -770,13 +770,16 @@ create_black_marble_dataset_df <- function(product_id,
   year_end <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Generate parameter dataframe
-  param_df <- expand.grid(year = 2012:year_end, day = sprintf("%03d", params$days))
+  param_df <- expand.grid(year = 2012:year_end,
+                          day = sprintf("%03d", params$days)
+                          )
 
 
   # Add month if required
   if (params$add_month) {
     param_df <- param_df |>
-      dplyr::mutate(month = day |>
+      dplyr::mutate(
+        month = day |>
                julian_to_month()
       )
   }
@@ -863,9 +866,11 @@ count_n_obs <- function(values) {
   orig_vars <- names(values)
 
   values |>
-    mutate(across(orig_vars, ~ as.numeric(!is.na(.)) )) |>
-    summarise(across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
-              across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
+    dplyr::mutate(
+      dplyr::across(orig_vars, ~ as.numeric(!is.na(.)) )) |>
+    dplyr::summarise(
+      dplyr::across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
+              dplyr::across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
 }
 
 process_tiles <-
@@ -912,7 +917,7 @@ process_tiles <-
     } else {
       names(r_list) <- NULL
       r_list$fun <- max
-      return(do.call(mosaic, r_list))
+      return(do.call(terra::mosaic, r_list))
     }
 }
 #' Intersect black marble tiles with region of interest
