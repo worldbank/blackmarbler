@@ -803,96 +803,6 @@ create_black_marble_dataset_df <- function(product_id,
 
   return(files_df)
 }
-
-#' Download and Convert Raster Data
-#'
-#' Downloads raster data from NASA's LADSWeb and converts it to a raster object.
-#'
-#' @param file_name A character string representing the name of the file to download.
-#' @param temp_dir A character string specifying the temporary directory where the file will be saved.
-#' @param variable A character string specifying the variable to extract from the raster data.
-#' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
-#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
-#' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
-#'
-#' @return A raster object containing the downloaded and processed raster data.
-#'
-#' @details This function downloads raster data from NASA's LADSWeb based on the provided file name.
-#' It then converts the downloaded data to a raster object, extracting the specified variable and removing
-#' quality flag values if specified. The function also provides an option to suppress progress messages.
-#'
-#' @export
-download_and_convert_raster <- function(file_name,
-                                        temp_dir,
-                                        variable,
-                                        bearer,
-                                        quality_flags_to_remove = numeric(),
-                                        quiet = FALSE) {
-
-
-  # Construct download URL
-  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
-                product_id, '/', year, '/', day, '/', file_name)
-
-  # Define url request
-  # thi si because regular httr2 setting doesnt return an interger in libcurl version, generating a API error related to versionin
-
-  versions <- c(
-    httr2 = utils::packageVersion("httr2"),
-    `r-curl` = utils::packageVersion("curl"),
-    libcurl = sub("-DEV", "", curl::curl_version()$version)
-  )
-  string <- paste0(names(versions), "/", versions, collapse = " ")
-
-  request <- request(url) |>
-    req_headers(
-      'Authorization' = paste('Bearer', bearer)
-    ) |>
-    req_user_agent(string)
-
-
-
-  # Display processing message if not quiet
-  if (!quiet) message(paste0("Processing: ", file_name))
-
-
-
-  # Perform the download
-  if (quiet) {
-
-    # automaticallly overwrites
-    #how to capture error correrctly? try catch
-    response <- request |>
-      req_perform(
-        path = download_path
-      )
-
-  } else {
-    response <- request |>
-      req_progress(type = "down") |>
-      req_perform(
-        path = download_path
-      )
-
-  }
-
-  # Check for successful download
-  if (resp_status(response) != 200) {
-    message("Error in downloading data")
-    message(response |>
-              resp_status_desc()
-    )
-  }
-
-  # Convert downloaded file to raster
-  raster_data <- convert_h5_to_raster(download_path,
-                                      variable,
-                                      quality_flags_to_remove)
-
-  return(raster_data)
-}
-
-
 #' Define Black Marble Variable
 #'
 #' Defines the variable based on the Black Marble product ID if it is NULL.
@@ -1004,7 +914,49 @@ process_tiles <-
       r_list$fun <- max
       return(do.call(mosaic, r_list))
     }
-  }
+}
+#' Intersect black marble tiles with region of interest
+#'
+#' This function intersects black marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
+#'
+#' @param black_marble_tiles_sf Spatial object representing black marble tiles.
+#' @param roi_sf Spatial object representing the region of interest.
+#' @return Spatial object containing black marble tiles intersecting with the region of interest.
+#' @export
+#' @import sf
+#' @importFrom stringr str_detect
+#' @examples
+#' \dontrun{
+#' # Load required libraries
+#' library(sf)
+#'
+#' # Create example data
+#' black_marble_tiles_sf <- st_read("path_to_black_marble_tiles_shapefile")
+#' roi_sf <- st_read("path_to_roi_shapefile")
+#'
+#' # Intersect black marble tiles with region of interest
+#' intersected_tiles <- intersect_bm_tiles(black_marble_tiles_sf, roi_sf)
+#' }
+intersect_bm_tiles <- function(black_marble_tiles_sf, roi_sf) {
+  # Remove grid along edges, which causes st_intersects to fail
+  black_marble_tiles_sf <- black_marble_tiles_sf[!(stringr::str_detect(black_marble_tiles_sf$TileID, "h00") | stringr::str_detect(black_marble_tiles_sf$TileID, "v00")), ]
+
+  inter <- tryCatch(
+    {
+      inter <- sf::st_intersects(black_marble_tiles_sf, roi_sf, sparse = FALSE) |>
+        apply(1, sum)
+
+      inter
+    },
+    error = function(e){
+      warning("Issue with `roi_sf` intersecting with black marble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+      stop("Issue with `roi_sf` intersecting with black marble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+    }
+  )
+
+  grid_use_sf <- black_marble_tiles_sf[inter > 0,]
+  return(grid_use_sf)
+}
 
 
 #' Retrieve and Process Nightlight Data
@@ -1064,29 +1016,23 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 
   # Intersecting tiles ---------------------------------------------------------
   # Remove grid along edges, which causes st_intersects to fail
-
-  black_marble_tiles_sf <- black_marble_tiles_sf[!(str_detect(black_marble_tiles_sf$TileID, "h00") | str_detect(black_marble_tiles_sf$TileID, "v00")), ]
-
-
-  inter <- tryCatch(
-    {
-      inter <- st_intersects(black_marble_tiles_sf, roi_sf, sparse = F) |>
-        apply(1, sum)
-
-      inter
-    },
-    error = function(e){
-      warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-      stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-    }
-  )
-
-  grid_use_sf <- black_marble_tiles_sf[inter > 0,]
-
+  # Intersect black marble tiles with region of interest
+  intersected_tiles <- intersect_bm_tiles(black_marble_tiles_sf,
+                                          roi_sf)
   # Make Raster ----------------------------------------------------------------
   print("processing tiles...")
 
-  raster <- process_tiles(bm_files_df, grid_use_sf, check_all_tiles_exist, temp_dir, product_id, variable, bearer, quality_flags_to_remove, quiet)
+  raster <- process_tiles(
+    bm_files_df,
+    intersected_tiles,
+    check_all_tiles_exist,
+    temp_dir,
+    product_id,
+    variable,
+    bearer,
+    quality_flags_to_remove,
+    quiet
+  )
 
   ## Crop
   raster <- raster |>
