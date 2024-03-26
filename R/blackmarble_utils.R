@@ -69,8 +69,8 @@ map_black_marble_tiles <- function() {
 #' @export
 julian_to_month <- function(julian_date) {
   months <- c("01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12")
-  days <- as.integer(julian_date)
-  month_index <- findInterval(days, c(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366))
+  j_day <- as.integer(julian_date)
+  month_index <- findInterval(j_day, c(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366))
   return(as.numeric(months[month_index]))
 }
 
@@ -766,20 +766,20 @@ create_black_marble_dataset_df <- function(product_id,
     "VNP46A3" = list(months = NULL, days = c(
       "001", "032", "061", "092", "122", "153", "183", "214", "245", "275", "306", "336",
       "060", "091", "121", "152", "182", "213", "244", "274", "305", "335"
-    )),
+    ), add_month = TRUE),
     "VNP46A4" = list(months = NULL, days = "001", add_month = FALSE)
   )
 
   # Retrieve product-specific parameters
   params <- product_params[[product_id]]
 
-  # Determine end year
+  # Determine end year #what is this for?
   year_end <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Generate parameter dataframe
-  param_df <- expand.grid(
-    year = 2012:year_end,
-    day = sprintf("%03d", params$days)
+  param_df <- expand_grid(
+    years = 2012:year_end,
+    days = params$days # sprintf("%03d", params$days) days already come in the correct format
   )
 
 
@@ -787,28 +787,28 @@ create_black_marble_dataset_df <- function(product_id,
   if (params$add_month) {
     param_df <- param_df |>
       dplyr::mutate(
-        month = day |>
-          julian_to_month()
-      )
+        months = days |>
+          map_int(julian_to_month)
+        )
   }
 
   # Subset time period
   if (!is.null(years)) {
-    param_df <- param_df[param_df$year %in% years, ]
+    param_df <- param_df[param_df$years %in% years, ]
   }
 
   if (!is.null(months)) {
-    param_df <- param_df[as.numeric(param_df$month) %in% as.numeric(months), ]
+    param_df <- param_df[as.numeric(param_df$months) %in% as.numeric(months), ]
   }
 
   if (!is.null(days)) {
-    param_df <- param_df[as.numeric(param_df$day) %in% as.numeric(days), ]
+    param_df <- param_df[as.numeric(param_df$days) %in% as.numeric(days), ]
   }
 
   # Create data
   files_df <- purrr::map2(
-    param_df$year,
-    param_df$day,
+    param_df$years,
+    param_df$days,
     read_black_marble_csv,
     product_id
   ) |>
