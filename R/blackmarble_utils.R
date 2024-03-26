@@ -239,7 +239,7 @@ apply_scaling_factor_to_viirs_data <- function(x, variable, quiet = TRUE) {
 #'
 #' @export
 download_h5_viirs_sat_image <- function(file_name,
-                                        temp_dir,
+                                        download_path,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
@@ -270,9 +270,6 @@ download_h5_viirs_sat_image <- function(file_name,
       "Authorization" = paste("Bearer", bearer)
     ) |>
     httr2::req_user_agent(string)
-
-  # Define download path
-  download_path <- file.path(temp_dir, file_name)
 
   # Display processing message if not quiet
   if (!quiet) message(paste0("Processing: ", file_name))
@@ -477,14 +474,14 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
 #'
 #' @export
 extract_data_and_metadata_from_hdf5 <- function(h5_data,
-                                                file_path,
+                                                download_path,
                                                 variable_name,
                                                 quality_flags_to_remove) {
-  if (grepl("VNP46A1|VNP46A2", file_path, ignore.case = TRUE)) {
+  if (grepl("VNP46A1|VNP46A2", download_path, ignore.case = TRUE)) {
     print("im in daily_result")
     # Extract data for daily files
     daily_result <- extract_daily_data(
-      file_path,
+      download_path,
       h5_data,
       variable_name,
       quality_flags_to_remove
@@ -599,18 +596,18 @@ clean_raster_data <- function(raster_obj, variable_name) {
 #' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
 #'
 #' @export
-convert_h5_to_raster <- function(file_path,
+convert_h5_to_raster <- function(download_path,
                                  variable_name,
                                  quality_flags_to_remove = numeric()) {
   # Load HDF5 file
-  h5_data <- hdf5r::h5file(file_path, "r+")
+  h5_data <- hdf5r::h5file(download_path, "r+")
 
   # Extract data and metadata
   # print("extract_data_and_metadata_from_hdf5")
 
   result_metadata_list <- extract_data_and_metadata_from_hdf5(
     h5_data,
-    file_path,
+    download_path,
     variable_name,
     quality_flags_to_remove
   )
@@ -661,6 +658,7 @@ download_and_convert_raster <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
+
   # Define download path
   download_path <- file.path(temp_dir, file_name)
 
@@ -902,6 +900,7 @@ process_tiles <-
            bearer,
            quality_flags_to_remove,
            quiet) {
+
     tile_ids_rx <- grid_use_sf$TileID |>
       paste(collapse = "|")
 
@@ -1109,6 +1108,7 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 #' Extract and process raster data for individual dates
 extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
                                   quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
+
   bm_r <- retrieve_and_process_nightlight_data(
     roi_sf = roi_sf,
     product_id = product_id,

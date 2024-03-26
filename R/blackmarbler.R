@@ -85,14 +85,14 @@ bm_raster <- function(roi_sf,
                       date,
                       bearer,
                       variable = NULL,
-                      quality_flags_to_remove = NULL,
+               quality_flags_to_remove = NULL,
                       check_all_tiles_exist = TRUE,
                       interpol_na = FALSE,
                       output_location_type = "memory", # memory, file
                       file_dir = NULL,
                       file_prefix = NULL,
                       file_skip_if_exists = TRUE,
-                      quiet = FALSE,
+                      quiet = FALSE       ,
                       ...) {
   # Error Checks ---------------------------------------------------------------
   if (interpol_na && length(date) == 1) {
