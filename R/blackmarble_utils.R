@@ -510,7 +510,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
       nCols = ncol(data),
       res = nrow(data),
       nodata_val = NA,
-      myCrs = "+proj=longlat +datum=WGS84", # default crs for VIIRS data
+      myCrs = "epsg:4326", # default crs for VIIRS data
       min_lon = min_lon,
       max_lon = max_lon,
       min_lat = min_lat,
@@ -532,11 +532,13 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
 #'
 #' @export
 create_raster_from_data_metadata <- function(data, metadata) {
-  # Transpose data
-  transposed_data <- t(data)
+  #transpose data to fix flipped row and column order
+  #depending upon how your data are formatted you might not have to perform this
+ # transposed_data <- t(data)
 
   # Assign nodata values to NA
-  transposed_data[transposed_data == metadata$nodata_val] <- NA
+  # transposed_data[transposed_data == metadata$nodata_val] <- NA
+  data[data == metadata$nodata_val] <- NA
 
   # Create extent class
   rasExt <- terra::ext(c(
@@ -547,7 +549,7 @@ create_raster_from_data_metadata <- function(data, metadata) {
   ))
 
   # Create raster object
-  my_raster <- terra::rast(transposed_data,
+  my_raster <- terra::rast(data,
     extent = rasExt,
     crs = metadata$myCrs
   )
@@ -680,11 +682,6 @@ download_and_convert_raster <- function(file_name,
 
   return(raster_data)
 }
-
-
-# stopped here ------------------------------------------------------------
-
-
 
 #' Read Black Marble CSV Data
 #'

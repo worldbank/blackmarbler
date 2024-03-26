@@ -122,7 +122,7 @@ bm_raster <- function(roi_sf,
   blackmarble_variable <- define_blackmarble_variable(variable, product_id)
 
   # Download and Process Rasters -----------------------------------------------
-  r_list <- lapply(date, function(date_i) {
+  raster_list <- lapply(date, function(date_i) {
     out <- tryCatch(
       {
         date_name_i <- define_raster_name(date_i, product_id)
@@ -165,9 +165,10 @@ bm_raster <- function(roi_sf,
   })
 
   # Clean output ---------------------------------------------------------------
-  r_list <- r_list[!sapply(r_list, is.null)]
+  raster_list <- raster_list[!sapply(raster_list, is.null)]
 
-  r <- if (length(r_list) == 1) r_list[[1]] else terra::rast(r_list)
+  # extends need to match?
+  r <- if (length(raster_list) == 1) raster_list[[1]] else terra::rast(raster_list)
 
   # Interpolate ----------------------------------------------------------------
   if (interpol_na) {
@@ -272,7 +273,7 @@ bm_extract <- function(roi_sf,
     r <- bind_extracted_data(n_obs_df, ntl_df)
   } else {
     # Download data --------------------------------------------------------------
-    r_list <- lapply(date, function(date_i) {
+    raster_list <- lapply(date, function(date_i) {
       tryCatch(
         {
           # Make name for raster based on date
@@ -310,7 +311,7 @@ bm_extract <- function(roi_sf,
       )
     })
 
-    r <- bind_extracted_data_list(r_list)
+    r <- bind_extracted_data_list(raster_list)
   }
 
   unlink(temp_dir, recursive = TRUE)
