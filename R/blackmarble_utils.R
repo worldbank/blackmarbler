@@ -30,21 +30,22 @@
 #' # Generate the map
 #' map_black_marble_tiles()
 map_black_marble_tiles <- function() {
-
   # Define the center coordinates and zoom level
-  center <- c(19.432608, -99.133209)  # Mexico City coordinates
+  center <- c(19.432608, -99.133209) # Mexico City coordinates
 
-  zoom <- 2  # Adjust the zoom level as needed
+  zoom <- 2 # Adjust the zoom level as needed
 
   map <- leaflet::leaflet() |>
     leaflet::addProviderTiles("Stadia.AlidadeSmooth") |>
-    leaflet::addPolygons(data = black_marble_tiles_sf,
-                         color = "#35B779",
-                         weight = 3,
-                         fillOpacity = 0,
-                         opacity = 1) |>
+    leaflet::addPolygons(
+      data = black_marble_tiles_sf,
+      color = "#35B779",
+      weight = 3,
+      fillOpacity = 0,
+      opacity = 1
+    ) |>
     leaflet::addProviderTiles("NASAGIBS.ViirsEarthAtNight2012", options = leaflet::providerTileOptions(opacity = 0.5)) |>
-    leaflet::addMarkers(lng = center[2], lat = center[1], popup = paste("Latitude:", center[1], "<br>Longitude:", center[2])) |>  # Add marker with lat lon info
+    leaflet::addMarkers(lng = center[2], lat = center[1], popup = paste("Latitude:", center[1], "<br>Longitude:", center[2])) |> # Add marker with lat lon info
     leaflet::setView(lng = center[2], lat = center[1], zoom = zoom)
 
   return(map)
@@ -96,29 +97,35 @@ julian_to_month <- function(julian_date) {
 #' @export
 remove_fill_value_from_satellite_data <- function(data, variable) {
   artifact_values_mapping <- list(
-    list(255, c("Granule", "Mandatory_Quality_Flag", "Latest_High_Quality_Retrieval",
-                "Snow_Flag", "DNB_Platform", "Land_Water_Mask",
-                "AllAngle_Composite_Snow_Covered_Quality", "AllAngle_Composite_Snow_Free_Quality",
-                "NearNadir_Composite_Snow_Covered_Quality", "NearNadir_Composite_Snow_Free_Quality",
-                "OffNadir_Composite_Snow_Covered_Quality", "OffNadir_Composite_Snow_Free_Quality")),
+    list(255, c(
+      "Granule", "Mandatory_Quality_Flag", "Latest_High_Quality_Retrieval",
+      "Snow_Flag", "DNB_Platform", "Land_Water_Mask",
+      "AllAngle_Composite_Snow_Covered_Quality", "AllAngle_Composite_Snow_Free_Quality",
+      "NearNadir_Composite_Snow_Covered_Quality", "NearNadir_Composite_Snow_Free_Quality",
+      "OffNadir_Composite_Snow_Covered_Quality", "OffNadir_Composite_Snow_Free_Quality"
+    )),
     list(-999.9, "UTC_Time"),
-    list(-32768, c("Sensor_Azimuth", "Sensor_Zenith", "Solar_Azimuth", "Solar_Zenith",
-                   "Lunar_Azimuth", "Lunar_Zenith", "Glint_Angle", "Moon_Illumination_Fraction",
-                   "Moon_Phase_Angle")),
-    list(65535, c("DNB_At_Sensor_Radiance_500m", "BrightnessTemperature_M12", "BrightnessTemperature_M13",
-                  "BrightnessTemperature_M15", "BrightnessTemperature_M16", "QF_Cloud_Mask", "QF_DNB",
-                  "QF_VIIRS_M10", "QF_VIIRS_M11", "QF_VIIRS_M12", "QF_VIIRS_M13", "QF_VIIRS_M15", "QF_VIIRS_M16",
-                  "Radiance_M10", "Radiance_M11", "DNB_BRDF-Corrected_NTL", "DNB_Lunar_Irradiance",
-                  "Gap_Filled_DNB_BRDF-Corrected_NTL", "AllAngle_Composite_Snow_Covered",
-                  "AllAngle_Composite_Snow_Covered_Num", "AllAngle_Composite_Snow_Free",
-                  "AllAngle_Composite_Snow_Free_Num", "NearNadir_Composite_Snow_Covered",
-                  "NearNadir_Composite_Snow_Covered_Num", "NearNadir_Composite_Snow_Free",
-                  "NearNadir_Composite_Snow_Free_Num", "OffNadir_Composite_Snow_Covered",
-                  "OffNadir_Composite_Snow_Covered_Num", "OffNadir_Composite_Snow_Free",
-                  "OffNadir_Composite_Snow_Free_Num", "AllAngle_Composite_Snow_Covered_Std",
-                  "AllAngle_Composite_Snow_Free_Std", "NearNadir_Composite_Snow_Covered_Std",
-                  "NearNadir_Composite_Snow_Free_Std", "OffNadir_Composite_Snow_Covered_Std",
-                  "OffNadir_Composite_Snow_Free_Std"))
+    list(-32768, c(
+      "Sensor_Azimuth", "Sensor_Zenith", "Solar_Azimuth", "Solar_Zenith",
+      "Lunar_Azimuth", "Lunar_Zenith", "Glint_Angle", "Moon_Illumination_Fraction",
+      "Moon_Phase_Angle"
+    )),
+    list(65535, c(
+      "DNB_At_Sensor_Radiance_500m", "BrightnessTemperature_M12", "BrightnessTemperature_M13",
+      "BrightnessTemperature_M15", "BrightnessTemperature_M16", "QF_Cloud_Mask", "QF_DNB",
+      "QF_VIIRS_M10", "QF_VIIRS_M11", "QF_VIIRS_M12", "QF_VIIRS_M13", "QF_VIIRS_M15", "QF_VIIRS_M16",
+      "Radiance_M10", "Radiance_M11", "DNB_BRDF-Corrected_NTL", "DNB_Lunar_Irradiance",
+      "Gap_Filled_DNB_BRDF-Corrected_NTL", "AllAngle_Composite_Snow_Covered",
+      "AllAngle_Composite_Snow_Covered_Num", "AllAngle_Composite_Snow_Free",
+      "AllAngle_Composite_Snow_Free_Num", "NearNadir_Composite_Snow_Covered",
+      "NearNadir_Composite_Snow_Covered_Num", "NearNadir_Composite_Snow_Free",
+      "NearNadir_Composite_Snow_Free_Num", "OffNadir_Composite_Snow_Covered",
+      "OffNadir_Composite_Snow_Covered_Num", "OffNadir_Composite_Snow_Free",
+      "OffNadir_Composite_Snow_Free_Num", "AllAngle_Composite_Snow_Covered_Std",
+      "AllAngle_Composite_Snow_Free_Std", "NearNadir_Composite_Snow_Covered_Std",
+      "NearNadir_Composite_Snow_Free_Std", "OffNadir_Composite_Snow_Covered_Std",
+      "OffNadir_Composite_Snow_Free_Std"
+    ))
   )
 
   mapping_found <- FALSE
@@ -130,7 +137,7 @@ remove_fill_value_from_satellite_data <- function(data, variable) {
       value <- mapping[[1]]
       data[data == value] <- NA
       mapping_found <- TRUE
-      break  # exit loop once artifact value is found
+      break # exit loop once artifact value is found
     }
   }
 
@@ -236,7 +243,6 @@ download_h5_viirs_sat_image <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
-
   # Extract file metadata
   year <- substr(file_name, 10, 13)
   day <- substr(file_name, 14, 16)
@@ -244,8 +250,10 @@ download_h5_viirs_sat_image <- function(file_name,
 
 
   # Construct download URL
-  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
-                product_id, '/', year, '/', day, '/', file_name)
+  url <- paste0(
+    "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",
+    product_id, "/", year, "/", day, "/", file_name
+  )
 
   # Define url request
   # This is because regular httr2 setting doesn't return an integer in libcurl version, generating an API error related to versioning
@@ -259,7 +267,7 @@ download_h5_viirs_sat_image <- function(file_name,
 
   request <- httr2::request(url) |>
     httr2::req_headers(
-      'Authorization' = paste('Bearer', bearer)
+      "Authorization" = paste("Bearer", bearer)
     ) |>
     httr2::req_user_agent(string)
 
@@ -287,11 +295,8 @@ download_h5_viirs_sat_image <- function(file_name,
   if (httr2::resp_status(response) != 200) {
     message("Error in downloading data")
     message(response |>
-              httr2::resp_status_desc()
-    )
+      httr2::resp_status_desc())
   }
-
-
 }
 #' Extracts bounding box coordinates based on tile ID from the file path
 #'
@@ -309,7 +314,7 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
   tile_i <- file_path |>
     stringr::str_extract("h\\d{2}v\\d{2}")
 
-  grid_i_sf <- black_marble_tiles_sf[black_marble_tiles_sf$TileID %in% tile_i,]
+  grid_i_sf <- black_marble_tiles_sf[black_marble_tiles_sf$TileID %in% tile_i, ]
 
   grid_i_sf_box <- grid_i_sf |>
     sf::st_bbox()
@@ -344,7 +349,6 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
 extract_daily_data <- function(file_path,
                                h5_data,
                                variable_name, quality_flags_to_remove) {
-
   allowed_variables_for_daily_data <- c(
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
@@ -364,17 +368,19 @@ extract_daily_data <- function(file_path,
     "OffNadir_Composite_Snow_Free_Std"
   )
 
-  if(!(variable_name %in% allowed_variables_for_daily_data)) {
+  if (!(variable_name %in% allowed_variables_for_daily_data)) {
     stop("Variable name must be one of the specified values.")
   }
 
-  out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable_name)]][,]
-  qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
+  out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable_name)]][, ]
+  qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][, ]
 
   # Check if there are quality flags to remove and if the variable is applicable
-  if (length(quality_flags_to_remove) > 0 && variable_name %in% c("DNB_BRDF-Corrected_NTL",
-                                                                  "Gap_Filled_DNB_BRDF-Corrected_NTL",
-                                                                  "Latest_High_Quality_Retrieval")) {
+  if (length(quality_flags_to_remove) > 0 && variable_name %in% c(
+    "DNB_BRDF-Corrected_NTL",
+    "Gap_Filled_DNB_BRDF-Corrected_NTL",
+    "Latest_High_Quality_Retrieval"
+  )) {
     # Iterate over each quality flag value to remove
     for (flag_value in quality_flags_to_remove) {
       # Set values to NA where quality flag matches the specified value
@@ -393,7 +399,6 @@ extract_daily_data <- function(file_path,
 
   # Return the extracted data and bounding box coordinates
   return(list(data = out, min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat))
-
 }
 
 #' Extract Monthly Data from HDF5 File
@@ -402,7 +407,7 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
   lat <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lat"]][]
   lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
 
-  out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable_name)]][,]
+  out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable_name)]][, ]
 
   # Check if there are quality flags to remove
   if (length(quality_flags_to_remove) > 0) {
@@ -417,7 +422,7 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
     # Check if the quality flag variable exists in the data
     if (qf_name %in% names(h5_data)) {
       # Extract the quality flag data
-      qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", qf_name)]][,]
+      qf <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", qf_name)]][, ]
 
       # Set values to NA where quality flag matches the specified value
       for (val in quality_flags_to_remove) {
@@ -478,17 +483,18 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
   if (grepl("VNP46A1|VNP46A2", file_path, ignore.case = TRUE)) {
     print("im in daily_result")
     # Extract data for daily files
-    daily_result <- extract_daily_data(file_path,
-                                       h5_data,
-                                       variable_name,
-                                       quality_flags_to_remove)
+    daily_result <- extract_daily_data(
+      file_path,
+      h5_data,
+      variable_name,
+      quality_flags_to_remove
+    )
 
     data <- daily_result$data
     min_lon <- daily_result$min_lon
     max_lon <- daily_result$max_lon
     min_lat <- daily_result$min_lat
     max_lat <- daily_result$max_lat
-
   } else {
     print("im in monthly_result")
     # Extract data for monthly/annually files
@@ -498,7 +504,6 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
     max_lon <- monthly_result$max_lon
     min_lat <- monthly_result$min_lat
     max_lat <- monthly_result$max_lat
-
   }
 
   # Construct metadata
@@ -530,7 +535,6 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
 #'
 #' @export
 create_raster_from_data_metadata <- function(data, metadata) {
-
   # Transpose data
   transposed_data <- t(data)
 
@@ -538,15 +542,18 @@ create_raster_from_data_metadata <- function(data, metadata) {
   transposed_data[transposed_data == metadata$nodata_val] <- NA
 
   # Create extent class
-  rasExt <- terra::ext(c(metadata$min_lon,
-                  metadata$max_lon,
-                  metadata$min_lat,
-                  metadata$max_lat))
+  rasExt <- terra::ext(c(
+    metadata$min_lon,
+    metadata$max_lon,
+    metadata$min_lat,
+    metadata$max_lat
+  ))
 
   # Create raster object
   my_raster <- terra::rast(transposed_data,
-                    extent = rasExt,
-                    crs = metadata$myCrs)
+    extent = rasExt,
+    crs = metadata$myCrs
+  )
 
   return(my_raster)
 }
@@ -595,17 +602,18 @@ clean_raster_data <- function(raster_obj, variable_name) {
 convert_h5_to_raster <- function(file_path,
                                  variable_name,
                                  quality_flags_to_remove = numeric()) {
-
   # Load HDF5 file
   h5_data <- hdf5r::h5file(file_path, "r+")
 
   # Extract data and metadata
-  #print("extract_data_and_metadata_from_hdf5")
+  # print("extract_data_and_metadata_from_hdf5")
 
-  result_metadata_list <- extract_data_and_metadata_from_hdf5(h5_data,
-                                                     file_path,
-                                                     variable_name,
-                                                     quality_flags_to_remove)
+  result_metadata_list <- extract_data_and_metadata_from_hdf5(
+    h5_data,
+    file_path,
+    variable_name,
+    quality_flags_to_remove
+  )
 
   data <- result_metadata_list$data
 
@@ -653,21 +661,24 @@ download_and_convert_raster <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
-
   # Define download path
   download_path <- file.path(temp_dir, file_name)
 
   # Download VIIRS satellite image in HDF5 format
-  download_h5_viirs_sat_image(file_name,
-                                                 download_path,
-                                                 bearer,
-                                                 quality_flags_to_remove,
-                                                 quiet)
+  download_h5_viirs_sat_image(
+    file_name,
+    download_path,
+    bearer,
+    quality_flags_to_remove,
+    quiet
+  )
 
   # Convert downloaded file to raster
-  raster_data <- convert_h5_to_raster(download_path,
-                                      variable,
-                                      quality_flags_to_remove)
+  raster_data <- convert_h5_to_raster(
+    download_path,
+    variable,
+    quality_flags_to_remove
+  )
 
   return(raster_data)
 }
@@ -700,24 +711,24 @@ download_and_convert_raster <- function(file_name,
 #'
 #' @export
 read_black_marble_csv <- function(year, day, product_id) {
-
   df_out <- tryCatch(
     {
       df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/", product_id, "/", year, "/", day, ".csv"),
-                     show_col_types = FALSE)
+        show_col_types = FALSE
+      )
 
       df$year <- year
       df$day <- day
 
       df
     },
-    error = function(e){
+    error = function(e) {
       warning(paste0("Error with year: ", year, "; day: ", day))
       data.frame(NULL)
     }
   )
 
-  Sys.sleep(0.1)  # Adding a small delay to avoid overloading the server
+  Sys.sleep(0.1) # Adding a small delay to avoid overloading the server
 
   return(df_out)
 }
@@ -753,13 +764,14 @@ create_black_marble_dataset_df <- function(product_id,
                                            years = NULL,
                                            months = NULL,
                                            days = NULL) {
-
   # Define product-specific parameters and conditions
   product_params <- list(
     "VNP46A1" = list(months = NULL, days = 1:366, add_month = TRUE),
     "VNP46A2" = list(months = NULL, days = 1:366, add_month = TRUE),
-    "VNP46A3" = list(months = NULL, days = c("001", "032", "061", "092", "122", "153", "183", "214", "245", "275", "306", "336",
-                                             "060", "091", "121", "152", "182", "213", "244", "274", "305", "335")),
+    "VNP46A3" = list(months = NULL, days = c(
+      "001", "032", "061", "092", "122", "153", "183", "214", "245", "275", "306", "336",
+      "060", "091", "121", "152", "182", "213", "244", "274", "305", "335"
+    )),
     "VNP46A4" = list(months = NULL, days = "001", add_month = FALSE)
   )
 
@@ -770,9 +782,10 @@ create_black_marble_dataset_df <- function(product_id,
   year_end <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Generate parameter dataframe
-  param_df <- expand.grid(year = 2012:year_end,
-                          day = sprintf("%03d", params$days)
-                          )
+  param_df <- expand.grid(
+    year = 2012:year_end,
+    day = sprintf("%03d", params$days)
+  )
 
 
   # Add month if required
@@ -780,7 +793,7 @@ create_black_marble_dataset_df <- function(product_id,
     param_df <- param_df |>
       dplyr::mutate(
         month = day |>
-               julian_to_month()
+          julian_to_month()
       )
   }
 
@@ -798,10 +811,12 @@ create_black_marble_dataset_df <- function(product_id,
   }
 
   # Create data
-  files_df <- purrr::map2(param_df$year,
-                   param_df$day,
-                   read_black_marble_csv,
-                   product_id) |>
+  files_df <- purrr::map2(
+    param_df$year,
+    param_df$day,
+    read_black_marble_csv,
+    product_id
+  ) |>
     purrr::list_rbind()
 
   return(files_df)
@@ -819,11 +834,12 @@ create_black_marble_dataset_df <- function(product_id,
 define_blackmarble_variable <- function(variable, product_id) {
   if (is.null(variable)) {
     variable <- switch(product_id,
-                       "VNP46A1" = "DNB_At_Sensor_Radiance_500m",
-                       "VNP46A2" = "Gap_Filled_DNB_BRDF-Corrected_NTL",
-                       "VNP46A3" = "NearNadir_Composite_Snow_Free",
-                       "VNP46A4" = "NearNadir_Composite_Snow_Free",
-                       variable)
+      "VNP46A1" = "DNB_At_Sensor_Radiance_500m",
+      "VNP46A2" = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+      "VNP46A3" = "NearNadir_Composite_Snow_Free",
+      "VNP46A4" = "NearNadir_Composite_Snow_Free",
+      variable
+    )
   }
 
   return(variable)
@@ -843,9 +859,10 @@ define_blackmarble_variable <- function(variable, product_id) {
 #' @export
 define_raster_name <- function(date_string, product_id) {
   raster_name <- switch(product_id,
-                        "VNP46A1", "VNP46A2" = paste0("t", stringr::str_replace_all(date_string, "-", "_")),
-                        "VNP46A3" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 7)),
-                        "VNP46A4" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 4))
+    "VNP46A1",
+    "VNP46A2" = paste0("t", stringr::str_replace_all(date_string, "-", "_")),
+    "VNP46A3" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 7)),
+    "VNP46A4" = paste0("t", stringr::str_replace_all(date_string, "-", "_") |> substring(1, 4))
   )
 
   return(raster_name)
@@ -862,15 +879,17 @@ define_raster_name <- function(date_string, product_id) {
 #'
 #' @export
 count_n_obs <- function(values) {
-  #coverage_fraction was a param but not used perhaps the other functions needs it
+  # coverage_fraction was a param but not used perhaps the other functions needs it
   orig_vars <- names(values)
 
   values |>
     dplyr::mutate(
-      dplyr::across(orig_vars, ~ as.numeric(!is.na(.)) )) |>
+      dplyr::across(orig_vars, ~ as.numeric(!is.na(.)))
+    ) |>
     dplyr::summarise(
       dplyr::across(orig_vars, sum, .names = "n_non_na_pixels.{.col}"),
-              dplyr::across(orig_vars, ~length(.), .names = "n_pixels.{.col}"))
+      dplyr::across(orig_vars, ~ length(.), .names = "n_pixels.{.col}")
+    )
 }
 
 process_tiles <-
@@ -882,14 +901,12 @@ process_tiles <-
            variable,
            bearer,
            quality_flags_to_remove,
-           quiet
-  ) {
-
+           quiet) {
     tile_ids_rx <- grid_use_sf$TileID |>
       paste(collapse = "|")
 
     selected_bm_files_df <- bm_files_df[bm_files_df$name |>
-                                          stringr::str_detect(tile_ids_rx), ]
+      stringr::str_detect(tile_ids_rx), ]
 
 
     if ((nrow(selected_bm_files_df) < nrow(grid_use_sf)) && check_all_tiles_exist) {
@@ -904,12 +921,14 @@ process_tiles <-
     }
 
     r_list <- lapply(selected_bm_files_df$name, function(name_i) {
-      download_and_convert_raster(name_i,
-                                  temp_dir,
-                                  variable,
-                                  bearer,
-                                  quality_flags_to_remove,
-                                  quiet)
+      download_and_convert_raster(
+        name_i,
+        temp_dir,
+        variable,
+        bearer,
+        quality_flags_to_remove,
+        quiet
+      )
     })
 
     if (length(r_list) == 1) {
@@ -919,7 +938,7 @@ process_tiles <-
       r_list$fun <- max
       return(do.call(terra::mosaic, r_list))
     }
-}
+  }
 #' Intersect black marble tiles with region of interest
 #'
 #' This function intersects black marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
@@ -953,13 +972,13 @@ intersect_bm_tiles <- function(black_marble_tiles_sf, roi_sf) {
 
       inter
     },
-    error = function(e){
+    error = function(e) {
       warning("Issue with `roi_sf` intersecting with black marble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
       stop("Issue with `roi_sf` intersecting with black marble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
     }
   )
 
-  grid_use_sf <- black_marble_tiles_sf[inter > 0,]
+  grid_use_sf <- black_marble_tiles_sf[inter > 0, ]
   return(grid_use_sf)
 }
 
@@ -997,33 +1016,38 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
                                                  quiet = FALSE,
                                                  temp_dir) {
   # Checks ---------------------------------------------------------------------
-  if(!("sf" %in% class(roi_sf))){
+  if (!("sf" %in% class(roi_sf))) {
     stop("roi must be an sf object")
   }
 
 
   # Prep dates -----------------------------------------------------------------
   date <- switch(product_id,
-                 "VNP46A3" = ifelse(nchar(date) == 7, paste0(date, "-01"), date),
-                 "VNP46A4" = ifelse(nchar(date) == 4, paste0(date, "-01-01"), date),
-                 date)
+    "VNP46A3" = ifelse(nchar(date) == 7, paste0(date, "-01"), date),
+    "VNP46A4" = ifelse(nchar(date) == 4, paste0(date, "-01-01"), date),
+    date
+  )
 
   # Grab tile dataframe --------------------------------------------------------
-  year  <- date |>  lubridate::year()
-  month <- date |>  lubridate::month()
-  day   <- date |>  lubridate::yday()
+  year <- date |> lubridate::year()
+  month <- date |> lubridate::month()
+  day <- date |> lubridate::yday()
 
-  bm_files_df <- create_black_marble_dataset_df(product_id = product_id,
-                                                all = T,
-                                                years = year,
-                                                months = month,
-                                                days = day)
+  bm_files_df <- create_black_marble_dataset_df(
+    product_id = product_id,
+    all = T,
+    years = year,
+    months = month,
+    days = day
+  )
 
   # Intersecting tiles ---------------------------------------------------------
   # Remove grid along edges, which causes st_intersects to fail
   # Intersect black marble tiles with region of interest
-  intersected_tiles <- intersect_bm_tiles(black_marble_tiles_sf,
-                                          roi_sf)
+  intersected_tiles <- intersect_bm_tiles(
+    black_marble_tiles_sf,
+    roi_sf
+  )
   # Make Raster ----------------------------------------------------------------
   print("processing tiles...")
 
@@ -1058,12 +1082,16 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 
   if (add_n_pixels) {
     # Compute additional pixel information if add_n_pixels is TRUE
-    roi_df$n_pixels <-  exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction)
-      sum(!is.na(values)),
-      progress = !quiet)
-    roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction)
-      length(values),
-      progress = !quiet)
+    roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      sum(!is.na(values))
+    },
+    progress = !quiet
+    )
+    roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      length(values)
+    },
+    progress = !quiet
+    )
     roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
   }
 
@@ -1081,27 +1109,35 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 #' Extract and process raster data for individual dates
 extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
                                   quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
-  bm_r <- retrieve_and_process_nightlight_data(roi_sf = roi_sf,
-                                               product_id = product_id,
-                                               date = date_i,
-                                               bearer = bearer,
-                                               variable = variable,
-                                               quality_flags_to_remove = quality_flags_to_remove,
-                                               check_all_tiles_exist = check_all_tiles_exist,
-                                               quiet = quiet,
-                                               temp_dir = temp_dir)
+  bm_r <- retrieve_and_process_nightlight_data(
+    roi_sf = roi_sf,
+    product_id = product_id,
+    date = date_i,
+    bearer = bearer,
+    variable = variable,
+    quality_flags_to_remove = quality_flags_to_remove,
+    check_all_tiles_exist = check_all_tiles_exist,
+    quiet = quiet,
+    temp_dir = temp_dir
+  )
 
-  r_agg <- exactextractr::exact_extract(x = bm_r, y = roi_sf, fun = aggregation_fun,
-                         progress = !quiet)
+  r_agg <- exactextractr::exact_extract(
+    x = bm_r, y = roi_sf, fun = aggregation_fun,
+    progress = !quiet
+  )
 
   if (add_n_pixels) {
     # Compute additional pixel information if add_n_pixels is TRUE
-    roi_sf$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
-      sum(!is.na(values)),
-      progress = !quiet)
-    roi_sf$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction)
-      length(values),
-      progress = !quiet)
+    roi_sf$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
+      sum(!is.na(values))
+    },
+    progress = !quiet
+    )
+    roi_sf$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
+      length(values)
+    },
+    progress = !quiet
+    )
     roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels
   }
 

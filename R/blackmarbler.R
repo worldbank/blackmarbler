@@ -52,26 +52,32 @@
 #'
 #' # sf polygon of Ghana
 #' library(geodata)
-#' roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) %>% st_as_sf()
+#' roi_sf <- gadm(country = "GHA", level = 1, path = tempdir()) %>% st_as_sf()
 #'
 #' # Daily data: raster for October 3, 2021
-#' ken_20210205_r <- bm_extract(roi_sf = roi_sf,
-#'                             product_id = "VNP46A2",
-#'                             date = "2021-10-03",
-#'                             bearer = bearer)
+#' ken_20210205_r <- bm_extract(
+#'   roi_sf = roi_sf,
+#'   product_id = "VNP46A2",
+#'   date = "2021-10-03",
+#'   bearer = bearer
+#' )
 #'
 #' # Monthly data: raster for March 2021
-#' ken_202103_r <- bm_extract(roi_sf = roi_sf,
-#'                           product_id = "VNP46A3",
-#'                           date = "2021-03-01",
-#'                           bearer = bearer)
+#' ken_202103_r <- bm_extract(
+#'   roi_sf = roi_sf,
+#'   product_id = "VNP46A3",
+#'   date = "2021-03-01",
+#'   bearer = bearer
+#' )
 #'
 #' # Annual data: raster for 2021
-#' ken_2021_r <- bm_extract(roi_sf = roi_sf,
-#'                         product_id = "VNP46A4",
-#'                         date = 2021,
-#'                         bearer = bearer)
-#'}
+#' ken_2021_r <- bm_extract(
+#'   roi_sf = roi_sf,
+#'   product_id = "VNP46A4",
+#'   date = 2021,
+#'   bearer = bearer
+#' )
+#' }
 #'
 #' @export
 bm_raster <- function(roi_sf,
@@ -87,8 +93,7 @@ bm_raster <- function(roi_sf,
                       file_prefix = NULL,
                       file_skip_if_exists = TRUE,
                       quiet = FALSE,
-                      ...){
-
+                      ...) {
   # Error Checks ---------------------------------------------------------------
   if (interpol_na && length(date) == 1) {
     stop("If interpol_na = TRUE, then must have more than one date")
@@ -102,10 +107,10 @@ bm_raster <- function(roi_sf,
   # Assign Interpolation Variables ---------------------------------------------
   if (interpol_na) {
     method <- "linear"
-    rule   <- 1
-    f      <- 0
-    ties   <- mean
-    z      <- NULL
+    rule <- 1
+    f <- 0
+    ties <- mean
+    z <- NULL
     NArule <- 1
   }
 
@@ -132,15 +137,17 @@ bm_raster <- function(roi_sf,
           }
         }
 
-        r <- retrieve_and_process_nightlight_data(roi_sf = roi_sf,
-                                                  product_id = product_id,
-                                                  date = date_i,
-                                                  bearer = bearer,
-                                                  variable = blackmarble_variable,
-                                                  quality_flags_to_remove = quality_flags_to_remove,
-                                                  check_all_tiles_exist = check_all_tiles_exist,
-                                                  quiet = quiet,
-                                                  temp_dir = temp_dir)
+        r <- retrieve_and_process_nightlight_data(
+          roi_sf = roi_sf,
+          product_id = product_id,
+          date = date_i,
+          bearer = bearer,
+          variable = blackmarble_variable,
+          quality_flags_to_remove = quality_flags_to_remove,
+          check_all_tiles_exist = check_all_tiles_exist,
+          quiet = quiet,
+          temp_dir = temp_dir
+        )
 
         if (output_location_type == "file") {
           terra::writeRaster(r, out_path)
@@ -158,7 +165,7 @@ bm_raster <- function(roi_sf,
   })
 
   # Clean output ---------------------------------------------------------------
-  r_list <- r_list[!sapply(r_list,is.null)]
+  r_list <- r_list[!sapply(r_list, is.null)]
 
   r <- if (length(r_list) == 1) r_list[[1]] else terra::rast(r_list)
 
@@ -217,7 +224,6 @@ bm_extract <- function(roi_sf,
                        file_skip_if_exists = TRUE,
                        quiet = FALSE,
                        ...) {
-
   # Errors & Warnings ----------------------------------------------------------
   if (interpol_na & length(date) == 1) {
     stop("If interpol_na = TRUE, then must have more than one date")
@@ -236,75 +242,75 @@ bm_extract <- function(roi_sf,
 
   if (interpol_na) {
     # Create raster
-    bm_r <- bm_raster(roi_sf = roi_sf,
-                      product_id = product_id,
-                      date = date,
-                      bearer = bearer,
-                      variable = variable,
-                      quality_flags_to_remove = quality_flags_to_remove,
-                      check_all_tiles_exist = check_all_tiles_exist,
-                      interpol_na = FALSE,
-                      quiet = quiet,
-                      temp_dir = temp_dir)
+    bm_r <- bm_raster(
+      roi_sf = roi_sf,
+      product_id = product_id,
+      date = date,
+      bearer = bearer,
+      variable = variable,
+      quality_flags_to_remove = quality_flags_to_remove,
+      check_all_tiles_exist = check_all_tiles_exist,
+      interpol_na = FALSE,
+      quiet = quiet,
+      temp_dir = temp_dir
+    )
 
     # Interpolate
     bm_r <- terra::approximate(bm_r,
-                        method = "linear",
-                        rule = 1,
-                        f = 0,
-                        ties = mean,
-                        z = NULL,
-                        NArule = 1)
+      method = "linear",
+      rule = 1,
+      f = 0,
+      ties = mean,
+      z = NULL,
+      NArule = 1
+    )
 
     # Extract
     n_obs_df <- extract_and_process(bm_r, roi_sf, count_n_obs, quiet)
     ntl_df <- extract_and_process(bm_r, roi_sf, aggregation_fun, quiet)
 
     r <- bind_extracted_data(n_obs_df, ntl_df)
-
   } else {
-
     # Download data --------------------------------------------------------------
-    r_list <- lapply(date, function(date_i){
+    r_list <- lapply(date, function(date_i) {
+      tryCatch(
+        {
+          # Make name for raster based on date
+          date_name_i <- define_raster_name(date_i, product_id)
 
-      tryCatch({
+          # If save to file
+          if (output_location_type == "file") {
+            out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".Rds")
+            out_path <- file.path(file_dir, out_name)
 
-        # Make name for raster based on date
-        date_name_i <- define_raster_name(date_i, product_id)
+            if (file_skip_if_exists && file.exists(out_path)) {
+              return(NULL)
+            }
 
-        # If save to file
-        if (output_location_type == "file") {
+            r_agg <- extract_and_process_i(
+              roi_sf, product_id, date_i, bearer, variable,
+              quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir
+            )
 
-          out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".Rds")
-          out_path <- file.path(file_dir, out_name)
+            export_extracted_data(r_agg, out_path)
 
-          if (file_skip_if_exists && file.exists(out_path)) {
-            return(NULL)
+            return(NULL) # Saving as file, so output from function should be NULL
+          } else {
+            r_out <- extract_and_process_i(
+              roi_sf, product_id, date_i, bearer, variable,
+              quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir
+            )
+
+            return(r_out)
           }
-
-          r_agg <- extract_and_process_i(roi_sf, product_id, date_i, bearer, variable,
-                                         quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir)
-
-          export_extracted_data(r_agg, out_path)
-
-          return(NULL) # Saving as file, so output from function should be NULL
-
-        } else {
-
-          r_out <- extract_and_process_i(roi_sf, product_id, date_i, bearer, variable,
-                                         quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir)
-
-          return(r_out)
+        },
+        error = function(e) {
+          return(NULL)
         }
-
-      }, error = function(e) {
-        return(NULL)
-      })
-
+      )
     })
 
     r <- bind_extracted_data_list(r_list)
-
   }
 
   unlink(temp_dir, recursive = TRUE)
@@ -313,5 +319,3 @@ bm_extract <- function(roi_sf,
 
 
 # PENDING REPEAT DOCUMENTION OF PREVIOUS ----------------------------------
-
-
