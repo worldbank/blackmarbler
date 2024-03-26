@@ -1041,7 +1041,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 
   ## Crop
   raster <- raster |>
-    raster::crop(roi_sf)
+    terra::crop(roi_sf)
 
   unlink(file.path(temp_dir, product_id), recursive = T)
 
