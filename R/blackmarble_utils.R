@@ -777,7 +777,7 @@ create_black_marble_dataset_df <- function(product_id,
   year_end <- as.numeric(format(Sys.Date(), "%Y"))
 
   # Generate parameter dataframe
-  param_df <- expand_grid(
+  param_df <- tidyr::expand_grid(
     years = 2012:year_end,
     days = params$days # sprintf("%03d", params$days) days already come in the correct format
   )
@@ -788,7 +788,7 @@ create_black_marble_dataset_df <- function(product_id,
     param_df <- param_df |>
       dplyr::mutate(
         months = days |>
-          map_int(julian_to_month)
+          purrr::map_int(julian_to_month)
         )
   }
 
