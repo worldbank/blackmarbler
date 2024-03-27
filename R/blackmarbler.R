@@ -734,11 +734,11 @@ bm_extract <- function(roi_sf,
               
               if(add_n_pixels){
                 
-                r_n_obs <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+                r_n_obs <- exact_extract(r, roi_sf, function(values, coverage_fraction)
                   sum(!is.na(values)),
                   progress = !quiet)
                 
-                r_n_obs_poss <- exact_extract(r_out, roi_sf, function(values, coverage_fraction)
+                r_n_obs_poss <- exact_extract(r, roi_sf, function(values, coverage_fraction)
                   length(values),
                   progress = !quiet)
                 

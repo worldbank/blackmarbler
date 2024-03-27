@@ -30,8 +30,21 @@ bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 # getData function to load a polygon of Ghana
 #roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) |> st_as_sf()
 
+# Test -------------------------------------------------------------------------
+
 #########
 roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) |> st_as_sf()
+
+
+r_201804 <- bm_raster(roi_sf = roi_sf,
+                      product_id = "VNP46A3",
+                      date = "2018-04", # The day is ignored
+                      variable = "AllAngle_Composite_Snow_Free",
+                      quality_flag_rm = c(1, 2),
+                      bearer = bearer)
+
+
+
 
 ########
 r <- bm_raster(roi_sf = roi_sf,
