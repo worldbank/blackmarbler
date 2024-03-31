@@ -767,7 +767,11 @@ read_black_marble_csv <- function(year, day, product_id) {
     }
   )
 
+  # Add a small delay to avoid overloading the server
+  print("adding delay to avoid overloading the server")
   Sys.sleep(0.1) # Adding a small delay to avoid overloading the server
+
+  #should we just download the tiles df data?
 
   return(df_out)
 }

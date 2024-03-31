@@ -11,6 +11,19 @@
 
 <!-- badges: end -->
 
+## Next steps
+
+ - [ ] performance tuning
+ - [ ] migrate to cli package
+ - [ ] let user know how many tiles are gonna be process cause it timely
+ - [ ] More tests
+   - [ ] test bm_extract
+   - [X] test bm_raster
+   - [ ] test quality flags
+
+
+## Overview
+
 **BlackMarbleR** is a R package that provides a simple way to use nighttime lights data from NASA's Black Marble. [Black Marble](https://blackmarble.gsfc.nasa.gov) is a [NASA Earth Science Data Systems (ESDS)](https://www.earthdata.nasa.gov) project that provides a product suite of daily, monthly and yearly global [nighttime lights](https://www.earthdata.nasa.gov/learn/backgrounders/nighttime-lights). This package automates the process of downloading all relevant tiles from the [NASA LAADS DAAC](https://www.earthdata.nasa.gov/eosdis/daacs/laads) to cover a region of interest, converting and mosaicing the raw files (in HDF5 format) to georeferenced rasters.
 
 * [Installation](#installation)
