@@ -1,4 +1,25 @@
-# Test for daily data
+# Test for daily data VNP46A1
+test_that("Test raster for VNP46A1 works", {
+  # Define bearer token
+  bearer <- Sys.getenv("BEARER_NASA_TOKEN")
+
+  # sf polygon of Ghana
+  roi_sf <- geodata::gadm(country = "GHA", level = 1, path = tempdir()) |> sf::st_as_sf()
+
+  ken_20210205_r <- bm_raster(
+    roi_sf = roi_sf,
+    product_id = "VNP46A1",
+    date = "2021-10-03",
+    bearer = bearer,
+    quiet = TRUE
+  )
+
+  expect_true(class(ken_20210205_r)[1] == "SpatRaster",
+    info = "ken_20210205_r is not a SpatRaster object"
+  )
+})
+
+# Test for daily data VNP46A2
 test_that("Test raster for VNP46A2 works", {
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
