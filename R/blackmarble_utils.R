@@ -80,13 +80,13 @@ julian_to_month <- function(julian_date) {
 #' Artifact values are commonly used in satellite data to represent fill values,
 #' invalid measurements, or missing data.
 #'
-#' The artifact values and their corresponding variables are based on the data format
+#' The artifact values and their corresponding blackmarble_variables are based on the data format
 #' described in the Black Marble User Guide (https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf).
 #'  # * Table 3 (page 12)
 # * Table 6 (page 16)
 # * Table 9 (page 18)
 #' @param data A matrix or data frame containing satellite data.
-#' @param variable A character string specifying the variable for which artifact values should be removed.
+#' @param blackmarble_variable A character string specifying the blackmarble_variable for which artifact values should be removed.
 #' @return The input data with artifact values replaced by NA.
 #' @examples
 #' # Remove artifact values from UTC_Time variable in satellite data
@@ -95,7 +95,7 @@ julian_to_month <- function(julian_date) {
 #' For more information on artifact values in satellite data, refer to the Black Marble User Guide.
 #'
 #' @export
-remove_fill_value_from_satellite_data <- function(data, variable) {
+remove_fill_value_from_satellite_data <- function(data, blackmarble_variable) {
   artifact_values_mapping <- list(
     list(255, c(
       "Granule", "Mandatory_Quality_Flag", "Latest_High_Quality_Retrieval",
@@ -656,7 +656,7 @@ convert_h5_to_raster <- function(download_path,
 #' @export
 download_and_convert_raster <- function(file_name,
                                         temp_dir,
-                                        variable,
+                                        blackmarble_variable,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
@@ -676,7 +676,7 @@ download_and_convert_raster <- function(file_name,
   # Convert downloaded file to raster
   raster_data <- convert_h5_to_raster(
     download_path,
-    variable,
+    blackmarble_variable,
     quality_flags_to_remove
   )
 
@@ -893,7 +893,7 @@ process_tiles <-
            check_all_tiles_exist,
            temp_dir,
            product_id,
-           variable,
+           blackmarble_variable,
            bearer,
            quality_flags_to_remove,
            quiet) {
@@ -920,7 +920,7 @@ process_tiles <-
       download_and_convert_raster(
         name_i,
         temp_dir,
-        variable,
+        blackmarble_variable,
         bearer,
         quality_flags_to_remove,
         quiet
@@ -987,7 +987,7 @@ intersect_bm_tiles <- function(black_marble_tiles_sf, roi_sf) {
 #' @param product_id A character string specifying the product ID.
 #' @param date A character string representing the date.
 #' @param bearer A character string representing the authorization bearer token.
-#' @param variable A character string specifying the variable to extract.
+#' @param blackmarble_variable A character string specifying the blackmarble_variable to extract.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
 #' @param check_all_tiles_exist A logical value indicating whether to check if all satellite imagery tiles for the location exist (default is TRUE).
 #' @param quiet A logical value indicating whether to suppress progress messages (default is FALSE).
@@ -1006,7 +1006,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
                                                  product_id,
                                                  date,
                                                  bearer,
-                                                 variable,
+                                                 blackmarble_variable,
                                                  quality_flags_to_remove,
                                                  check_all_tiles_exist = TRUE,
                                                  quiet = FALSE,
@@ -1029,6 +1029,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
   month <- date |> lubridate::month()
   day <- date |> lubridate::yday()
 
+  # Slow!!
   bm_files_df <- create_black_marble_dataset_df(
     product_id = product_id,
     all = T,
@@ -1053,7 +1054,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
     check_all_tiles_exist,
     temp_dir,
     product_id,
-    variable,
+    blackmarble_variable,
     bearer,
     quality_flags_to_remove,
     quiet
@@ -1103,7 +1104,7 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 }
 
 #' Extract and process raster data for individual dates
-extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
+extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, blackmarble_variable,
                                   quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
 
   bm_r <- retrieve_and_process_nightlight_data(
@@ -1111,7 +1112,7 @@ extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, variable,
     product_id = product_id,
     date = date_i,
     bearer = bearer,
-    variable = variable,
+    blackmarble_variable = blackmarble_variable,
     quality_flags_to_remove = quality_flags_to_remove,
     check_all_tiles_exist = check_all_tiles_exist,
     quiet = quiet,
