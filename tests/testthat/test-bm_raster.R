@@ -27,7 +27,8 @@ test_that("Test raster for VNP46A3 monthly data works", {
   ken_202103_r <- bm_raster(roi_sf = roi_sf,
                             product_id = "VNP46A3",
                             date = "2021-03-01",
-                            bearer = bearer)
+                            bearer = bearer,
+                            quiet = TRUE)
 
   expect_true(class(ken_202103_r) == "SpatRaster",
               info = "ken_202103_r is not a SpatRaster object")
@@ -44,7 +45,11 @@ test_that("Test raster for VNP46A4 anual data works", {
   ken_2021_r <- bm_raster(roi_sf = roi_sf,
                           product_id = "VNP46A4",
                           date = 2021,
-                          bearer = bearer)
+                          bearer = bearer,
+                          quiet = TRUE)
+
   expect_true(class(ken_2021_r) == "SpatRaster",
               info = "ken_2021_r is not a SpatRaster object")
 })
+
+# pending test to run with quality flags
