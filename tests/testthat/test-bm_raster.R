@@ -1,4 +1,4 @@
-# Test for daily data VNP46A1
+# Test for daily data VNP46A1 (this fails)
 test_that("Test raster for VNP46A1 works", {
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
@@ -15,7 +15,7 @@ test_that("Test raster for VNP46A1 works", {
   )
 
   expect_true(class(ken_20210205_r)[1] == "SpatRaster",
-    info = "ken_20210205_r is not a SpatRaster object"
+              info = "ken_20210205_r is not a SpatRaster object"
   )
 })
 
@@ -36,7 +36,7 @@ test_that("Test raster for VNP46A2 works", {
   )
 
   expect_true(class(ken_20210205_r)[1] == "SpatRaster",
-    info = "ken_20210205_r is not a SpatRaster object"
+              info = "ken_20210205_r is not a SpatRaster object"
   )
 })
 
@@ -57,7 +57,7 @@ test_that("Test raster for VNP46A3 monthly data works", {
   )
 
   expect_true(class(ken_202103_r) == "SpatRaster",
-    info = "ken_202103_r is not a SpatRaster object"
+              info = "ken_202103_r is not a SpatRaster object"
   )
 })
 
@@ -78,7 +78,7 @@ test_that("Test raster for VNP46A4 anual data works", {
   )
 
   expect_true(class(ken_2021_r) == "SpatRaster",
-    info = "ken_2021_r is not a SpatRaster object"
+              info = "ken_2021_r is not a SpatRaster object"
   )
 })
 
