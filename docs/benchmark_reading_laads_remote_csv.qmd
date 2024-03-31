@@ -1,0 +1,60 @@
+---
+title: "Benchmark Reading LAADS Remote CSV: readr vs duckdb"
+---
+
+```{r}
+library(readr)
+library(dplyr)
+library(duckdb)
+#install.packages("microbenchmark")
+library(microbenchmark)
+```
+
+```{r}
+# Renamed functions with emphasized package names
+readr_laads_vnp46_h5_file_names <- function(laads_url) {
+  readr::read_csv(laads_url,
+                        show_col_types = FALSE) |>
+    dplyr::mutate(
+      year = year,
+      day = day
+    )
+}
+
+duckdb_laads_vnp46_h5_file_names <- function(quack_conn, laads_url) {
+  dplyr::tbl(quack_conn,
+             glue::glue("read_csv('{laads_url}', auto_detect = true)")
+  ) |>
+    dplyr::mutate(
+      year = year,
+      day = day
+    ) |>
+    dplyr::collect()
+}
+
+```
+
+```{r}
+product_id <- "VNP46A2"
+year <- "2023"
+day <- "001"
+quack_conn <- dbConnect(duckdb::duckdb(), ":memory:")
+      duckdb::dbSendQuery(quack_conn,
+                        "INSTALL httpfs;
+                        LOAD httpfs;")
+laads_url <- glue::glue("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/{product_id}/{year}/{day}.csv")
+
+```
+
+```{r}
+benchmark_result <- microbenchmark(
+  readr_laads_vnp46_h5_file_names(laads_url),
+  duckdb_laads_vnp46_h5_file_names(quack_conn, laads_url),
+  times = 10
+)
+```
+
+```{r}
+print(benchmark_result)
+```
+
