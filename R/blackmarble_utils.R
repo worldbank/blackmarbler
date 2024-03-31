@@ -346,7 +346,6 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
 extract_daily_data <- function(download_file_path,
                                h5_data,
                                blackmarble_variable, quality_flags_to_remove) {
-
   allowed_variables_for_daily_data <- c(
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
@@ -371,14 +370,14 @@ extract_daily_data <- function(download_file_path,
   }
 
 
-# Get Data out of H5 ------------------------------------------------------
+  # Get Data out of H5 ------------------------------------------------------
 
 
   out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", blackmarble_variable)]][, ]
   qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][, ]
 
 
-# Apply Quality Flags to H5 data ------------------------------------------
+  # Apply Quality Flags to H5 data ------------------------------------------
 
 
 
@@ -396,14 +395,14 @@ extract_daily_data <- function(download_file_path,
   }
 
 
-# Extract Bounding Box from Raster ----------------------------------------
+  # Extract Bounding Box from Raster ----------------------------------------
 
 
   # Call the extract_bounding_box function to get the bounding box coordinates
   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
 
 
-# Get Min Max Coordinates -------------------------------------------------
+  # Get Min Max Coordinates -------------------------------------------------
 
 
   # Extract the coordinates from the bounding box list
@@ -420,8 +419,7 @@ extract_daily_data <- function(download_file_path,
 extract_monthly_data <- function(download_file_path,
                                  h5_data, blackmarble_variable,
                                  quality_flags_to_remove) {
-
-# Extract Lan and Lon from H5 Month data WHy? ----------------------------------
+  # Extract Lan and Lon from H5 Month data WHy? ----------------------------------
 
 
   # Extracting monthly data logic from the original function
@@ -429,13 +427,13 @@ extract_monthly_data <- function(download_file_path,
   lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
 
 
-# Get Data out of H5 ------------------------------------------------------
+  # Get Data out of H5 ------------------------------------------------------
 
 
   out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", blackmarble_variable)]][, ]
 
 
-# Apply Quality Flags to H5 Data ------------------------------------------
+  # Apply Quality Flags to H5 Data ------------------------------------------
 
 
   # Check if there are quality flags to remove
@@ -461,7 +459,7 @@ extract_monthly_data <- function(download_file_path,
   }
 
 
-# Convert Data to Matrix? ------------------------------------------------------
+  # Convert Data to Matrix? ------------------------------------------------------
 
 
   # Check if the data type of the first element is not numeric
@@ -472,21 +470,21 @@ extract_monthly_data <- function(download_file_path,
   }
 
 
-# Extract Bounding Box from Raster ----------------------------------------
-#
-#   # Call the extract_bounding_box function to get the bounding box coordinates
-#   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
-#
+  # Extract Bounding Box from Raster ----------------------------------------
+  #
+  #   # Call the extract_bounding_box function to get the bounding box coordinates
+  #   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
+  #
 
-# Get Min Max Coordinates -------------------------------------------------
+  # Get Min Max Coordinates -------------------------------------------------
 
 
   # Extract lon/lat
 
-    min_lon <- min(lon) |> round()
-    max_lon <- max(lon) |> round()
-    min_lat <- min(lat) |> round()
-    max_lat <- max(lat) |> round()
+  min_lon <- min(lon) |> round()
+  max_lon <- max(lon) |> round()
+  min_lat <- min(lat) |> round()
+  max_lat <- max(lat) |> round()
 
 
   return(list(data = out, min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat))
@@ -534,10 +532,12 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
   } else {
     print("im in monthly_result")
     # Extract data for monthly/annually files
-    monthly_result <- extract_monthly_data(download_path,
-                                           h5_data,
-                                           blackmarble_variable,
-                                           quality_flags_to_remove)
+    monthly_result <- extract_monthly_data(
+      download_path,
+      h5_data,
+      blackmarble_variable,
+      quality_flags_to_remove
+    )
 
     data <- monthly_result$data
     min_lon <- monthly_result$min_lon
@@ -575,9 +575,9 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
 #'
 #' @export
 create_raster_from_data_metadata <- function(data, metadata) {
-  #transpose data to fix flipped row and column order
-  #depending upon how your data are formatted you might not have to perform this
- # transposed_data <- t(data)
+  # transpose data to fix flipped row and column order
+  # depending upon how your data are formatted you might not have to perform this
+  # transposed_data <- t(data)
 
   # Assign nodata values to NA
   # transposed_data[transposed_data == metadata$nodata_val] <- NA
@@ -703,7 +703,6 @@ download_and_convert_raster <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
-
   # Define download path
   download_path <- file.path(temp_dir, file_name)
 
@@ -771,7 +770,7 @@ read_black_marble_csv <- function(year, day, product_id) {
   print("adding delay to avoid overloading the server")
   Sys.sleep(0.1) # Adding a small delay to avoid overloading the server
 
-  #should we just download the tiles df data?
+  # should we just download the tiles df data?
 
   return(df_out)
 }
@@ -837,7 +836,7 @@ create_black_marble_dataset_df <- function(product_id,
       dplyr::mutate(
         months = days |>
           purrr::map_int(julian_to_month)
-        )
+      )
   }
 
   # Subset time period
@@ -946,7 +945,6 @@ process_tiles <-
            bearer,
            quality_flags_to_remove,
            quiet) {
-
     tile_ids_rx <- grid_use_sf$TileID |>
       paste(collapse = "|")
 
@@ -1155,7 +1153,6 @@ extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet)
 #' Extract and process raster data for individual dates
 extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, blackmarble_variable,
                                   quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
-
   bm_r <- retrieve_and_process_nightlight_data(
     roi_sf = roi_sf,
     product_id = product_id,
