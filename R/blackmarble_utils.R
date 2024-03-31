@@ -460,7 +460,7 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
 #'
 #' @param h5_data The HDF5 file data.
 #' @param file_path A character string specifying the file path.
-#' @param variable_name A character string specifying the variable name.
+#' @param blackmarble_variable A character string specifying the variable name.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data.
 #'
 #' @return A list containing the extracted data and metadata.
@@ -475,7 +475,7 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
 #' @export
 extract_data_and_metadata_from_hdf5 <- function(h5_data,
                                                 download_path,
-                                                variable_name,
+                                                blackmarble_variable,
                                                 quality_flags_to_remove) {
   if (grepl("VNP46A1|VNP46A2", download_path, ignore.case = TRUE)) {
     print("im in daily_result")
@@ -483,7 +483,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
     daily_result <- extract_daily_data(
       download_path,
       h5_data,
-      variable_name,
+      blackmarble_variable,
       quality_flags_to_remove
     )
 
@@ -495,7 +495,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
   } else {
     print("im in monthly_result")
     # Extract data for monthly/annually files
-    monthly_result <- extract_monthly_data(h5_data, variable_name, quality_flags_to_remove)
+    monthly_result <- extract_monthly_data(h5_data, blackmarble_variable, quality_flags_to_remove)
     data <- monthly_result$data
     min_lon <- monthly_result$min_lon
     max_lon <- monthly_result$max_lon
@@ -585,7 +585,7 @@ clean_raster_data <- function(raster_obj, variable_name) {
 #' Converts an HDF5 file to a raster object.
 #'
 #' @param file_path A character string representing the filepath to the HDF5 file.
-#' @param variable_name A character string specifying the variable name to extract from the HDF5 file.
+#' @param blackmarble_variable A character string specifying the blackmarble_variable name to extract from the HDF5 file.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
 #'
 #' @return A raster object containing the extracted variable data from the HDF5 file.
@@ -599,7 +599,7 @@ clean_raster_data <- function(raster_obj, variable_name) {
 #'
 #' @export
 convert_h5_to_raster <- function(download_path,
-                                 variable_name,
+                                 blackmarble_variable,
                                  quality_flags_to_remove = numeric()) {
   # Load HDF5 file
   h5_data <- hdf5r::h5file(download_path, "r+")
@@ -610,7 +610,7 @@ convert_h5_to_raster <- function(download_path,
   result_metadata_list <- extract_data_and_metadata_from_hdf5(
     h5_data,
     download_path,
-    variable_name,
+    blackmarble_variable,
     quality_flags_to_remove
   )
 
@@ -663,6 +663,7 @@ download_and_convert_raster <- function(file_name,
 
   # Define download path
   download_path <- file.path(temp_dir, file_name)
+
 
   # Download VIIRS satellite image in HDF5 format
   download_h5_viirs_sat_image(
