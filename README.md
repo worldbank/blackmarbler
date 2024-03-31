@@ -16,8 +16,8 @@
  - [ ] performance tuning
  - [ ] migrate to cli package
  - [ ] let user know how many tiles are gonna be process cause it timely
- - [ ] More tests
-   - [ ] test bm_extract
+ - [ ] More tests (priority)
+   - [ ] test bm_extract (next)
    - [X] test bm_raster
    - [ ] test quality flags
 
