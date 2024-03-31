@@ -875,18 +875,25 @@ create_black_marble_dataset_df <- function(product_id,
 #'
 #' @export
 define_blackmarble_variable <- function(variable, product_id) {
+  available_products <- c("VNP46A1", "VNP46A2", "VNP46A3", "VNP46A4")
+
+  if (!(product_id %in% available_products)) {
+    stop("Product ID must be in the list of available Black Marble products.")
+  }
+
   if (is.null(variable)) {
     variable <- switch(product_id,
-      "VNP46A1" = "DNB_At_Sensor_Radiance_500m",
-      "VNP46A2" = "Gap_Filled_DNB_BRDF-Corrected_NTL",
-      "VNP46A3" = "NearNadir_Composite_Snow_Free",
-      "VNP46A4" = "NearNadir_Composite_Snow_Free",
-      variable
+                       "VNP46A1" = "DNB_At_Sensor_Radiance_500m",
+                       "VNP46A2" = "Gap_Filled_DNB_BRDF-Corrected_NTL",
+                       "VNP46A3" = "NearNadir_Composite_Snow_Free",
+                       "VNP46A4" = "NearNadir_Composite_Snow_Free",
+                       variable
     )
   }
 
   return(variable)
 }
+
 
 
 
