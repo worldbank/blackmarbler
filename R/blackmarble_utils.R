@@ -133,7 +133,7 @@ remove_fill_value_from_satellite_data <- function(data, blackmarble_variable) {
 
   for (mapping in artifact_values_mapping) {
     variables <- mapping[[2]]
-    if (variable %in% variables || variable %in% unlist(variables)) {
+    if (blackmarble_variable %in% variables || blackmarble_variable %in% unlist(variables)) {
       value <- mapping[[1]]
       data[data == value] <- NA
       mapping_found <- TRUE
@@ -142,7 +142,7 @@ remove_fill_value_from_satellite_data <- function(data, blackmarble_variable) {
   }
 
   if (!mapping_found) {
-    warning(paste("Variable", variable, "not found in artifact values mapping. No action taken."))
+    warning(paste("Variable", blackmarble_variable, "not found in artifact values mapping. No action taken."))
   }
 
   return(data)
@@ -343,9 +343,10 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
 #' Black Marble User Guide - https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf
 #'
 #' @export
-extract_daily_data <- function(file_path,
+extract_daily_data <- function(download_file_path,
                                h5_data,
-                               variable_name, quality_flags_to_remove) {
+                               blackmarble_variable, quality_flags_to_remove) {
+
   allowed_variables_for_daily_data <- c(
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
@@ -365,15 +366,24 @@ extract_daily_data <- function(file_path,
     "OffNadir_Composite_Snow_Free_Std"
   )
 
-  if (!(variable_name %in% allowed_variables_for_daily_data)) {
+  if (!(blackmarble_variable %in% allowed_variables_for_daily_data)) {
     stop("Variable name must be one of the specified values.")
   }
 
-  out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable_name)]][, ]
+
+# Get Data out of H5 ------------------------------------------------------
+
+
+  out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", blackmarble_variable)]][, ]
   qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][, ]
 
+
+# Apply Quality Flags to H5 data ------------------------------------------
+
+
+
   # Check if there are quality flags to remove and if the variable is applicable
-  if (length(quality_flags_to_remove) > 0 && variable_name %in% c(
+  if (length(quality_flags_to_remove) > 0 && blackmarble_variable %in% c(
     "DNB_BRDF-Corrected_NTL",
     "Gap_Filled_DNB_BRDF-Corrected_NTL",
     "Latest_High_Quality_Retrieval"
@@ -385,8 +395,16 @@ extract_daily_data <- function(file_path,
     }
   }
 
+
+# Extract Bounding Box from Raster ----------------------------------------
+
+
   # Call the extract_bounding_box function to get the bounding box coordinates
-  bounding_box <- extract_bounding_box(file_path, black_marble_tiles_sf)
+  bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
+
+
+# Get Min Max Coordinates -------------------------------------------------
+
 
   # Extract the coordinates from the bounding box list
   min_lon <- bounding_box$min_lon
@@ -399,17 +417,31 @@ extract_daily_data <- function(file_path,
 }
 
 #' Extract Monthly Data from HDF5 File
-extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove) {
+extract_monthly_data <- function(download_file_path,
+                                 h5_data, blackmarble_variable,
+                                 quality_flags_to_remove) {
+
+# Extract Lan and Lon from H5 Month data WHy? ----------------------------------
+
+
   # Extracting monthly data logic from the original function
   lat <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lat"]][]
   lon <- h5_data[["HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/lon"]][]
 
-  out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", variable_name)]][, ]
+
+# Get Data out of H5 ------------------------------------------------------
+
+
+  out <- h5_data[[paste0("HDFEOS/GRIDS/VIIRS_Grid_DNB_2d/Data Fields/", blackmarble_variable)]][, ]
+
+
+# Apply Quality Flags to H5 Data ------------------------------------------
+
 
   # Check if there are quality flags to remove
   if (length(quality_flags_to_remove) > 0) {
     # Extract the base variable name without "_Num" or "_Std"
-    variable_short <- variable_name |>
+    variable_short <- blackmarble_variable |>
       stringr::str_remove_all("_Num") |>
       stringr::str_remove_all("_Std")
 
@@ -429,26 +461,33 @@ extract_monthly_data <- function(h5_data, variable_name, quality_flags_to_remove
   }
 
 
+# Convert Data to Matrix? ------------------------------------------------------
+
+
   # Check if the data type of the first element is not numeric
   if (class(out[1, 1]) != "numeric") {
+    print("Data is not numeric. Converting to numeric.")
     # Convert the entire matrix to numeric
     out <- as.matrix(as.numeric(out))
   }
 
 
-  # Extract lon/lat if available
-  # if not i think the rest fails. so we need to check if it is available
-  if ("lon" %in% colnames(out) && "lat" %in% colnames(out)) {
-    min_lon <- min(out$lon)
-    max_lon <- max(out$lon)
-    min_lat <- min(out$lat)
-    max_lat <- max(out$lat)
-  } else {
-    min_lon <- NULL
-    max_lon <- NULL
-    min_lat <- NULL
-    max_lat <- NULL
-  }
+# Extract Bounding Box from Raster ----------------------------------------
+#
+#   # Call the extract_bounding_box function to get the bounding box coordinates
+#   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
+#
+
+# Get Min Max Coordinates -------------------------------------------------
+
+
+  # Extract lon/lat
+
+    min_lon <- min(lon) |> round()
+    max_lon <- max(lon) |> round()
+    min_lat <- min(lat) |> round()
+    max_lat <- max(lat) |> round()
+
 
   return(list(data = out, min_lon = min_lon, max_lon = max_lon, min_lat = min_lat, max_lat = max_lat))
 }
@@ -495,7 +534,11 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
   } else {
     print("im in monthly_result")
     # Extract data for monthly/annually files
-    monthly_result <- extract_monthly_data(h5_data, blackmarble_variable, quality_flags_to_remove)
+    monthly_result <- extract_monthly_data(download_path,
+                                           h5_data,
+                                           blackmarble_variable,
+                                           quality_flags_to_remove)
+
     data <- monthly_result$data
     min_lon <- monthly_result$min_lon
     max_lon <- monthly_result$max_lon
@@ -626,7 +669,7 @@ convert_h5_to_raster <- function(download_path,
   print("clean_raster_data")
 
   # Clean raster data
-  clean_raster_obj <- clean_raster_data(raster_obj, variable_name)
+  clean_raster_obj <- clean_raster_data(raster_obj, blackmarble_variable)
 
   # Close HDF5 file
   h5_data$close_all()
