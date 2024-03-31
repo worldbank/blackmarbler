@@ -811,7 +811,7 @@ create_black_marble_dataset_df <- function(product_id,
       "001", "032", "061", "092", "122", "153", "183", "214", "245", "275", "306", "336",
       "060", "091", "121", "152", "182", "213", "244", "274", "305", "335"
     ), add_month = TRUE),
-    "VNP46A4" = list(months = NULL, days = "001", add_month = FALSE)
+    "VNP46A4" = list(months = NULL, days = "001", add_month = TRUE)
   )
 
   # Retrieve product-specific parameters
@@ -850,6 +850,7 @@ create_black_marble_dataset_df <- function(product_id,
   }
 
   # Create data
+  # this is the slow operation
   files_df <- purrr::map2(
     param_df$years,
     param_df$days,
