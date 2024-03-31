@@ -753,10 +753,11 @@ read_black_marble_csv <- function(year, day, product_id) {
     {
       df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/", product_id, "/", year, "/", day, ".csv"),
         show_col_types = FALSE
-      )
-
-      df$year <- year
-      df$day <- day
+      ) |>
+        dplyr::mutate(
+          year = year,
+          day = day
+        )
 
       df
     },
