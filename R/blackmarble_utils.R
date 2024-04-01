@@ -346,7 +346,9 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
 extract_daily_data <- function(download_file_path,
                                h5_data,
                                blackmarble_variable, quality_flags_to_remove) {
+
   allowed_variables_for_daily_data <- c(
+    "DNB_At_Sensor_Radiance_500m", #VNP46A1
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
     "Gap_Filled_DNB_BRDF-Corrected_NTL",
@@ -374,29 +376,33 @@ extract_daily_data <- function(download_file_path,
 
 
   out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", blackmarble_variable)]][, ]
-  qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][, ]
+
+    # Apply Quality Flags to H5 data ------------------------------------------
+  # if VNP46A1 dont search for quality flags
+
+  if (blackmarble_variable != "DNB_At_Sensor_Radiance_500m") {
+
+    qf <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][, ]
 
 
-  # Apply Quality Flags to H5 data ------------------------------------------
-
-
-
-  # Check if there are quality flags to remove and if the variable is applicable
-  if (length(quality_flags_to_remove) > 0 && blackmarble_variable %in% c(
-    "DNB_BRDF-Corrected_NTL",
-    "Gap_Filled_DNB_BRDF-Corrected_NTL",
-    "Latest_High_Quality_Retrieval"
-  )) {
-    # Iterate over each quality flag value to remove
-    for (flag_value in quality_flags_to_remove) {
-      # Set values to NA where quality flag matches the specified value
-      out[qf == flag_value] <- NA
+    # Check if there are quality flags to remove and if the variable is applicable
+    if (length(quality_flags_to_remove) > 0 && blackmarble_variable %in% c(
+      "DNB_BRDF-Corrected_NTL",
+      "Gap_Filled_DNB_BRDF-Corrected_NTL",
+      "Latest_High_Quality_Retrieval"
+    )) {
+      # Iterate over each quality flag value to remove
+      for (flag_value in quality_flags_to_remove) {
+        # Set values to NA where quality flag matches the specified value
+        out[qf == flag_value] <- NA
+      }
     }
   }
 
 
-  # Extract Bounding Box from Raster ----------------------------------------
 
+
+  # Extract Bounding Box from Raster ----------------------------------------
 
   # Call the extract_bounding_box function to get the bounding box coordinates
   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
@@ -470,7 +476,7 @@ extract_monthly_data <- function(download_file_path,
   }
 
 
-  # Extract Bounding Box from Raster ----------------------------------------
+  # Extract Bounding Box from Raster NOT ----------------------------------------
   #
   #   # Call the extract_bounding_box function to get the bounding box coordinates
   #   bounding_box <- extract_bounding_box(download_file_path, black_marble_tiles_sf)
@@ -514,6 +520,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
                                                 download_path,
                                                 blackmarble_variable,
                                                 quality_flags_to_remove) {
+
   if (grepl("VNP46A1|VNP46A2", download_path, ignore.case = TRUE)) {
     print("im in daily_result")
     # Extract data for daily files
