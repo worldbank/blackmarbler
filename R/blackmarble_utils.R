@@ -1084,7 +1084,8 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
     "VNP46A3" = ifelse(nchar(date) == 7, paste0(date, "-01"), date),
     "VNP46A4" = ifelse(nchar(date) == 4, paste0(date, "-01-01"), date),
     date
-  )
+  ) |>
+    as.Date(origin = "1970-01-01")
 
   # Grab tile dataframe --------------------------------------------------------
   year <- date |> lubridate::year()
