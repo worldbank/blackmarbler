@@ -125,6 +125,8 @@ bm_raster <- function(roi_sf,
   raster_list <- lapply(date, function(date_i) {
     out <- tryCatch(
       {
+
+
         date_name_i <- define_raster_name(date_i, product_id)
 
         if (output_location_type == "file") {
@@ -136,6 +138,9 @@ bm_raster <- function(roi_sf,
             return(NULL)
           }
         }
+
+        #print("Date:")
+        #print(date_i)
 
         r <- retrieve_and_process_nightlight_data(
           roi_sf = roi_sf,

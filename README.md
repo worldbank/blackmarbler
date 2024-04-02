@@ -20,6 +20,9 @@
    - [ ] test bm_extract (next)
    - [X] test bm_raster
    - [ ] test quality flags
+   - [ ] test based off readme examples
+     - [X] bm raster test
+     - [ ] bm extract tests
 
 
 ## Overview
