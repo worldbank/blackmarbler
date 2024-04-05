@@ -166,7 +166,7 @@ bm_raster <- function(roi_sf,
       },
       error = function(e) {
         # add error message of error
-        cli::cli_inform("Error in down load and porocess function")
+        cli::cli_inform("Error in download and process function")
         return(NULL)
       }
     )
@@ -332,8 +332,7 @@ bm_extract <- function(roi_sf,
               quality_flags_to_remove = quality_flags_to_remove,
               check_all_tiles_exist = check_all_tiles_exist,
               interpol_na = interpol_na,
-              quiet = quiet,
-              file_dir = out_path
+              quiet = quiet
             )
 
 
@@ -367,6 +366,7 @@ bm_extract <- function(roi_sf,
 
 # Create Raster -----------------------------------------------------------
 
+            cli::cli_inform("Calling BM raster for bm Spat Raster")
 
             bm_r <- bm_raster(
               roi_sf = roi_sf,
@@ -377,13 +377,13 @@ bm_extract <- function(roi_sf,
               quality_flags_to_remove = quality_flags_to_remove,
               check_all_tiles_exist = check_all_tiles_exist,
               interpol_na = interpol_na,
-              quiet = quiet,
-              file_dir = file_dir
+              quiet = quiet
             )
 
 
 # Extract and Process -----------------------------------------------------
 
+            cli::cli_inform("Calling extract and process")
 
             r_out <- extract_and_process(bm_r = bm_r,
                                          roi_sf = roi_sf,

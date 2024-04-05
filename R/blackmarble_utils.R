@@ -1227,6 +1227,10 @@ extract_and_process <-
 
 
     if (length(fun) > 1) {
+
+# setting column names per function ---------------------------------------
+
+
       names(extracted_data) <- paste0("ntl_", names(extracted_data))
       extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
 
