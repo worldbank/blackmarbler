@@ -1168,7 +1168,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 #' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean)
 #'
 extract_and_process <-
-  function(raster,
+  function(bm_r,
            roi_sf,
            fun,
            add_n_pixels = TRUE,
@@ -1190,16 +1190,16 @@ extract_and_process <-
     roi_df <- sf::st_drop_geometry(roi_sf)
     roi_df$date <- NULL
 
-    extracted_data <- exactextractr::exact_extract(raster, roi_sf, fun, progress = !quiet)
+    extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
 
 
     if (add_n_pixels) {
-      roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         sum(!is.na(values))
       }, progress = !quiet)
 
-      roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      roi_df$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         length(values)
       }, progress = !quiet)
 
@@ -1216,29 +1216,17 @@ extract_and_process <-
 
   } else {
 
-    bm_r <- retrieve_and_process_nightlight_data(
-      roi_sf = roi_sf,
-      product_id = product_id,
-      date = date_i,
-      bearer = bearer,
-      blackmarble_variable = blackmarble_variable,
-      quality_flags_to_remove = quality_flags_to_remove,
-      check_all_tiles_exist = check_all_tiles_exist,
-      quiet = quiet,
-      temp_dir = temp_dir
-    )
-
     extracted_data <- exactextractr::exact_extract(
       x = bm_r, y = roi_sf, fun = fun,
       progress = !quiet
     )
 
     if (add_n_pixels) {
-      roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         sum(!is.na(values))
       }, progress = !quiet)
 
-      roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+      roi_df$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         length(values)
       }, progress = !quiet)
 

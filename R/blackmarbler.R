@@ -115,10 +115,12 @@ bm_raster <- function(roi_sf,
   }
 
   # Define Temporary Directory -------------------------------------------------
+  # NO Nneed to define if filedir is passed
   temp_dir <- tempfile(pattern = paste0("bm_raster_temp_", format(Sys.time(), "%Y%m%d%H%M%S")))
   dir.create(temp_dir, showWarnings = FALSE)
 
   # Define NTL Variable --------------------------------------------------------
+  # robust against recursion
   blackmarble_variable <- define_blackmarble_variable(variable, product_id)
 
   # Download and Process Rasters -----------------------------------------------
@@ -255,32 +257,30 @@ bm_extract <- function(roi_sf,
 
 
 
-  # NTL Variable ---------------------------------------------------------------
-  blackmarble_variable <- define_blackmarble_variable(variable, product_id)
-
-  current_time_millis = as.character(as.numeric(Sys.time())*1000) %>%
-    stringr::str_replace_all("[:punct:]", "")
-
-  temp_dir = file.path(temp_main_dir, paste0("bm_raster_temp_", current_time_millis))
-
-  dir.create(temp_dir, showWarnings = F)
+  # Interpolation if ---------------------------------------------------------------
 
   if (interpol_na) { # if interpolation true then approximate
-    # Create raster
+
+# Create raster -----------------------------------------------------------
+
+
     bm_r <- bm_raster(
       roi_sf = roi_sf,
       product_id = product_id,
       date = date,
       bearer = bearer,
-      variable = blackmarble_variable,
+      variable = variable,
       quality_flags_to_remove = quality_flags_to_remove,
       check_all_tiles_exist = check_all_tiles_exist,
-      interpol_na = FALSE,
+      interpol_na = TRUE,
       quiet = quiet,
-      temp_dir = temp_dir
+      file_dir = file_dir
     )
 
-    # Interpolate
+
+# Interpolate -------------------------------------------------------------
+
+
     bm_r <- terra::approximate(bm_r,
                                method = "linear",
                                rule = 1,
@@ -289,7 +289,10 @@ bm_extract <- function(roi_sf,
                                z = NULL,
                                NArule = 1)
 
-    # Extract and process
+
+# Extract and process -----------------------------------------------------
+
+
     extracted_data <- extract_and_process(raster = bm_r,
                                           roi_sf = roi_sf,
                                           fun = aggregation_fun,
@@ -298,15 +301,20 @@ bm_extract <- function(roi_sf,
                                           ...)
 
   } else {
-    # Apply to each date data --------------------------------------------------------------
+    #Apply to each date data --------------------------------------------------------------
     extracted_data <- lapply(date, function(date_i) {
       tryCatch(
         {
-          # Make name for raster based on date
-          date_name_i <- define_raster_name(date_i, product_id)
 
-          # If save to file
+
+# If save to file ---------------------------------------------------------
+
+
           if (output_location_type == "file") {
+            # Make name for raster based on date
+            date_name_i <- define_raster_name(date_i, product_id)
+
+
             out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".Rds")
             out_path <- file.path(file_dir, out_name)
 
@@ -314,20 +322,74 @@ bm_extract <- function(roi_sf,
               return(NULL)
             }
 
+
+# Create raster -----------------------------------------------------------
+
+
+            bm_r <- bm_raster(
+              roi_sf = roi_sf,
+              product_id = product_id,
+              date = date,
+              bearer = bearer,
+              variable = variable,
+              quality_flags_to_remove = quality_flags_to_remove,
+              check_all_tiles_exist = check_all_tiles_exist,
+              interpol_na = interpol_na,
+              quiet = quiet,
+              file_dir = file_dir
+            )
+
+
+# Extract and Process -----------------------------------------------------
+
+
+
             r_agg <- extract_and_process(raster = bm_r,
                                          roi_sf = roi_sf,
+                                         bearer = bearer,
                                          fun = aggregation_fun,
                                          add_n_pixels = add_n_pixels,
                                          quiet = quiet,
                                          ...)
 
-            #### Export
+# Export ------------------------------------------------------------------
+
+
             saveRDS(r_agg, out_path)
+
 
             return(NULL) # Saving as file, so output from function should be NULL
           } else {
+
+
+# Else --------------------------------------------------------------------
+
+
+
+
+# Create Raster -----------------------------------------------------------
+
+
+            bm_r <- bm_raster(
+              roi_sf = roi_sf,
+              product_id = product_id,
+              date = date,
+              bearer = bearer,
+              variable = variable,
+              quality_flags_to_remove = quality_flags_to_remove,
+              check_all_tiles_exist = check_all_tiles_exist,
+              interpol_na = FALSE,
+              quiet = quiet,
+              file_dir = file_dir
+            )
+
+
+# Extract and Process -----------------------------------------------------
+
+
             r_out <- extract_and_process(raster = bm_r,
                                          roi_sf = roi_sf,
+                                         bearer = bearer,
                                          fun = aggregation_fun,
                                          add_n_pixels = add_n_pixels,
                                          quiet = quiet,
