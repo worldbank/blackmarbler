@@ -1291,7 +1291,7 @@ extract_and_process <-
 #'
 #' @param ... One or more extracted data frames or a list of extracted data frames.
 #'
-#' @return A data frame containing the bound extracted data.
+#' @return A single data frame containing the bound extracted data.
 #'
 #' @export
 #'
@@ -1302,23 +1302,22 @@ extract_and_process <-
 #' # Binding a list of extracted data frames
 #' bind_extracted_data(list_of_dfs)
 #'
-bind_extracted_data <- function(...) {
-  dfs <- list(...)
+bind_extracted_data <- function(extracted_data_list) {
+  dfs <- extracted_data_list
 
   # Remove NULLs from the list
   dfs <- dfs[!sapply(dfs, is.null)]
 
   # If only one data frame provided, return it
   if (length(dfs) == 1) {
+    cli::cli_inform("Only one data frame provided. Returning it.")
     return(dfs[[1]])
   }
 
   # Bind the data frames together
   if (length(dfs) > 1) {
-    for (i in 1:(length(dfs) - 1)) {
-      dfs[[i + 1]] <- dplyr::bind_rows(dfs[[i]], dfs[[i + 1]])
-    }
+    cli::cli_inform("Binding data frames together.")
+    combined_df <- dplyr::bind_rows(dfs)
+    return(combined_df)
   }
-
-  return(dfs[[length(dfs)]])
 }

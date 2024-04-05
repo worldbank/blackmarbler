@@ -256,7 +256,7 @@ bm_extract <- function(roi_sf,
   # Interpolation if ---------------------------------------------------------------
 
   if (interpol_na) { # if interpolation true then approximate
-
+cli::cli_inform("Inside Interpolation if")
 # Create raster -----------------------------------------------------------
 
 
@@ -297,7 +297,10 @@ bm_extract <- function(roi_sf,
                                           is_single = TRUE # This is a single date
     )
 
+
+
   } else {
+    cli::cli_inform("Else Interpolation if")
     #Apply to each date data --------------------------------------------------------------
     extracted_data_list <- lapply(date, function(date_i) {
       tryCatch(
@@ -402,9 +405,13 @@ bm_extract <- function(roi_sf,
       )
     })
 
+# bind extracted data -----------------------------------------------------
+
+
     extracted_data <- bind_extracted_data(extracted_data_list)
   }
 
+  # sisue first colum is named ...1 ....
   #unlink(temp_dir, recursive = TRUE)
   return(extracted_data)
 }
