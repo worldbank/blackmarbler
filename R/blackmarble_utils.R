@@ -243,57 +243,62 @@ download_h5_viirs_sat_image <- function(file_name,
                                         bearer,
                                         quality_flags_to_remove = numeric(),
                                         quiet = FALSE) {
-  # Extract file metadata
-  year <- substr(file_name, 10, 13)
-  day <- substr(file_name, 14, 16)
-  product_id <- substr(file_name, 1, 7)
+  tryCatch({
+    # Extract file metadata
+    year <- substr(file_name, 10, 13)
+    day <- substr(file_name, 14, 16)
+    product_id <- substr(file_name, 1, 7)
 
+    # Construct download URL
+    url <- paste0(
+      "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",
+      product_id, "/", year, "/", day, "/", file_name
+    )
 
-  # Construct download URL
-  url <- paste0(
-    "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",
-    product_id, "/", year, "/", day, "/", file_name
-  )
+    # Define url request
+    # This is because regular httr2 setting doesn't return an integer in libcurl version, generating an API error related to versioning
 
-  # Define url request
-  # This is because regular httr2 setting doesn't return an integer in libcurl version, generating an API error related to versioning
+    # here needs to return error about httr2 request failures -----------------
 
-  versions <- c(
-    httr2 = utils::packageVersion("httr2"),
-    `r-curl` = utils::packageVersion("curl"),
-    libcurl = sub("-DEV", "", curl::curl_version()$version)
-  )
-  string <- paste0(names(versions), "/", versions, collapse = " ")
+    versions <- c(
+      httr2 = utils::packageVersion("httr2"),
+      `r-curl` = utils::packageVersion("curl"),
+      libcurl = sub("-DEV", "", curl::curl_version()$version)
+    )
+    string <- paste0(names(versions), "/", versions, collapse = " ")
 
-  request <- httr2::request(url) |>
-    httr2::req_headers(
-      "Authorization" = paste("Bearer", bearer)
-    ) |>
-    httr2::req_user_agent(string)
+    request <- httr2::request(url) |>
+      httr2::req_headers(
+        "Authorization" = paste("Bearer", bearer)
+      ) |>
+      httr2::req_user_agent(string)
 
-  # Display processing message if not quiet
-  if (!quiet) message(paste0("Processing: ", file_name))
+    # Display processing message if not quiet
+    if (!quiet) message(paste0("Processing: ", file_name))
 
-  # Perform the download
-  if (quiet) {
-    response <- request |>
-      httr2::req_perform(
-        path = download_path
-      )
-  } else {
-    response <- request |>
-      httr2::req_progress(type = "down") |>
-      httr2::req_perform(
-        path = download_path
-      )
-  }
+    # Perform the download
+    if (quiet) {
+      response <- request |>
+        httr2::req_perform(
+          path = download_path
+        )
+    } else {
+      response <- request |>
+        httr2::req_progress(type = "down") |>
+        httr2::req_perform(
+          path = download_path
+        )
+    }
 
-  # Check for successful download
-  if (httr2::resp_status(response) != 200) {
-    message("Error in downloading data")
-    message(response |>
-      httr2::resp_status_desc())
-  }
+    # Check for successful download
+    if (httr2::resp_status(response) != 200) {
+      message("Error in downloading data")
+      message(response |>
+                httr2::resp_status_desc())
+    }
+  }, error = function(e) {
+    message("Error occurred during download: ", conditionMessage(e))
+  })
 }
 #' Extracts bounding box coordinates based on tile ID from the file path
 #'
@@ -1171,30 +1176,41 @@ extract_and_process <-
   function(bm_r,
            roi_sf,
            fun,
-           add_n_pixels = TRUE,
+           add_n_pixels = TRUE, # why this default?
            quiet = FALSE,
-           is_single = FALSE,
-           product_id = NULL,
-           date_i = NULL,
-           bearer = NULL,
-           blackmarble_variable = NULL,
-           quality_flags_to_remove = NULL,
-           check_all_tiles_exist = TRUE,
-           temp_dir = NULL) {
+           is_single = FALSE) {
+
+
+
+# is not single -----------------------------------------------------------
 
 
   if (!is_single) {
 
     # REVIEW ORDER OF OPERATIONS HERE
 
+
+# drop geometry -----------------------------------------------------------
+    cli::cli_inform("dropping geometry...")
+
+
     roi_df <- sf::st_drop_geometry(roi_sf)
+    cli::cli_inform("nulling date...")
     roi_df$date <- NULL
 
+    cli::cli_inform("using extract function...")
     extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
 
 
+# if add pixels -----------------------------------------------------------
+
+
     if (add_n_pixels) {
+
+# exact extract functions -----------------------------------------------------------
+
+
       roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         sum(!is.na(values))
       }, progress = !quiet)
@@ -1205,23 +1221,48 @@ extract_and_process <-
 
       roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
     }
+
+
+#  if more than 1 fun passed ----------------------------------------------
+
 
     if (length(fun) > 1) {
       names(extracted_data) <- paste0("ntl_", names(extracted_data))
       extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
+
+      return(extracted_data)
+
     } else {
       roi_df[[paste0("ntl_", fun)]] <- extracted_data
-      extracted_data <- roi_df
+      extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
+
+      return(extracted_data)
+
     }
 
   } else {
 
-    extracted_data <- exactextractr::exact_extract(
-      x = bm_r, y = roi_sf, fun = fun,
-      progress = !quiet
-    )
+# else --------------------------------------------------------------------
+    # drop geometry -----------------------------------------------------------
+    cli::cli_inform("dropping geometry...")
+
+
+    roi_df <- sf::st_drop_geometry(roi_sf)
+    cli::cli_inform("nulling date...")
+    roi_df$date <- NULL
+
+    cli::cli_inform("using extract function...")
+    extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
+
+# if add pixels -----------------------------------------------------------
+
 
     if (add_n_pixels) {
+
+
+# extact exgtract fucntions -----------------------------------------------
+
+
       roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
         sum(!is.na(values))
       }, progress = !quiet)
@@ -1231,8 +1272,10 @@ extract_and_process <-
       }, progress = !quiet)
 
       roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
+
     }
 
+    extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
 
     return(extracted_data)
   }

@@ -25,9 +25,11 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
     - [ ] Overview (Introduction)
     - [ ] GDP Correlation
     - [ ] Assessing Quality Flags
+    - [ ] Differences in Aggregation Functions
     - [ ] Transportation Infrastructure
  - [ ] let user know how many tiles are gonna be process cause it timely
- - [ ] More tests (priority)
+ - [ ] More tests (priority)\
+   - [ ] test argument output localtion file
    - [!] test bm_extract (next)
    - [X!] test bm_raster
    - [ ] test quality flags

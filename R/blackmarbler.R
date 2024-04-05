@@ -166,6 +166,7 @@ bm_raster <- function(roi_sf,
       },
       error = function(e) {
         # add error message of error
+        cli::cli_inform("Error in down load and porocess function")
         return(NULL)
       }
     )
@@ -252,11 +253,6 @@ bm_extract <- function(roi_sf,
     interpol_na <- FALSE
   }
 
-  # Define Tempdir -------------------------------------------------------------
-  temp_main_dir <- tempdir()
-
-
-
   # Interpolation if ---------------------------------------------------------------
 
   if (interpol_na) { # if interpolation true then approximate
@@ -293,16 +289,17 @@ bm_extract <- function(roi_sf,
 # Extract and process -----------------------------------------------------
 
 
-    extracted_data <- extract_and_process(raster = bm_r,
+    extracted_data <- extract_and_process(bm_r = bm_r,
                                           roi_sf = roi_sf,
                                           fun = aggregation_fun,
                                           add_n_pixels = add_n_pixels,
                                           quiet = quiet,
-                                          ...)
+                                          is_single = TRUE # This is a single date
+    )
 
   } else {
     #Apply to each date data --------------------------------------------------------------
-    extracted_data <- lapply(date, function(date_i) {
+    extracted_data_list <- lapply(date, function(date_i) {
       tryCatch(
         {
 
@@ -329,7 +326,52 @@ bm_extract <- function(roi_sf,
             bm_r <- bm_raster(
               roi_sf = roi_sf,
               product_id = product_id,
-              date = date,
+              date = date_i,
+              bearer = bearer,
+              variable = variable,
+              quality_flags_to_remove = quality_flags_to_remove,
+              check_all_tiles_exist = check_all_tiles_exist,
+              interpol_na = interpol_na,
+              quiet = quiet,
+              file_dir = out_path
+            )
+
+
+# Extract and Process -----------------------------------------------------
+
+
+
+            r_agg <- extract_and_process(bm_r = bm_r,
+                                         roi_sf = roi_sf,
+                                         fun = aggregation_fun,
+                                         add_n_pixels = add_n_pixels,
+                                         quiet = quiet,
+                                         is_single = TRUE # This is a single date
+            )
+
+# Export ------------------------------------------------------------------
+
+
+            saveRDS(r_agg, out_path)
+
+
+            return(NULL) # Saving as file, so output from function should be NULL
+          } else {
+
+            cli::cli_inform("output location in memory")
+
+# Else --------------------------------------------------------------------
+
+
+
+
+# Create Raster -----------------------------------------------------------
+
+
+            bm_r <- bm_raster(
+              roi_sf = roi_sf,
+              product_id = product_id,
+              date = date_i,
               bearer = bearer,
               variable = variable,
               quality_flags_to_remove = quality_flags_to_remove,
@@ -343,57 +385,13 @@ bm_extract <- function(roi_sf,
 # Extract and Process -----------------------------------------------------
 
 
-
-            r_agg <- extract_and_process(raster = bm_r,
+            r_out <- extract_and_process(bm_r = bm_r,
                                          roi_sf = roi_sf,
-                                         bearer = bearer,
                                          fun = aggregation_fun,
                                          add_n_pixels = add_n_pixels,
                                          quiet = quiet,
-                                         ...)
-
-# Export ------------------------------------------------------------------
-
-
-            saveRDS(r_agg, out_path)
-
-
-            return(NULL) # Saving as file, so output from function should be NULL
-          } else {
-
-
-# Else --------------------------------------------------------------------
-
-
-
-
-# Create Raster -----------------------------------------------------------
-
-
-            bm_r <- bm_raster(
-              roi_sf = roi_sf,
-              product_id = product_id,
-              date = date,
-              bearer = bearer,
-              variable = variable,
-              quality_flags_to_remove = quality_flags_to_remove,
-              check_all_tiles_exist = check_all_tiles_exist,
-              interpol_na = FALSE,
-              quiet = quiet,
-              file_dir = file_dir
-            )
-
-
-# Extract and Process -----------------------------------------------------
-
-
-            r_out <- extract_and_process(raster = bm_r,
-                                         roi_sf = roi_sf,
-                                         bearer = bearer,
-                                         fun = aggregation_fun,
-                                         add_n_pixels = add_n_pixels,
-                                         quiet = quiet,
-                                         ...)
+                                         is_single = TRUE # This is a single date
+                                         )
 
             return(r_out)
           }
@@ -404,9 +402,9 @@ bm_extract <- function(roi_sf,
       )
     })
 
-    extracted_data <- bind_extracted_data(extracted_data)
+    extracted_data <- bind_extracted_data(extracted_data_list)
   }
 
-  unlink(temp_dir, recursive = TRUE)
+  #unlink(temp_dir, recursive = TRUE)
   return(extracted_data)
 }
