@@ -35,8 +35,8 @@ test_that("Test extract for VNP46A3 works.. fails", {
                              quiet = TRUE,
                              check_all_tiles_exist = TRUE)
 
-  expect_true(class(ken_202103_r) == "data.frame",
-              info = "ken_202103_r is not a data.frame object"
+  expect_true(class(ken_202303_r) == "data.frame",
+              info = "ken_202303_r is not a data.frame object"
   )
 
 })
