@@ -1,0 +1,30 @@
+project:
+  type: website
+
+website:
+  title: "BlackMarbleR"
+  favicon: images/favicon.ico
+  body-header: |
+    This page brought to you by <https://example.com>
+  margin-header: |
+    ![Packge Logo. An image of dark background with point yellow lights](images/logo.png)
+  navbar:
+    logo: images/logo.png
+    search: true
+    left:
+      - href: index.qmd
+        text: Home
+      - about.qmd
+      - testing_webr.qmd
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+execute:
+  eval: false
+
+
+

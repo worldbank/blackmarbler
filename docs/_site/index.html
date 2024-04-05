@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.547">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>BlackMarbleR</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./images/favicon.ico" rel="icon">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    <img src="./images/logo.png" alt="" class="navbar-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">BlackMarbleR</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./about.html"> 
+<span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./testing_webr.html"> 
+<span class="menu-text">webR in Quarto HTML Documents</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar"><div class="quarto-margin-header"><div class="margin-header-item">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/logo.png" class="img-fluid figure-img"></p>
+<figcaption>Packge Logo. An image of dark background with point yellow lights</figcaption>
+</figure>
+</div>
+</div></div>
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#comments" id="toc-comments" class="nav-link active" data-scroll-target="#comments">Comments</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation </a><a name="installation" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#bearer-token" id="toc-bearer-token" class="nav-link" data-scroll-target="#bearer-token">Bearer Token </a><a name="token" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage </a><a name="usage" class="nav-link" data-scroll-target="undefined"></a>
+  <ul class="collapse">
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup </a><a name="setup" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#make-raster-of-nighttime-lights" id="toc-make-raster-of-nighttime-lights" class="nav-link" data-scroll-target="#make-raster-of-nighttime-lights">Make raster of nighttime lights </a><a name="raster" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#make-raster-stack-of-nighttime-lights-across-multiple-time-periods" id="toc-make-raster-stack-of-nighttime-lights-across-multiple-time-periods" class="nav-link" data-scroll-target="#make-raster-stack-of-nighttime-lights-across-multiple-time-periods">Make raster stack of nighttime lights across multiple time periods </a><a name="stack" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#map-of-nighttime-lights" id="toc-map-of-nighttime-lights" class="nav-link" data-scroll-target="#map-of-nighttime-lights">Map of nighttime lights </a><a name="map" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#trends-over-time" id="toc-trends-over-time" class="nav-link" data-scroll-target="#trends-over-time">Trends over time </a><a name="trends" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#workflow-to-update-data" id="toc-workflow-to-update-data" class="nav-link" data-scroll-target="#workflow-to-update-data">Workflow to update data </a><a name="update-data" class="nav-link" data-scroll-target="undefined"></a></li>
+  </ul></li>
+  <li><a href="#functions-and-arguments" id="toc-functions-and-arguments" class="nav-link" data-scroll-target="#functions-and-arguments">Functions and arguments </a><a name="function-args" class="nav-link" data-scroll-target="undefined"></a>
+  <ul class="collapse">
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions </a><a name="functions" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#required-arguments" id="toc-required-arguments" class="nav-link" data-scroll-target="#required-arguments">Required arguments </a><a name="args-required" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#optional-arguments" id="toc-optional-arguments" class="nav-link" data-scroll-target="#optional-arguments">Optional arguments </a><a name="args-optional" class="nav-link" data-scroll-target="undefined"></a></li>
+  <li><a href="#argument-for-bm_extract-only" id="toc-argument-for-bm_extract-only" class="nav-link" data-scroll-target="#argument-for-bm_extract-only">Argument for <code>bm_extract</code> only </a><a name="args-extract" class="nav-link" data-scroll-target="undefined"></a></li>
+  </ul></li>
+  <li><a href="#black-marble-resources" id="toc-black-marble-resources" class="nav-link" data-scroll-target="#black-marble-resources">Black Marble Resources </a><a name="resources" class="nav-link" data-scroll-target="undefined"></a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">BlackMarbleR</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+<p>This page brought to you by <a href="https://example.com" class="uri">https://example.com</a></p>
+<!-- badges: start -->
+<p><a href="https://cran.r-project.org/package=blackmarbler"><img src="http://www.r-pkg.org/badges/version/blackmarbler.png" class="img-fluid" alt="CRAN_Status_Badge"></a> <a href="https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml"><img src="https://github.com/dime-worldbank/googletraffic/actions/workflows/R-CMD-check.yaml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <img src="http://cranlogs.r-pkg.org/badges/grand-total/blackmarbler.png" class="img-fluid" alt="downloads"> <a href="https://github.com/worldbank/blackmarbler"><img src="https://img.shields.io/github/stars/worldbank/blackmarbler.png" class="img-fluid" alt="GitHub Repo stars"></a> <a href="https://github.com/worldbank/blackmarbler/graphs/commit-activity"><img src="https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler.png" class="img-fluid" alt="activity"></a> <a href="https://opensource.org/license/mit/"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" class="img-fluid" alt="License: MIT"></a></p>
+<!-- badges: end -->
+<section id="comments" class="level2">
+<h2 class="anchored" data-anchor-id="comments">Comments</h2>
+<p>In logic for extracting bm_extract, when its 1 file it drops the geometry then exact_extracts but when its many it first extracts then drops the geometry. This is a bug?</p>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next steps</h2>
+<ul>
+<li><label><input type="checkbox">performance tuning</label></li>
+<li><label><input type="checkbox">Adding vignettes (quarto docs?)</label></li>
+<li><label><input type="checkbox">of use cases and considerations</label></li>
+<li><label><input type="checkbox">migrate to cli package</label></li>
+<li>[! ] Fix Docs, Roxygen2</li>
+<li><label><input type="checkbox">let user know how many tiles are gonna be process cause it timely</label></li>
+<li><label><input type="checkbox">More tests (priority)</label>
+<ul>
+<li>[!] test bm_extract (next)</li>
+<li>[X!] test bm_raster</li>
+<li><label><input type="checkbox">test quality flags</label></li>
+<li><label><input type="checkbox">test based off readme examples</label>
+<ul class="task-list">
+<li><label><input type="checkbox" checked="">bm raster test</label></li>
+<li><label><input type="checkbox">bm extract tests</label></li>
+</ul></li>
+</ul></li>
+</ul>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p><strong>BlackMarbleR</strong> is a R package that provides a simple way to use nighttime lights data from NASA’s Black Marble. <a href="https://blackmarble.gsfc.nasa.gov">Black Marble</a> is a <a href="https://www.earthdata.nasa.gov">NASA Earth Science Data Systems (ESDS)</a> project that provides a product suite of daily, monthly and yearly global <a href="https://www.earthdata.nasa.gov/learn/backgrounders/nighttime-lights">nighttime lights</a>. This package automates the process of downloading all relevant tiles from the <a href="https://www.earthdata.nasa.gov/eosdis/daacs/laads">NASA LAADS DAAC</a> to cover a region of interest, converting and mosaicing the raw files (in HDF5 format) to georeferenced rasters.</p>
+<ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#token">Bearer token</a></li>
+<li><a href="#usage">Usage</a>
+<ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#raster">Make raster</a></li>
+<li><a href="#stack">Make raster stack across multiple time periods</a></li>
+<li><a href="#map">Make map</a></li>
+<li><a href="#trends">Make figure of trends in nighttime lights</a></li>
+<li><a href="#update-data">Workflow to update data</a></li>
+</ul></li>
+<li><a href="#function-args">Functions and arguments</a>
+<ul>
+<li><a href="#functions">Functions</a></li>
+<li><a href="#args-required">Required Arguments</a></li>
+<li><a href="#args-optional">Optional Arguments</a></li>
+<li><a href="#args-extract">Argument only for <code>bm_extract</code></a></li>
+</ul></li>
+<li><a href="#resources">Black Marble Resources</a></li>
+</ul>
+</section>
+<section id="installation" class="level2">
+<h2 class="anchored" data-anchor-id="installation">Installation <a name="installation"></a></h2>
+<p>The package can be installed via CRAN.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"blackmarbler"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To install the development version from Github:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("devtools")</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"worldbank/blackmarbler"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="bearer-token" class="level2">
+<h2 class="anchored" data-anchor-id="bearer-token">Bearer Token <a name="token"></a></h2><a name="token">
+<p>The function requires using a <strong>Bearer Token</strong>; to obtain a token, follow the below steps:</p>
+</a><ol type="1"><a name="token">
+</a><li><a name="token">Go to the </a><a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/">NASA LAADS Archive</a></li>
+<li>Click “Login” (bottom on top right); create an account if needed.</li>
+<li>Click “See wget Download Command” (bottom near top, in the middle)</li>
+<li>After clicking, you will see text that can be used to download data. The “Bearer” token will be a long string in red.</li>
+</ol>
+<p><strong>After logging in, the below will show the bearer token in red instead of <code>INSERT_DOWNLOAD_TOKEN_HERE</code>.</strong> Sometimes, after logging in, the NASA website will redirect to another part of the website. To obtain the bearer token, just navigate to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/">NASA LAADS Archive</a> after logging in.</p>
+<p align="center">
+<img src="images/nasa_laads_login.png" alt="NASA LAADS Bearer Token" width="800">
+</p>
+</section>
+<section id="usage" class="level2">
+<h2 class="anchored" data-anchor-id="usage">Usage <a name="usage"></a></h2><a name="usage">
+</a><section id="setup" class="level3"><a name="usage">
+</a><h3 class="anchored" data-anchor-id="setup"><a name="usage">Setup </a><a name="setup"></a></h3><a name="setup">
+<p>Before downloading and extracting Black Marble data, we first load packages, define the NASA bearer token, and define a region of interest.</p>
+</a><div class="sourceCode" id="cb3"><a name="setup"></a><pre class="sourceCode r code-with-copy"><a name="setup"><code class="sourceCode r"><span id="cb3-1"></span></code></a><code class="sourceCode r"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">#### Setup</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(blackmarbler)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(geodata)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(raster)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="do">#### Define NASA bearer token</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>bearer <span class="ot">&lt;-</span> <span class="st">"BEARER-TOKEN-HERE"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="do">### ROI</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Define region of interest (roi). The roi must be (1) an sf polygon and (2)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># in the WGS84 (epsg:4326) coordinate reference system. Here, we use the</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># getData function to load a polygon of Ghana</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>roi_sf <span class="ot">&lt;-</span> <span class="fu">gadm</span>(<span class="at">country =</span> <span class="st">"GHA"</span>, <span class="at">level=</span><span class="dv">1</span>, <span class="at">path =</span> <span class="fu">tempdir</span>()) <span class="sc">|&gt;</span> <span class="fu">st_as_sf</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="make-raster-of-nighttime-lights" class="level3">
+<h3 class="anchored" data-anchor-id="make-raster-of-nighttime-lights">Make raster of nighttime lights <a name="raster"></a></h3><a name="raster">
+<p>The below example shows making daily, monthly, and annual rasters of nighttime lights for Ghana.</p>
+</a><div class="sourceCode" id="cb4"><a name="raster"></a><pre class="sourceCode r code-with-copy"><a name="raster"><code class="sourceCode r"><span id="cb4-1"></span></code></a><code class="sourceCode r"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Daily data: raster for February 5, 2021</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>r_20210205 <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">product_id =</span> <span class="st">"VNP46A2"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">date =</span> <span class="st">"2021-02-05"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">bearer =</span> bearer)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="do">### Monthly data: raster for October 2021</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>r_202110 <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                      <span class="at">product_id =</span> <span class="st">"VNP46A3"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>                      <span class="at">date =</span> <span class="st">"2021-10-01"</span>, <span class="co"># The day is ignored</span></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">bearer =</span> bearer)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="do">### Annual data: raster for 2021</span></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>r_2021 <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">product_id =</span> <span class="st">"VNP46A4"</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>                    <span class="at">date =</span> <span class="dv">2021</span>,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                    <span class="at">bearer =</span> bearer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="make-raster-stack-of-nighttime-lights-across-multiple-time-periods" class="level3">
+<h3 class="anchored" data-anchor-id="make-raster-stack-of-nighttime-lights-across-multiple-time-periods">Make raster stack of nighttime lights across multiple time periods <a name="stack"></a></h3><a name="stack">
+<p>To extract data for multiple time periods, add multiple time periods to <code>date</code>. The function will return a raster stack, where each raster band corresponds to a different date. The below code provides examples getting data across multiple days, months, and years.</p>
+</a><div class="sourceCode" id="cb5"><a name="stack"></a><pre class="sourceCode r code-with-copy"><a name="stack"><code class="sourceCode r"><span id="cb5-1"></span></code></a><code class="sourceCode r"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="do">#### Daily data in March 2021</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>r_daily <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">product_id =</span> <span class="st">"VNP46A3"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">date =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">ymd</span>(<span class="st">"2021-03-01"</span>), <span class="at">to =</span> <span class="fu">ymd</span>(<span class="st">"2021-03-31"</span>), <span class="at">by =</span> <span class="st">"day"</span>),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bearer =</span> bearer)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="do">#### Monthly aggregated data in 2021 and 2022</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>r_monthly <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">product_id =</span> <span class="st">"VNP46A3"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                       <span class="at">date =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">ymd</span>(<span class="st">"2021-01-01"</span>), <span class="at">to =</span> <span class="fu">ymd</span>(<span class="st">"2022-12-01"</span>), <span class="at">by =</span> <span class="st">"month"</span>),</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>                       <span class="at">bearer =</span> bearer)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="do">#### Yearly aggregated data in 2012 and 2021</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>r_annual <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                      <span class="at">product_id =</span> <span class="st">"VNP46A4"</span>,</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">date =</span> <span class="dv">2012</span><span class="sc">:</span><span class="dv">2021</span>,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>                      <span class="at">bearer =</span> bearer)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="map-of-nighttime-lights" class="level3">
+<h3 class="anchored" data-anchor-id="map-of-nighttime-lights">Map of nighttime lights <a name="map"></a></h3><a name="map">
+<p>Using one of the rasters, we can make a map of nighttime lights</p>
+</a><div class="sourceCode" id="cb6"><a name="map"></a><pre class="sourceCode r code-with-copy"><a name="map"><code class="sourceCode r"><span id="cb6-1"></span></code></a><code class="sourceCode r"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">#### Make raster</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> <span class="fu">bm_raster</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">product_id =</span> <span class="st">"VNP46A3"</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">date =</span> <span class="st">"2021-10-01"</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">bearer =</span> bearer)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="do">#### Prep data</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> r <span class="sc">|&gt;</span> <span class="fu">mask</span>(roi_sf)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>r_df <span class="ot">&lt;-</span> <span class="fu">rasterToPoints</span>(r, <span class="at">spatial =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">as.data.frame</span>()</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(r_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"value"</span>, <span class="st">"x"</span>, <span class="st">"y"</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="do">## Remove very low values of NTL; can be considered noise</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>r_df<span class="sc">$</span>value[r_df<span class="sc">$</span>value <span class="sc">&lt;=</span> <span class="dv">2</span>] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="do">## Distribution is skewed, so log</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>r_df<span class="sc">$</span>value_adj <span class="ot">&lt;-</span> <span class="fu">log</span>(r_df<span class="sc">$</span>value<span class="sc">+</span><span class="dv">1</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="do">##### Map</span></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>p <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_raster</span>(<span class="at">data =</span> r_df,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">aes</span>(<span class="at">x =</span> x, <span class="at">y =</span> y,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill =</span> value_adj)) <span class="sc">+</span></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient2</span>(<span class="at">low =</span> <span class="st">"black"</span>,</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>                       <span class="at">mid =</span> <span class="st">"yellow"</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>                       <span class="at">high =</span> <span class="st">"red"</span>,</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>                       <span class="at">midpoint =</span> <span class="fl">4.5</span>) <span class="sc">+</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Nighttime Lights: October 2021"</span>) <span class="sc">+</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_quickmap</span>() <span class="sc">+</span></span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_void</span>() <span class="sc">+</span></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p align="center">
+<img src="images/ntl_gha.png" alt="Nighttime Lights Map" width="800">
+</p>
+</section>
+<section id="trends-over-time" class="level3">
+<h3 class="anchored" data-anchor-id="trends-over-time">Trends over time <a name="trends"></a></h3><a name="trends">
+</a><p><a name="trends">We can use the <code>bm_extract</code> function to observe changes in nighttime lights over time. The <code>bm_extract</code> function leverages the </a><a href="https://github.com/isciences/exactextractr"><code>exactextractr</code></a> package to aggregate nighttime lights data to polygons. Below we show trends in annual nighttime lights data across Ghana’s first administrative divisions.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">#### Extract annual data</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ntl_df <span class="ot">&lt;-</span> <span class="fu">bm_extract</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">product_id =</span> <span class="st">"VNP46A4"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">date =</span> <span class="dv">2012</span><span class="sc">:</span><span class="dv">2022</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">bearer =</span> bearer)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="do">#### Trends over time</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>ntl_df <span class="sc">|&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>() <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="fu">aes</span>(<span class="at">x =</span> date,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> ntl_mean),</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">fill =</span> <span class="st">"darkorange"</span>) <span class="sc">+</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>NAME_1) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"NTL Luminosity"</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Ghana Admin Level 1: Annual Average Nighttime Lights"</span>) <span class="sc">+</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(<span class="at">labels =</span> <span class="fu">seq</span>(<span class="dv">2012</span>, <span class="dv">2022</span>, <span class="dv">4</span>),</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2012</span>, <span class="dv">2022</span>, <span class="dv">4</span>)) <span class="sc">+</span></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">face =</span> <span class="st">"bold"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p align="center">
+<img src="images/ntl_trends_gha.png" alt="Nighttime Lights Trends" width="800">
+</p>
+</section>
+<section id="workflow-to-update-data" class="level3">
+<h3 class="anchored" data-anchor-id="workflow-to-update-data">Workflow to update data <a name="update-data"></a></h3><a name="update-data">
+<p>Some users may want to monitor near-real-time changes in nighttime lights. For example, daily Black Marble nighttime lights data is updated regularly, where data is available roughly on a week delay; same use cases may require examining trends in daily nighttime lights data as new data becomes available. Below shows example code that could be regularly run to produce an updated daily dataset of nighttime lights.</p>
+<p>The below code produces a dataframe of nighttime lights for each date, where average nighttime lights for Ghana’s 1st administrative division is produced. The code will check whether data has already been downloaded/extracted for a specific date, and only download/extract new data.</p>
+</a><div class="sourceCode" id="cb8"><a name="update-data"></a><pre class="sourceCode r code-with-copy"><a name="update-data"><code class="sourceCode r"><span id="cb8-1"></span></code></a><code class="sourceCode r"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create directories to store data</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"bm_files"</span>))</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">dir.create</span>(<span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"bm_files"</span>, <span class="st">"daily"</span>))</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract daily-level nighttime lights data for Ghana's first administrative divisions.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Save a separate dataset for each date in the `"~/Desktop/bm_files/daily"` directory.</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co"># The code extracts data from January 1, 2023 to today. Given that daily nighttime lights</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co"># data is produced on roughly a week delay, the function will only extract data that exists;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co"># it will skip extracting data for dates where data has not yet been produced by NASA Black Marble.</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">bm_extract</span>(<span class="at">roi_sf =</span> roi_sf,</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">product_id =</span> <span class="st">"VNP46A2"</span>,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">date =</span> <span class="fu">seq.Date</span>(<span class="at">from =</span> <span class="fu">ymd</span>(<span class="st">"2023-01-01"</span>), <span class="at">to =</span> <span class="fu">Sys.Date</span>(), <span class="at">by =</span> <span class="dv">1</span>),</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>           <span class="at">bearer =</span> bearer,</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">output_location_type =</span> <span class="st">"file"</span>,</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">file_dir =</span> <span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"bm_files"</span>, <span class="st">"daily"</span>))</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Append daily-level datasets into one file</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a><span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"bm_files"</span>, <span class="st">"daily"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">list.files</span>(<span class="at">pattern =</span> <span class="st">"*.Rds"</span>,</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">full.names =</span> T) <span class="sc">|&gt;</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">map_df</span>(readRDS) <span class="sc">|&gt;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">saveRDS</span>(<span class="fu">file.path</span>(<span class="fu">getwd</span>(), <span class="st">"bm_files"</span>, <span class="st">"ntl_daily.Rds"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="functions-and-arguments" class="level2">
+<h2 class="anchored" data-anchor-id="functions-and-arguments">Functions and arguments <a name="function-args"></a></h2><a name="function-args">
+</a><section id="functions" class="level3"><a name="function-args">
+</a><h3 class="anchored" data-anchor-id="functions"><a name="function-args">Functions </a><a name="functions"></a></h3><a name="functions">
+<p>The package provides two functions.</p>
+<ul>
+<li><code>bm_raster</code> produces a raster of Black Marble nighttime lights.</li>
+<li><code>bm_extract</code> produces a dataframe of aggregated nighttime lights to a region of interest (e.g., average nighttime lights within US States).</li>
+</ul>
+<p>Both functions take the following arguments:</p>
+</a></section><a name="functions">
+</a><section id="required-arguments" class="level3"><a name="functions">
+</a><h3 class="anchored" data-anchor-id="required-arguments"><a name="functions">Required arguments </a><a name="args-required"></a></h3><a name="args-required">
+</a><ul><a name="args-required">
+</a><li><a name="args-required"></a><p><a name="args-required"><strong>roi_sf:</strong> Region of interest; sf polygon. Must be in the </a><a href="https://epsg.io/4326">WGS 84 (epsg:4326)</a> coordinate reference system. For <code>bm_extract</code>, aggregates nighttime lights within each polygon of <code>roi_sf</code>.</p></li>
+<li><p><strong>product_id:</strong> One of the following:</p>
+<ul>
+<li><code>"VNP46A1"</code>: Daily (raw)</li>
+<li><code>"VNP46A2"</code>: Daily (corrected)</li>
+<li><code>"VNP46A3"</code>: Monthly</li>
+<li><code>"VNP46A4"</code>: Annual</li>
+</ul></li>
+<li><p><strong>date:</strong> Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.</p>
+<ul>
+<li>For <code>product_id</code>s <code>"VNP46A1"</code> and <code>"VNP46A2"</code>, a date (eg, <code>"2021-10-03"</code>).</li>
+<li>For <code>product_id</code> <code>"VNP46A3"</code>, a date or year-month (e.g., <code>"2021-10-01"</code>, where the day will be ignored, or <code>"2021-10"</code>).</li>
+<li>For <code>product_id</code> <code>"VNP46A4"</code>, year or date (e.g., <code>"2021-10-01"</code>, where the month and day will be ignored, or <code>2021</code>).</li>
+</ul></li>
+<li><p><strong>bearer:</strong> NASA bearer token. For instructions on how to create a token, see <a href="https://github.com/worldbank/blackmarbler#bearer-token-">here</a>.</p></li>
+</ul>
+</section>
+<section id="optional-arguments" class="level3">
+<h3 class="anchored" data-anchor-id="optional-arguments">Optional arguments <a name="args-optional"></a></h3><a name="args-optional">
+</a><ul><a name="args-optional">
+</a><li><a name="args-optional"></a><p><a name="args-optional"><strong>variable:</strong> Variable to used to create raster (default: <code>NULL</code>). For information on all variable choices, see </a><a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf">here</a>; for <code>VNP46A1</code>, see Table 3; for <code>VNP46A2</code> see Table 6; for <code>VNP46A3</code> and <code>VNP46A4</code>, see Table 9. If <code>NULL</code>, uses the following default variables:</p>
+<ul>
+<li>For <code>product_id</code> <code>"VNP46A1"</code>, uses <code>DNB_At_Sensor_Radiance_500m</code>.</li>
+<li>For <code>product_id</code> <code>"VNP46A2"</code>, uses <code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>.</li>
+<li>For <code>product_id</code>s <code>"VNP46A3"</code> and <code>"VNP46A4"</code>, uses <code>NearNadir_Composite_Snow_Free</code>.</li>
+</ul></li>
+<li><p><strong>quality_flag_rm:</strong> Quality flag values to use to set values to <code>NA</code>. Each pixel has a quality flag value, where low quality values can be removed. Values are set to <code>NA</code> for each value in ther <code>quality_flag_rm</code> vector. (Default: <code>NULL</code>).</p>
+<ul>
+<li>For <code>VNP46A1</code> and <code>VNP46A2</code> (daily data):
+<ul>
+<li><code>0</code>: High-quality, Persistent nighttime lights</li>
+<li><code>1</code>: High-quality, Ephemeral nighttime Lights</li>
+<li><code>2</code>: Poor-quality, Outlier, potential cloud contamination, or other issues</li>
+</ul></li>
+<li>For <code>VNP46A3</code> and <code>VNP46A4</code> (monthly and annual data):
+<ul>
+<li><code>0</code>: Good-quality, The number of observations used for the composite is larger than 3</li>
+<li><code>1</code>: Poor-quality, The number of observations used for the composite is less than or equal to 3</li>
+<li><code>2</code>: Gap filled NTL based on historical data</li>
+</ul></li>
+</ul></li>
+<li><p><strong>check_all_tiles_exist:</strong> Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If <code>TRUE</code>, skips cases where not all tiles are available. (Default: <code>TRUE</code>).</p></li>
+<li><p><strong>interpol_na:</strong> When data for more than one date is downloaded, whether to interpolate <code>NA</code> values in rasters using the <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA"><code>raster::approxNA</code></a> function. Additional arguments for the <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA"><code>raster::approxNA</code></a> function can also be passed into <code>bm_raster</code>/<code>bm_extract</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></li>
+<li><p><strong>output_location_type:</strong> Where output should be stored (default: <code>r_memory</code>). Either:</p>
+<ul>
+<li><code>r_memory</code> where the function will return an output in R</li>
+<li><code>file</code> where the function will export the data as a file. For <code>bm_raster</code>, a <code>.tif</code> file will be saved; for <code>bm_extract</code>, a <code>.Rds</code> file will be saved. A file is saved for each date. Consequently, if <code>date = c(2018, 2019, 2020)</code>, three datasets will be saved: one for each year. Saving a dataset for each date can facilitate re-running the function later and only downloading data for dates where data have not been downloaded.</li>
+</ul></li>
+</ul>
+<p>If <code>output_location_type = "file"</code>, the following arguments can be used:</p>
+<ul>
+<li><p><strong>file_dir:</strong> The directory where data should be exported (default: <code>NULL</code>, so the working directory will be used)</p></li>
+<li><p><strong>file_prefix:</strong> Prefix to add to the file to be saved. The file will be saved as the following: <code>[file_prefix][product_id]_t[date].[tif/Rds]</code></p></li>
+<li><p><strong>file_skip_if_exists:</strong> Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>). If the function is first run with <code>date = c(2018, 2019, 2020)</code>, then is later run with <code>date = c(2018, 2019, 2020, 2021)</code>, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.</p></li>
+<li><p><strong>…:</strong> Additional arguments for <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA"><code>raster::approxNA</code></a>, if <code>interpol_na = TRUE</code></p></li>
+</ul>
+</section>
+<section id="argument-for-bm_extract-only" class="level3">
+<h3 class="anchored" data-anchor-id="argument-for-bm_extract-only">Argument for <code>bm_extract</code> only <a name="args-extract"></a></h3><a name="args-extract">
+<ul>
+<li><strong>aggregation_fun:</strong> A vector of functions to aggregate data (default: <code>"mean"</code>). The <code>exact_extract</code> function from the <code>exactextractr</code> package is used for aggregations; this parameter is passed to <code>fun</code> argument in <code>exactextractr::exact_extract</code>.</li>
+<li><strong>add_n_pixels:</strong> Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When <code>TRUE</code>, it adds three values: <code>n_non_na_pixels</code> (the number of non-<code>NA</code> pixels used for computing nighttime light statistics); <code>n_pixels</code> (the total number of pixels); and <code>prop_non_na_pixels</code> the proportion of the two. (Default: <code>TRUE</code>).</li>
+</ul>
+</a></section><a name="args-extract">
+</a></section><a name="args-extract">
+</a><section id="black-marble-resources" class="level2"><a name="args-extract">
+</a><h2 class="anchored" data-anchor-id="black-marble-resources"><a name="args-extract">Black Marble Resources </a><a name="resources"></a></h2><a name="resources">
+<p>For more information on NASA Black Marble, see:</p>
+</a><ul><a name="resources">
+</a><li><a name="resources"></a><a href="https://www.sciencedirect.com/science/article/pii/S003442571830110X">Academic paper</a></li>
+<li><a href="https://yohaniddawela.substack.com/p/not-all-nightlight-datasets-are-the">Substack Post</a></li>
+<li><a href="https://appliedsciences.nasa.gov/get-involved/training/english/arset-introduction-nasas-black-marble-night-lights-data">Webinar</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
