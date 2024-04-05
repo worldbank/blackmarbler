@@ -10,6 +10,10 @@ website:
     ![Packge Logo. An image of dark background with point yellow lights](images/logo.png)
   navbar:
     logo: images/logo.png
+    right:
+      - icon: github
+        href: https://github.com/worldbank/blackmarbler/
+        aria-label: GitHub
     search: true
     left:
       - href: index.qmd
@@ -19,9 +23,10 @@ website:
 
 format:
   html:
-    theme: cosmo
+    theme: cyborg
     css: styles.css
     toc: true
+    smooth-scroll: true
 
 execute:
   eval: false
