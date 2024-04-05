@@ -195,25 +195,34 @@ bm_raster <- function(roi_sf,
 }
 
 
-#' Extracts raster data for specified region of interest
+#' Extract and process raster data for individual dates
 #'
-#' @param roi_sf Spatial object representing the region of interest.
-#' @param product_id Identifier for the product.
-#' @param date Dates for which raster data is to be extracted.
-#' @param bearer Authentication token for accessing the data.
-#' @param aggregation_fun Aggregation function to summarize raster values (default is "mean").
-#' @param add_n_pixels Logical indicating whether to add pixel count information (default is TRUE).
-#' @param variable Variable to extract from the product (default is NULL).
-#' @param quality_flags_to_remove Quality flag removal options (default is NULL).
-#' @param check_all_tiles_exist Logical indicating whether to check if all tiles exist (default is TRUE).
-#' @param interpol_na Logical indicating whether to interpolate missing values (default is FALSE).
-#' @param output_location_type Output location type ("memory" or "file", default is "memory").
-#' @param file_dir Directory for saving output files (used if output_location_type is "file", default is NULL).
-#' @param file_prefix Prefix for output file names (default is NULL).
-#' @param file_skip_if_exists Logical indicating whether to skip file creation if output file already exists (default is TRUE).
-#' @param quiet Logical indicating whether to suppress progress messages (default is FALSE).
-#' @return A data frame containing extracted raster data.
+#' This function extracts and processes raster data for individual dates.
+#'
+#' @param roi_sf The spatial features representing the regions of interest.
+#' @param product_id The product ID.
+#' @param date The date.
+#' @param bearer The bearer.
+#' @param aggregation_fun The function to aggregate data.
+#' @param add_n_pixels Logical indicating whether to compute additional pixel information.
+#' @param variable The variable.
+#' @param quality_flags_to_remove The quality flags to remove.
+#' @param check_all_tiles_exist Logical indicating whether to check if all tiles exist.
+#' @param interpol_na Logical indicating whether to interpolate missing values.
+#' @param output_location_type The type of output location.
+#' @param file_dir The directory to save files.
+#' @param file_prefix The prefix for file names.
+#' @param file_skip_if_exists Logical indicating whether to skip saving if files exist.
+#' @param quiet Logical indicating whether to suppress messages.
+#' @param ... Additional arguments passed to helper functions.
+#'
+#' @return A data frame containing the extracted and processed raster data.
+#'
 #' @export
+#'
+#' @examples
+#' bm_extract(roi_sf = my_roi_sf, product_id = "my_product", date = "2024-04-02", bearer = "my_bearer")
+#'
 bm_extract <- function(roi_sf,
                        product_id,
                        date,
@@ -230,6 +239,7 @@ bm_extract <- function(roi_sf,
                        file_skip_if_exists = TRUE,
                        quiet = FALSE,
                        ...) {
+
   # Errors & Warnings ----------------------------------------------------------
   if (interpol_na & length(date) == 1) {
     stop("If interpol_na = TRUE, then must have more than one date")
@@ -241,19 +251,28 @@ bm_extract <- function(roi_sf,
   }
 
   # Define Tempdir -------------------------------------------------------------
-  temp_dir <- tempdir()
+  temp_main_dir <- tempdir()
+
+
 
   # NTL Variable ---------------------------------------------------------------
-  variable <- define_blackmarble_variable(variable, product_id)
+  blackmarble_variable <- define_blackmarble_variable(variable, product_id)
 
-  if (interpol_na) {
+  current_time_millis = as.character(as.numeric(Sys.time())*1000) %>%
+    stringr::str_replace_all("[:punct:]", "")
+
+  temp_dir = file.path(temp_main_dir, paste0("bm_raster_temp_", current_time_millis))
+
+  dir.create(temp_dir, showWarnings = F)
+
+  if (interpol_na) { # if interpolation true then approximate
     # Create raster
     bm_r <- bm_raster(
       roi_sf = roi_sf,
       product_id = product_id,
       date = date,
       bearer = bearer,
-      variable = variable,
+      variable = blackmarble_variable,
       quality_flags_to_remove = quality_flags_to_remove,
       check_all_tiles_exist = check_all_tiles_exist,
       interpol_na = FALSE,
@@ -263,22 +282,24 @@ bm_extract <- function(roi_sf,
 
     # Interpolate
     bm_r <- terra::approximate(bm_r,
-      method = "linear",
-      rule = 1,
-      f = 0,
-      ties = mean,
-      z = NULL,
-      NArule = 1
-    )
+                               method = "linear",
+                               rule = 1,
+                               f = 0,
+                               ties = mean,
+                               z = NULL,
+                               NArule = 1)
 
-    # Extract
-    n_obs_df <- extract_and_process(bm_r, roi_sf, count_n_obs, quiet)
-    ntl_df <- extract_and_process(bm_r, roi_sf, aggregation_fun, quiet)
+    # Extract and process
+    extracted_data <- extract_and_process(raster = bm_r,
+                                          roi_sf = roi_sf,
+                                          fun = aggregation_fun,
+                                          add_n_pixels = add_n_pixels,
+                                          quiet = quiet,
+                                          ...)
 
-    r <- bind_extracted_data(n_obs_df, ntl_df)
   } else {
-    # Download data --------------------------------------------------------------
-    raster_list <- lapply(date, function(date_i) {
+    # Apply to each date data --------------------------------------------------------------
+    extracted_data <- lapply(date, function(date_i) {
       tryCatch(
         {
           # Make name for raster based on date
@@ -293,19 +314,24 @@ bm_extract <- function(roi_sf,
               return(NULL)
             }
 
-            r_agg <- extract_and_process_i(
-              roi_sf, product_id, date_i, bearer, variable,
-              quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir
-            )
+            r_agg <- extract_and_process(raster = bm_r,
+                                         roi_sf = roi_sf,
+                                         fun = aggregation_fun,
+                                         add_n_pixels = add_n_pixels,
+                                         quiet = quiet,
+                                         ...)
 
-            export_extracted_data(r_agg, out_path)
+            #### Export
+            saveRDS(r_agg, out_path)
 
             return(NULL) # Saving as file, so output from function should be NULL
           } else {
-            r_out <- extract_and_process_i(
-              roi_sf, product_id, date_i, bearer, variable,
-              quality_flags_to_remove, check_all_tiles_exist, quiet, temp_dir
-            )
+            r_out <- extract_and_process(raster = bm_r,
+                                         roi_sf = roi_sf,
+                                         fun = aggregation_fun,
+                                         add_n_pixels = add_n_pixels,
+                                         quiet = quiet,
+                                         ...)
 
             return(r_out)
           }
@@ -316,12 +342,9 @@ bm_extract <- function(roi_sf,
       )
     })
 
-    r <- bind_extracted_data_list(raster_list)
+    extracted_data <- bind_extracted_data(extracted_data)
   }
 
   unlink(temp_dir, recursive = TRUE)
-  return(r)
+  return(extracted_data)
 }
-
-
-# PENDING REPEAT DOCUMENTION OF PREVIOUS ----------------------------------
