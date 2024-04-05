@@ -1132,90 +1132,158 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
   return(raster)
 }
 
+
 # Helper functions ------------------------------------------------------------
 
 #' Extract and process raster data
-extract_and_process <- function(raster, roi_sf, fun, add_n_pixels = TRUE, quiet) {
-  extracted_data <- exactextractr::exact_extract(raster, roi_sf, fun, progress = !quiet)
-  roi_df <- sf::st_drop_geometry(roi_sf)
-  roi_df$date <- NULL
+#'
+#' This function extracts and processes raster data either for a single raster or for multiple rasters.
+#'
+#' @param raster The raster data.
+#' @param roi_sf The spatial features representing the regions of interest.
+#' @param fun The function to apply to the raster data for extraction and processing.
+#' @param add_n_pixels Logical indicating whether to compute additional pixel information.
+#' @param quiet Logical indicating whether to show progress messages.
+#' @param is_single Logical indicating whether the extraction is for a single raster or multiple rasters. Default is FALSE.
+#' @param product_id The product ID if is_single is TRUE.
+#' @param date_i The date if is_single is TRUE.
+#' @param bearer The bearer if is_single is TRUE.
+#' @param blackmarble_variable The blackmarble variable if is_single is TRUE.
+#' @param quality_flags_to_remove The quality flags to remove if is_single is TRUE.
+#' @param check_all_tiles_exist Logical indicating whether to check if all tiles exist if is_single is TRUE.
+#' @param temp_dir The temporary directory if is_single is TRUE.
+#'
+#' @return A data frame containing the extracted and processed raster data.
+#'
+#' @export
+#'
+#' @examples
+#' # For a single raster
+#' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean, is_single = TRUE,
+#'                     product_id = "my_product", date_i = "2024-04-02", bearer = "my_bearer",
+#'                     blackmarble_variable = "my_variable", quality_flags_to_remove = NULL,
+#'                     check_all_tiles_exist = TRUE, temp_dir = tempdir())
+#'
+#' # For multiple rasters
+#' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean)
+#'
+extract_and_process <-
+  function(raster,
+           roi_sf,
+           fun,
+           add_n_pixels = TRUE,
+           quiet = FALSE,
+           is_single = FALSE,
+           product_id = NULL,
+           date_i = NULL,
+           bearer = NULL,
+           blackmarble_variable = NULL,
+           quality_flags_to_remove = NULL,
+           check_all_tiles_exist = TRUE,
+           temp_dir = NULL) {
 
-  if (add_n_pixels) {
-    # Compute additional pixel information if add_n_pixels is TRUE
-    roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
-      sum(!is.na(values))
-    },
-    progress = !quiet
-    )
-    roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
-      length(values)
-    },
-    progress = !quiet
-    )
-    roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
-  }
 
-  if (length(fun) > 1) {
-    names(extracted_data) <- paste0("ntl_", names(extracted_data))
-    extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
+  if (!is_single) {
+
+    # REVIEW ORDER OF OPERATIONS HERE
+
+    roi_df <- sf::st_drop_geometry(roi_sf)
+    roi_df$date <- NULL
+
+    extracted_data <- exactextractr::exact_extract(raster, roi_sf, fun, progress = !quiet)
+
+
+
+    if (add_n_pixels) {
+      roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+        sum(!is.na(values))
+      }, progress = !quiet)
+
+      roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+        length(values)
+      }, progress = !quiet)
+
+      roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
+    }
+
+    if (length(fun) > 1) {
+      names(extracted_data) <- paste0("ntl_", names(extracted_data))
+      extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
+    } else {
+      roi_df[[paste0("ntl_", fun)]] <- extracted_data
+      extracted_data <- roi_df
+    }
+
   } else {
-    roi_df[[paste0("ntl_", fun)]] <- extracted_data
-    extracted_data <- roi_df
-  }
 
-  return(extracted_data)
-}
-
-#' Extract and process raster data for individual dates
-extract_and_process_i <- function(roi_sf, product_id, date_i, bearer, blackmarble_variable,
-                                  quality_flags_to_remove, check_all_tiles_exist, add_n_pixels = TRUE, quiet, temp_dir) {
-  bm_r <- retrieve_and_process_nightlight_data(
-    roi_sf = roi_sf,
-    product_id = product_id,
-    date = date_i,
-    bearer = bearer,
-    blackmarble_variable = blackmarble_variable,
-    quality_flags_to_remove = quality_flags_to_remove,
-    check_all_tiles_exist = check_all_tiles_exist,
-    quiet = quiet,
-    temp_dir = temp_dir
-  )
-
-  r_agg <- exactextractr::exact_extract(
-    x = bm_r, y = roi_sf, fun = aggregation_fun,
-    progress = !quiet
-  )
-
-  if (add_n_pixels) {
-    # Compute additional pixel information if add_n_pixels is TRUE
-    roi_sf$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-      sum(!is.na(values))
-    },
-    progress = !quiet
+    bm_r <- retrieve_and_process_nightlight_data(
+      roi_sf = roi_sf,
+      product_id = product_id,
+      date = date_i,
+      bearer = bearer,
+      blackmarble_variable = blackmarble_variable,
+      quality_flags_to_remove = quality_flags_to_remove,
+      check_all_tiles_exist = check_all_tiles_exist,
+      quiet = quiet,
+      temp_dir = temp_dir
     )
-    roi_sf$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-      length(values)
-    },
-    progress = !quiet
-    )
-    roi_sf$prop_non_na_pixels <- roi_sf$n_non_na_pixels / roi_sf$n_pixels
-  }
 
-  return(r_agg)
+    extracted_data <- exactextractr::exact_extract(
+      x = bm_r, y = roi_sf, fun = fun,
+      progress = !quiet
+    )
+
+    if (add_n_pixels) {
+      roi_df$n_non_na_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+        sum(!is.na(values))
+      }, progress = !quiet)
+
+      roi_df$n_pixels <- exactextractr::exact_extract(raster, roi_sf, function(values, coverage_fraction) {
+        length(values)
+      }, progress = !quiet)
+
+      roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
+    }
+
+
+    return(extracted_data)
+  }
 }
 
 #' Bind extracted data
-bind_extracted_data <- function(n_obs_df, ntl_df) {
-  names(ntl_df)[names(ntl_df) != "date"] <- paste0("ntl_", names(ntl_df)[names(ntl_df) != "date"])
-  ntl_df$date <- NULL
+#'
+#' This function binds together the extracted data frames or a list of extracted data frames.
+#'
+#' @param ... One or more extracted data frames or a list of extracted data frames.
+#'
+#' @return A data frame containing the bound extracted data.
+#'
+#' @export
+#'
+#' @examples
+#' # Binding extracted data frames
+#' bind_extracted_data(df1, df2)
+#'
+#' # Binding a list of extracted data frames
+#' bind_extracted_data(list_of_dfs)
+#'
+bind_extracted_data <- function(...) {
+  dfs <- list(...)
 
-  r <- dplyr::bind_cols(n_obs_df, ntl_df)
-  return(r)
-}
+  # Remove NULLs from the list
+  dfs <- dfs[!sapply(dfs, is.null)]
 
-#' Bind extracted data list
-bind_extracted_data_list <- function(r_list) {
-  r_list <- r_list[!sapply(r_list, is.null)]
-  r <- dplyr::bind_rows(r_list)
-  return(r)
+  # If only one data frame provided, return it
+  if (length(dfs) == 1) {
+    return(dfs[[1]])
+  }
+
+  # Bind the data frames together
+  if (length(dfs) > 1) {
+    for (i in 1:(length(dfs) - 1)) {
+      dfs[[i + 1]] <- dplyr::bind_rows(dfs[[i]], dfs[[i + 1]])
+    }
+  }
+
+  return(dfs[[length(dfs)]])
 }
