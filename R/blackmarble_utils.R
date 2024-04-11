@@ -1138,7 +1138,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 }
 
 
-# Helper functions ------------------------------------------------------------
+# Helper functions for BM Extract ------------------------------------------------------------
 
 #' Extract and process raster data
 #'
@@ -1199,6 +1199,7 @@ extract_and_process <-
     roi_df$date <- NULL
 
     cli::cli_inform("using extract function...")
+
     extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
 
@@ -1228,16 +1229,19 @@ extract_and_process <-
 
     if (length(fun) > 1) {
 
-# setting column names per function ---------------------------------------
+# setting column names per function.... sketchy logic.. somewhat okay ---------------------------------------
 
 
       names(extracted_data) <- paste0("ntl_", names(extracted_data))
+
       extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
 
       return(extracted_data)
 
     } else {
+
       roi_df[[paste0("ntl_", fun)]] <- extracted_data
+
       extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
 
       return(extracted_data)
@@ -1252,10 +1256,12 @@ extract_and_process <-
 
 
     roi_df <- sf::st_drop_geometry(roi_sf)
+
     cli::cli_inform("nulling date...")
     roi_df$date <- NULL
 
     cli::cli_inform("using extract function...")
+
     extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
 # if add pixels -----------------------------------------------------------
