@@ -36,6 +36,14 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
    - [ ] test based off readme examples
      - [X] bm raster test
      - [ ] bm extract tests
+        - [ ] check the logic of if its not single why   roi_df$date <- NULL
+        - [ ] extact extract logic
+        - [ ] test using differnt balck marble variable extraction 
+        - [ ] multiple vs single dates
+        - [ ] location memory vs file
+          - [ ] single date
+          - [ ] multiple dates (save multiple files)
+        - [ ] Add pixels false
 
 
 ## Overview
