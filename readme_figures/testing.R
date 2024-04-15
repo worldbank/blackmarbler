@@ -50,8 +50,6 @@ e_202110 <- bm_raster(roi_sf = roi_sf,
 e_202110 <- bm_extract(roi_sf = roi_sf,
                        product_id = "VNP46A3",
                        date = c("2021-10-01", "2021-11-01"), 
-                       bearer = bearer,
-                       output_location_type = "file",
-                       file_dir = "~/Desktop/test1")
+                       bearer = bearer)
 
 

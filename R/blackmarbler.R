@@ -932,7 +932,7 @@ bm_extract <- function(roi_sf,
 #' @import lubridate
 #' @rawNamespace import(tidyr, except = c(extract))
 #' @rawNamespace import(purrr, except = c(flatten_df, values))
-#' @rawNamespace import(raster, except = c(union, select, intersect, origin, tail, head, values))
+#' @rawNamespace import(terra, except = c(intersect, values, origin, union))
 #' 
 # @rawNamespace import(utils, except = c(stack, unstack))
 bm_raster <- function(roi_sf,

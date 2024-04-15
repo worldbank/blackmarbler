@@ -8,9 +8,9 @@ import(hdf5r)
 import(httr)
 import(lubridate)
 import(purrr, except = c(flatten_df, values))
-import(raster, except = c(union, select, intersect, origin, tail, head, values))
-
 import(readr)
 import(sf)
 import(stringr)
+import(terra, except = c(intersect, values, origin, union))
+
 import(tidyr, except = c(extract))
