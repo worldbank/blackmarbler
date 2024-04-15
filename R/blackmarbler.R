@@ -145,7 +145,7 @@ remove_fill_value <- function(x, variable){
   )){
     x[][x[] == 65535] <- NA
   }
-
+  
   return(x)
 }
 
@@ -297,7 +297,7 @@ file_to_raster <- function(f,
   nCols      <- ncol(out)
   res        <- nRows
   nodata_val <- NA
-  myCrs      <- 4326
+  myCrs      <- "EPSG:4326"
   
   ## Make Raster
   
@@ -309,13 +309,15 @@ file_to_raster <- function(f,
   out[out == nodata_val] <- NA
   
   #turn the out object into a raster
-  outr <- raster(out,crs=myCrs)
+  outr <- terra::rast(out,
+                      crs = myCrs,
+                      extent = c(xMin,xMax,yMin,yMax))
   
   #create extents class
-  rasExt <- raster::extent(c(xMin,xMax,yMin,yMax))
+  #rasExt <- raster::extent(c(xMin,xMax,yMin,yMax))
   
   #assign the extents to the raster
-  extent(outr) <- rasExt
+  #extent(outr) <- rasExt
   
   #set fill values to NA
   outr <- remove_fill_value(outr, variable)
@@ -457,7 +459,7 @@ download_raster <- function(file_name,
                           write_disk(download_path, overwrite = TRUE),
                           progress())
   }
-
+  
   
   if(response$status_code != 200){
     message("Error in downloading data")
@@ -637,6 +639,17 @@ bm_extract <- function(roi_sf,
   # NTL Variable ---------------------------------------------------------------
   variable <- define_variable(variable, product_id)
   
+  # Filename root --------------------------------------------------------------
+  # Define outside of lapply, as use this later to aggregate rasters
+  if(output_location_type == "file"){
+    out_name_begin <- paste0(file_prefix, 
+                             product_id, "_", 
+                             variable, "_",
+                             "qflag", 
+                             quality_flag_rm %>% paste0(collapse="_"), "_",
+                             aggregation_fun %>% paste0(collapse="_"))
+  }
+  
   if(interpol_na == T){
     
     #### Create raster
@@ -680,8 +693,6 @@ bm_extract <- function(roi_sf,
     
     ntl_df$date <- NULL
     r <- bind_cols(n_obs_df, ntl_df)
-    #r <- ntl_df %>%
-    #  left_join(n_obs_df, by = "date")
     
     # Apply through each date, extract, then append
   } else{
@@ -698,7 +709,8 @@ bm_extract <- function(roi_sf,
           #### If save to file
           if(output_location_type == "file"){
             
-            out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".Rds")
+            out_name_end <- paste0("_", date_name_i, ".Rds")
+            out_name <- paste0(out_name_begin, out_name_end)
             out_path <- file.path(file_dir, out_name)
             
             make_raster <- TRUE
@@ -820,6 +832,15 @@ bm_extract <- function(roi_sf,
     r <- r_list %>%
       bind_rows()
     
+  }
+  
+  # Output dataframe when output_location_type = "file" ------------------------
+  if(output_location_type == "file"){
+    r <- file_dir %>%
+      list.files(full.names = T,
+                 pattern = paste0("*.Rds")) %>%
+      str_subset(out_name_begin) %>%
+      map_df(readRDS)
   }
   
   unlink(temp_dir, recursive = T)
@@ -961,6 +982,16 @@ bm_raster <- function(roi_sf,
   # NTL Variable ---------------------------------------------------------------
   variable <- define_variable(variable, product_id)
   
+  # Filename root --------------------------------------------------------------
+  # Define outside of lapply, as use this later to aggregate rasters
+  if(output_location_type == "file"){
+    out_name_begin <- paste0(file_prefix, 
+                             product_id, "_", 
+                             variable, "_",
+                             "qflag", 
+                             quality_flag_rm %>% paste0(collapse="_"))
+  }
+  
   # Download data --------------------------------------------------------------
   r_list <- lapply(date, function(date_i){
     
@@ -972,7 +1003,13 @@ bm_raster <- function(roi_sf,
         
         #### If save as tif format
         if(output_location_type == "file"){
-          out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".tif")
+          
+          ## Output path
+          out_name_end <- paste0("_",
+                                 date_name_i,
+                                 ".tif")
+          out_name <- paste0(out_name_begin, out_name_end)
+          
           out_path <- file.path(file_dir, out_name)
           
           make_raster <- TRUE
@@ -1048,6 +1085,15 @@ bm_raster <- function(roi_sf,
   
   unlink(temp_dir, recursive = T)
   
+  # Output raster when output_location_type = "file" ---------------------------
+  if(output_location_type == "file"){
+    r <- file_dir %>%
+      list.files(full.names = T,
+                 pattern = paste0("*.tif")) %>%
+      str_subset(out_name_begin) %>%
+      rast()
+  }
+  
   return(r)
 }
 
@@ -1089,9 +1135,6 @@ bm_raster_i <- function(roi_sf,
   }
   
   # Grab tile dataframe --------------------------------------------------------
-  #product_id <- "VNP46A4"
-  #date <- "2021-10-15"
-  
   year  <- date %>% year()
   month <- date %>% month()
   day   <- date %>% yday()
@@ -1107,10 +1150,6 @@ bm_raster_i <- function(roi_sf,
   bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
   bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
   
-  #inter <- st_intersects(bm_tiles_sf, roi_1row_sf, sparse = F) %>% as.vector()
-  # inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
-  #   apply(1, sum)
-  
   inter <- tryCatch(
     {
       inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
@@ -1121,11 +1160,10 @@ bm_raster_i <- function(roi_sf,
     error = function(e){
       warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
       stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-      #stop(st_intersects(bm_tiles_sf, roi_sf, sparse = F))
     }
   )
   
-  grid_use_sf <- bm_tiles_sf[inter>0,]
+  grid_use_sf <- bm_tiles_sf[inter > 0,]
   
   # Make Raster ----------------------------------------------------------------
   tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
@@ -1150,16 +1188,11 @@ bm_raster_i <- function(roi_sf,
     r <- r_list[[1]]
   } else{
     
-    ## Mosaic rasters together
-    names(r_list)    <- NULL
-    r_list$fun       <- max
-    
-    r <- do.call(raster::mosaic, r_list)
-    
+    r <- do.call(terra::mosaic, c(r_list, fun = "max"))
   }
   
   ## Crop
-  r <- r %>% crop(roi_sf)
+  r <- r %>% terra::crop(roi_sf)
   
   unlink(file.path(temp_dir, product_id), recursive = T)
   
