@@ -1212,15 +1212,8 @@ extract_and_process <-
 # exact extract functions -----------------------------------------------------------
 
 
-      roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-        sum(!is.na(values))
-      }, progress = !quiet)
+      roi_df <- add_n_pixels(roi_df, bm_r, roi_sf, quiet)
 
-      roi_df$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-        length(values)
-      }, progress = !quiet)
-
-      roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
     }
 
 
@@ -1271,18 +1264,7 @@ extract_and_process <-
 
 
 # extact exgtract fucntions -----------------------------------------------
-
-
-      roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-        sum(!is.na(values))
-      }, progress = !quiet)
-
-      roi_df$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
-        length(values)
-      }, progress = !quiet)
-
-      roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
-
+      roi_df <- add_n_pixels(roi_df, bm_r, roi_sf, quiet)
     }
 
     extracted_data <- dplyr::bind_cols(extracted_data, roi_df)
@@ -1326,4 +1308,19 @@ bind_extracted_data <- function(extracted_data_list) {
     combined_df <- dplyr::bind_rows(dfs)
     return(combined_df)
   }
+}
+
+#' @export
+add_n_pixels <- function(roi_df, bm_r, roi_sf, quiet) {
+  roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
+    sum(!is.na(values))
+  }, progress = !quiet)
+
+  roi_df$n_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
+    length(values)
+  }, progress = !quiet)
+
+  roi_df$prop_non_na_pixels <- roi_df$n_non_na_pixels / roi_df$n_pixels
+
+  return(roi_df)
 }
