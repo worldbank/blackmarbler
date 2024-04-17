@@ -1,3 +1,7 @@
+
+# Test Different Versions daily-monthly-annual ----------------------------
+
+
 test_that("Test extract for VNP46A2 works", {
 
   # Define bearer token
@@ -19,7 +23,7 @@ expect_true(class(ken_202103_r) == "data.frame",
 
 })
 
-test_that("Test extract for VNP46A3 works.. fails", {
+test_that("Test extract for VNP46A3 works", {
 
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
@@ -62,3 +66,12 @@ test_that("Test extract for VNP46A4 works", {
 
 })
 
+
+# Changing the variable from black marble (using another NTL varia --------
+
+# Changing the variable from black marble (using another NTL variable), or something like cloud cover [changing using the "variable" param]
+
+
+# Output location (memory vs file), checking both with multiple da --------
+
+# * Output location (memory vs file), checking both with multiple dates. (eg, for "file" and multiple dates, outputs separate files)
