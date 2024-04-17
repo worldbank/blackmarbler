@@ -67,11 +67,6 @@ test_that("Test extract for VNP46A4 works", {
 })
 
 
-# Changing the variable from black marble (using another NTL varia --------
-
-# Changing the variable from black marble (using another NTL variable), or something like cloud cover [changing using the "variable" param]
 
 
-# Output location (memory vs file), checking both with multiple da --------
 
-# * Output location (memory vs file), checking both with multiple dates. (eg, for "file" and multiple dates, outputs separate files)

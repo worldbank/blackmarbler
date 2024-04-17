@@ -17,8 +17,8 @@ test_that("Test extract for VNP46A2 pasing multiple dates works", {
     quiet = TRUE
   )
 
-  expect_true(class(ken_202103_r) == "SpatRaster",
-              info = "ken_202103_r is not a SpatRaster object"
+  expect_true(class(ken_202103_r) == "data.frame",
+              info = "ken_202103_r is not a data.frame object"
   )
 })
 
@@ -30,7 +30,7 @@ test_that("Test extract for VNP46A3 pasing multiple dates works", {
   roi_sf <- geodata::gadm(country = "GHA", level = 1, path = tempdir()) |> sf::st_as_sf()
 
   # Monthly aggregated data in 2021 and 2022
-  ken_2021_2022_r <- bm_extract(
+  ken_202103_r <- bm_extract(
     roi_sf = roi_sf,
     product_id = "VNP46A3",
     date = seq.Date(from = lubridate::ymd("2021-01-01"), to = lubridate::ymd("2021-03-01"), by = "month"),
@@ -38,8 +38,8 @@ test_that("Test extract for VNP46A3 pasing multiple dates works", {
     quiet = TRUE
   )
 
-  expect_true(class(ken_2021_2022_r) == "SpatRaster",
-              info = "ken_2021_2022_r is not a SpatRaster object"
+  expect_true(class(ken_202103_r) == "data.frame",
+              info = "ken_202103_r is not a data.frame object"
   )
 })
 
