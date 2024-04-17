@@ -353,6 +353,7 @@ extract_daily_data <- function(download_file_path,
                                blackmarble_variable, quality_flags_to_remove) {
 
   allowed_variables_for_daily_data <- c(
+    "QF_Cloud_Mask", #cloud cover
     "DNB_At_Sensor_Radiance_500m", #VNP46A1
     "DNB_At_Sensor_Radiance",
     "DNB_BRDF-Corrected_NTL",
@@ -682,6 +683,7 @@ convert_h5_to_raster <- function(download_path,
 
   # Clean raster data
   clean_raster_obj <- clean_raster_data(raster_obj, blackmarble_variable)
+
 
   # Close HDF5 file
   h5_data$close_all()

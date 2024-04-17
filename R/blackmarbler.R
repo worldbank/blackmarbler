@@ -158,7 +158,7 @@ bm_raster <- function(roi_sf,
 
         if (output_location_type == "file") {
           terra::writeRaster(r, out_path)
-          return(NULL) # Saving as tif file, so output from function should be NULL
+          return(r)
         } else {
           names(r) <- date_name_i
           return(r)
@@ -269,8 +269,8 @@ cli::cli_inform("Inside Interpolation if")
       quality_flags_to_remove = quality_flags_to_remove,
       check_all_tiles_exist = check_all_tiles_exist,
       interpol_na = TRUE,
-      quiet = quiet,
-      file_dir = file_dir
+      output_location_type = "memory",
+      quiet = quiet
     )
 
 
@@ -313,36 +313,47 @@ cli::cli_inform("Inside Interpolation if")
           if (output_location_type == "file") {
             # Make name for raster based on date
             date_name_i <- define_raster_name(date_i, product_id)
+           # print("raster name")
+            #print(date_name_i)
 
 
             out_name <- paste0(file_prefix, product_id, "_", date_name_i, ".Rds")
+            #print("output name")
+            #print(out_name)
+            #print("file dir")
+           # print(file_dir)
             out_path <- file.path(file_dir, out_name)
+            print("outputh path is:")
+            print(out_path)
 
             if (file_skip_if_exists && file.exists(out_path)) {
+              print("file exists")
               return(NULL)
             }
 
 
 # Create raster -----------------------------------------------------------
 
-
+cli::cli_inform("Creating raster")
             bm_r <- bm_raster(
               roi_sf = roi_sf,
               product_id = product_id,
-              date = date_i,
+              date = date,
               bearer = bearer,
               variable = variable,
               quality_flags_to_remove = quality_flags_to_remove,
               check_all_tiles_exist = check_all_tiles_exist,
-              interpol_na = interpol_na,
-              quiet = quiet
+              interpol_na = FALSE,
+              quiet = quiet,
+              output_location_type = "file",
+              file_dir = file_dir
             )
 
 
 # Extract and Process -----------------------------------------------------
 
 
-
+cli::cli_inform("Extracting and processing")
             r_agg <- extract_and_process(bm_r = bm_r,
                                          roi_sf = roi_sf,
                                          fun = aggregation_fun,
@@ -353,11 +364,15 @@ cli::cli_inform("Inside Interpolation if")
 
 # Export ------------------------------------------------------------------
 
-
+            cli::cli_inform("Exporting to file")
             saveRDS(r_agg, out_path)
+            #check file was created succesfuly
+            if (!file.exists(out_path)) {
+              stop("File was not created")
+            }
 
 
-            return(NULL) # Saving as file, so output from function should be NULL
+            return(r_agg)
           } else {
 
             cli::cli_inform("output location in memory")
