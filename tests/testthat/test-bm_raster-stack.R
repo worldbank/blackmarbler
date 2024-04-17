@@ -1,6 +1,6 @@
 # Test make raster stack of nighttime lights across multiple time periods
 
-test_that("Test raster stack for VNP46A2 monthly data works", {
+test_that("Test raster stack for VNP46A2 daily data works", {
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
 
