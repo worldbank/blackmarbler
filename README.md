@@ -28,12 +28,11 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
     - [ ] Differences in Aggregation Functions
     - [ ] Transportation Infrastructure
  - [ ] let user know how many tiles are gonna be process cause its timely
- - [ ] More tests (priority)\
-   - [ ] test argument output localtion file
-   - [!] test bm_extract (next)
+ - [ ] More tests (priority)
+   - [X] test bm_extract (next)
    - [X!] test bm_raster
    - [ ] test quality flags
-   - [ ] test based off readme examples
+   - [X] test based off readme examples
      - [X] bm raster test
      - [ ] bm extract tests
         - [ ] check the logic of if its not single why   roi_df$date <- NULL
@@ -42,7 +41,7 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
         - [X] multiple vs single dates
         - [X] location memory vs file
           - [X] single date
-          - [] multiple dates (save multiple files) (incorrectly runs. inspect inside of the folder)
+          - [X] multiple dates (save multiple files) 
         - [X] Add pixels function
 
 
