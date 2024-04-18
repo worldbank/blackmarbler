@@ -51,10 +51,12 @@ test_that("Test extract for multiple dates works", {
   # sf polygon of Ghana
   roi_sf <- geodata::gadm(country = "GHA", level = 1, path = tempdir()) |> sf::st_as_sf()
 
+  dates_to_run <- seq.Date(from = lubridate::ymd("2021-03-01"), to = lubridate::ymd("2021-03-03"), by = "day")
+
   # Daily data: raster for October 3, 2021
   ken_202103_r <- bm_extract(roi_sf = roi_sf,
                              product_id = "VNP46A2",
-                             date = seq.Date(from = lubridate::ymd("2021-03-01"), to = lubridate::ymd("2021-03-03"), by = "day"),
+                             date = dates_to_run,
                              output_location = "file",
                              file_dir = temp_location,
                              file_prefix = NULL, # add warnign of requeired arguemtns
@@ -62,8 +64,8 @@ test_that("Test extract for multiple dates works", {
                              quiet = TRUE)
 
   # test length is 2
-  expect_equal(length(files_in_temp), 2,
-               info = "Length of files in temp location is not 2"
+  expect_equal(length(files_in_temp), length(dates_to_run)*2,
+               info = "Length of files in temp location is incorrect"
   )
 
   # test .tif and .Rds files exist
