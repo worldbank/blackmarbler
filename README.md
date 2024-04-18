@@ -27,7 +27,7 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
     - [ ] Assessing Quality Flags
     - [ ] Differences in Aggregation Functions
     - [ ] Transportation Infrastructure
- - [ ] let user know how many tiles are gonna be process cause it timely
+ - [ ] let user know how many tiles are gonna be process cause its timely
  - [ ] More tests (priority)\
    - [ ] test argument output localtion file
    - [!] test bm_extract (next)
@@ -37,13 +37,13 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
      - [X] bm raster test
      - [ ] bm extract tests
         - [ ] check the logic of if its not single why   roi_df$date <- NULL
-        - [ ] extact extract logic
-        - [ ] test using differnt balck marble variable extraction 
-        - [ ] multiple vs single dates
-        - [ ] location memory vs file
-          - [ ] single date
-          - [ ] multiple dates (save multiple files)
-        - [ ] Add pixels false
+        - [X] extact extract logic
+        - [X] test using different balck marble variable extraction (VNP46A3 FAILS )
+        - [X] multiple vs single dates
+        - [X] location memory vs file
+          - [X] single date
+          - [] multiple dates (save multiple files) (incorrectly runs. inspect inside of the folder)
+        - [X] Add pixels function
 
 
 ## Overview
