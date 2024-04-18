@@ -25,7 +25,7 @@ test_that("Test output location for 1 date works", {
 
 
   # test length is 2
-  expect_equal(length(files_in_temp), 2,
+  expect_equal(fs::dir_ls(files_in_temp) |> length(), 2,
                info = "Length of files in temp location is not 2"
   )
 
@@ -63,8 +63,8 @@ test_that("Test extract for multiple dates works", {
                              bearer = bearer,
                              quiet = TRUE)
 
-  # test length is 2
-  expect_equal(length(files_in_temp), length(dates_to_run)*2,
+  # test length
+  expect_equal(fs::dir_ls(files_in_temp) |> length(), length(dates_to_run)*2,
                info = "Length of files in temp location is incorrect"
   )
 
