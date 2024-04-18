@@ -327,7 +327,7 @@ cli::cli_inform("Inside Interpolation if")
             print(out_path)
 
             if (file_skip_if_exists && file.exists(out_path)) {
-              print("file exists")
+              print("Rds file exists")
               return(NULL)
             }
 
@@ -338,7 +338,7 @@ cli::cli_inform("Creating raster")
             bm_r <- bm_raster(
               roi_sf = roi_sf,
               product_id = product_id,
-              date = date,
+              date = date_i,
               bearer = bearer,
               variable = variable,
               quality_flags_to_remove = quality_flags_to_remove,
