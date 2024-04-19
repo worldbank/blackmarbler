@@ -19,6 +19,7 @@ bm_extract(
   file_dir = NULL,
   file_prefix = NULL,
   file_skip_if_exists = TRUE,
+  h5_dir = NULL,
   quiet = FALSE,
   ...
 )
@@ -82,6 +83,8 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 \item{file_prefix}{(If \code{output_location_type = file}). Prefix to add to the file to be saved. The file will be saved as the following: \verb{[file_prefix][product_id]_t[date].csv}}
 
 \item{file_skip_if_exists}{(If \code{output_location_type = file}). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
+
+\item{h5_dir}{Black Marble data are originally downloaded as \code{h5} files. If \code{h5_dir = NULL}, the function downloads to a temporary directory then deletes the directory. If \code{h5_dir} is set to a path, \code{h5} files are saved to that directory and not deleted. The function will then check if the needed \code{h5} file already exists in the directory; if it exists, the function will not re-download the \code{h5} file.}
 
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
 

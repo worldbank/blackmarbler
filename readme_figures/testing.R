@@ -43,8 +43,17 @@ r_202110 <- bm_raster(roi_sf = roi_sf,
                       h5_dir = "~/Desktop/h5_test",
                       quiet = T)
 
+r_202110 <- bm_extract(roi_sf = roi_sf,
+                      product_id = "VNP46A3",
+                      variable = "NearNadir_Composite_Snow_Free",
+                      date = "2021-10-01", 
+                      bearer = bearer)
+
 a <- terra::extract(r_202110, roi_sf, fun = sum, exact = T)$t2021_10
 b <- exact_extract(r_202110, roi_sf, fun = "sum")
+
+plot(r_202110)
+plot(roi_sf,add=T)
 
 e_202110 <- bm_raster(roi_sf = roi_sf,
                       product_id = "VNP46A3",
