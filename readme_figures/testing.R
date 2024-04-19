@@ -41,13 +41,18 @@ r_202110 <- bm_raster(roi_sf = roi_sf,
                       date = "2021-10-01", 
                       bearer = bearer,
                       h5_dir = "~/Desktop/h5_test",
-                      quiet = T)
+                      quiet = T,
+                      output_location_type = "file",
+                      file_dir = "~/Desktop")
 
 r_202110 <- bm_extract(roi_sf = roi_sf,
                       product_id = "VNP46A3",
                       variable = "NearNadir_Composite_Snow_Free",
                       date = "2021-10-01", 
-                      bearer = bearer)
+                      bearer = bearer,
+                      h5_dir = "~/Desktop/h5_test",
+                      output_location_type = "file",
+                      file_dir = "~/Desktop")
 
 a <- terra::extract(r_202110, roi_sf, fun = sum, exact = T)$t2021_10
 b <- exact_extract(r_202110, roi_sf, fun = "sum")
