@@ -43,6 +43,9 @@ r_202110 <- bm_raster(roi_sf = roi_sf,
                       h5_dir = "~/Desktop/h5_test",
                       quiet = T)
 
+a <- terra::extract(r_202110, roi_sf, fun = sum, exact = T)$t2021_10
+b <- exact_extract(r_202110, roi_sf, fun = "sum")
+
 e_202110 <- bm_raster(roi_sf = roi_sf,
                       product_id = "VNP46A3",
                       date = c("2021-10-01", "2021-11-01"), 
