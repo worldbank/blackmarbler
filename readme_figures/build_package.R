@@ -13,6 +13,8 @@ if(F){
   pkgdown::build_site_github_pages()
   #usethis::use_pkgdown_github_pages()
   
+  usethis::use_testthat(3)
+  
   usethis::use_pkgdown()
   usethis::use_github_pages()
   usethis::use_pkgdown_github_pages() #####

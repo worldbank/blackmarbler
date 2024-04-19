@@ -26,6 +26,8 @@ Imports:
   stringr,
   httr
 Suggests: 
-  geodata,
-  ggplot2,
-  knitr
+    geodata,
+    ggplot2,
+    knitr,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

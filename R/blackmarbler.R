@@ -976,6 +976,11 @@ bm_raster <- function(roi_sf,
     stop("interpol_na ignored. Interpolation only occurs when output_location_type = 'memory'")
   }
   
+  if(class(roi_sf)[1] == "SpatVector") roi_sf <- roi_sf %>% st_as_sf()
+  if(!("sf" %in% class(roi_sf))){
+    stop("roi must be an sf object")
+  }
+  
   # Assign interpolation variables ---------------------------------------------
   if(interpol_na == T){
     if(!exists("method")) method <- "linear"
@@ -1125,11 +1130,6 @@ bm_raster_i <- function(roi_sf,
                         h5_dir,
                         quiet,
                         temp_dir){
-  
-  # Checks ---------------------------------------------------------------------
-  if(!("sf" %in% class(roi_sf))){
-    stop("roi must be an sf object")
-  }
   
   # Black marble grid ----------------------------------------------------------
   bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
