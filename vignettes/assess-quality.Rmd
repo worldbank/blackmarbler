@@ -51,6 +51,7 @@ library(geodata)
 library(sf)
 library(raster)
 library(ggplot2)
+library(tidyterra)
 library(dplyr)
 library(exactextractr)
 library(lubridate)
@@ -90,24 +91,20 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_gap_daily_r_map, eval=FALSE}
 #### Prep data
-ntl_m_r <- ntl_r |> raster::mask(roi_sf) 
-
-ntl_df <- rasterToPoints(ntl_m_r, spatial = TRUE) |> as.data.frame()
-names(ntl_df) <- c("value", "x", "y")
+ntl_m_r <- ntl_r |> terra::mask(roi_sf) 
 
 ## Distribution is skewed, so log
-ntl_df$value_adj <- log(ntl_df$value+1)
+ntl_m_r[] <- log(ntl_m_r[]+1)
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
+  geom_spatraster(data = ntl_m_r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
+                       midpoint = 4,
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         legend.position = "none")
@@ -131,18 +128,14 @@ ntl_tmp_gap_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_tmp_gap_map, eval=FALSE}
 #### Prep data
-ntl_tmp_gap_r <- ntl_tmp_gap_r |> mask(roi_sf) 
-
-ntl_tmp_gap_df <- rasterToPoints(ntl_tmp_gap_r, spatial = TRUE) |> as.data.frame()
-names(ntl_tmp_gap_df) <- c("value", "x", "y")
+ntl_tmp_gap_r <- ntl_tmp_gap_r |> terra::mask(roi_sf) 
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_tmp_gap_df, 
-              aes(x = x, y = y, 
-                  fill = value)) +
-  scale_fill_distiller(palette = "Spectral") +
-  coord_quickmap() + 
+  geom_spatraster(data = ntl_tmp_gap_r) +
+  scale_fill_distiller(palette = "Spectral",
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   labs(fill = "Temporal\nGap\n(Days)",
        title = "Temporal gap between date (Jan 1, 2023)\nand date of high quality pixel used") +
@@ -169,24 +162,20 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_daily_r_map, eval=FALSE}
 #### Prep data
-ntl_m_r <- ntl_r |> raster::mask(roi_sf) 
-
-ntl_df <- rasterToPoints(ntl_m_r, spatial = TRUE) |> as.data.frame()
-names(ntl_df) <- c("value", "x", "y")
+ntl_m_r <- ntl_r |> terra::mask(roi_sf) 
 
 ## Distribution is skewed, so log
-ntl_df$value_adj <- log(ntl_df$value+1)
+ntl_m_r[] <- log(ntl_m_r[] + 1)
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
+  geom_spatraster(data = ntl_m_r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
+                       midpoint = 4,
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         legend.position = "none")
@@ -274,26 +263,22 @@ quality_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, quality_daily_r_map, eval=FALSE}
 #### Prep data
-quality_r <- quality_r |> mask(roi_sf) 
+quality_r <- quality_r |> terra::mask(roi_sf) 
 
-quality_df <- rasterToPoints(quality_r, spatial = TRUE) |> as.data.frame()
-names(quality_df) <- c("value", "x", "y")
+qual_levels <- data.frame(id=0:2, cover=c("0: High-quality, persistent", 
+                                  "1: High-quality, ephemeral", 
+                                  "2: Poor-quality"))
 
-quality_df <- quality_df %>%
-  dplyr::mutate(value_str = case_when(
-    value == 0 ~ "0: High-quality, persistent",
-    value == 1 ~ "1: High-quality, ephemeral",
-    value == 2 ~ "2: Poor-quality"
-  ))
+levels(quality_r) <- qual_levels
 
 ##### Map 
 ggplot() +
-  geom_raster(data = quality_df, 
-              aes(x = x, y = y, 
-                  fill = value_str)) +
-  scale_fill_brewer(palette = "Spectral", direction = -1) + 
+  geom_spatraster(data = quality_r) +
+  scale_fill_brewer(palette = "Spectral", 
+                    direction = -1,
+                    na.value = "transparent") + 
   labs(fill = "Quality") +
-  coord_quickmap() + 
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 ```
@@ -319,24 +304,20 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_daily_good_qual_map, eval=FALSE}
 #### Prep data
-ntl_good_qual_r <- ntl_good_qual_r |> mask(roi_sf) 
-
-ntl_good_qual_df <- rasterToPoints(ntl_good_qual_r, spatial = TRUE) |> as.data.frame()
-names(ntl_good_qual_df) <- c("value", "x", "y")
+ntl_good_qual_r <- ntl_good_qual_r |> terra::mask(roi_sf) 
 
 ## Distribution is skewed, so log
-ntl_good_qual_df$value_adj <- log(ntl_good_qual_df$value+1)
+ntl_good_qual_r[] <- log(ntl_good_qual_r[]+1)
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_good_qual_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
+  geom_spatraster(data = ntl_good_qual_r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
+                       midpoint = 4,
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         legend.position = "none")
@@ -366,24 +347,20 @@ ntl_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_r_map, eval=FALSE}
 #### Prep data
-ntl_r <- ntl_r |> mask(roi_sf) 
-
-ntl_df <- rasterToPoints(ntl_r, spatial = TRUE) |> as.data.frame()
-names(ntl_df) <- c("value", "x", "y")
+ntl_r <- ntl_r |> terra::mask(roi_sf) 
 
 ## Distribution is skewed, so log
-ntl_df$value_adj <- log(ntl_df$value+1)
+ntl_r[] <- log(ntl_r[] + 1)
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
+  geom_spatraster(data = ntl_r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
+                       midpoint = 4,
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         legend.position = "none")
@@ -409,21 +386,14 @@ cf_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, cf_r_map, eval=FALSE}
 #### Prep data
-cf_r <- cf_r |> mask(roi_sf) 
-
-cf_df <- rasterToPoints(cf_r, spatial = TRUE) |> as.data.frame()
-names(cf_df) <- c("value", "x", "y")
-
-cf_df$value <- cf_df$value %>% as.factor()
+cf_r <- cf_r |> terra::mask(roi_sf) 
 
 ##### Map 
 ggplot() +
-  geom_raster(data = cf_df, 
-              aes(x = x, y = y, 
-                  fill = value)) +
-  scale_fill_viridis_d() + 
+  geom_spatraster(data = cf_r) +
+  scale_fill_viridis_c(na.value = "transparent") + 
   labs(fill = "Number of\nObservations") +
-  coord_quickmap() + 
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 ```
@@ -456,26 +426,22 @@ quality_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, quality_r_map, eval=FALSE}
 #### Prep data
-quality_r <- quality_r |> mask(roi_sf) 
+quality_r <- quality_r |> terra::mask(roi_sf) 
 
-quality_df <- rasterToPoints(quality_r, spatial = TRUE) |> as.data.frame()
-names(quality_df) <- c("value", "x", "y")
+qual_levels <- data.frame(id=0:2, cover=c("0: Good quality", 
+                                  "1: Poor quality", 
+                                  "2: Gap filled"))
 
-quality_df <- quality_df %>%
-  dplyr::mutate(value_str = case_when(
-    value == 0 ~ "0: Good quality",
-    value == 1 ~ "1: Poor quality",
-    value == 2 ~ "2: Gap filled"
-  ))
+levels(quality_r) <- qual_levels
 
 ##### Map 
 ggplot() +
-  geom_raster(data = quality_df, 
-              aes(x = x, y = y, 
-                  fill = value_str)) +
-  scale_fill_brewer(palette = "Spectral", direction = -1) + 
+  geom_spatraster(data = quality_r) +
+  scale_fill_brewer(palette = "Spectral", 
+                    direction = -1,
+                    na.value = "transparent") + 
   labs(fill = "Quality") +
-  coord_quickmap() + 
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 ```
@@ -501,24 +467,20 @@ ntl_good_qual_r <- bm_raster(roi_sf = roi_sf,
 <summary>Show code to produce map</summary>
 ```{r, ntl_good_qual_map, eval=FALSE}
 #### Prep data
-ntl_good_qual_r <- ntl_good_qual_r |> mask(roi_sf) 
-
-ntl_good_qual_df <- rasterToPoints(ntl_good_qual_r, spatial = TRUE) |> as.data.frame()
-names(ntl_good_qual_df) <- c("value", "x", "y")
+ntl_good_qual_r <- ntl_good_qual_r |> terra::mask(roi_sf) 
 
 ## Distribution is skewed, so log
-ntl_good_qual_df$value_adj <- log(ntl_good_qual_df$value+1)
+ntl_good_qual_r[] <- log(ntl_good_qual_r[] + 1)
 
 ##### Map 
 ggplot() +
-  geom_raster(data = ntl_good_qual_df, 
-              aes(x = x, y = y, 
-                  fill = value_adj)) +
+  geom_spatraster(data = ntl_good_qual_r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4) +
-  coord_quickmap() + 
+                       midpoint = 4,
+                       na.value = "transparent") +
+  coord_sf() + 
   theme_void() +
   theme(plot.title = element_text(face = "bold", hjust = 0.5),
         legend.position = "none")
