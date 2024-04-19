@@ -68,7 +68,7 @@ test_that("Query VNP46A4", {
   
   # Daily data
   r <- bm_raster(roi_sf = roi_sf,
-                 product_id = "VNP46A3",
+                 product_id = "VNP46A4",
                  date = 2021,
                  bearer = bearer)
   
