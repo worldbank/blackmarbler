@@ -13,6 +13,7 @@ if(F){
   bearer <- read_csv("~/Desktop/bearer_bm.csv") %>%
     pull(token)
   
+  roi_sf <- read_sf("https://www.geoboundaries.org/api/current/gbOpen/GHA/ADM1/")
   roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) %>% st_as_sf()
   product_id <- "VNP46A3"
   year <- 2018

@@ -435,6 +435,7 @@ download_raster <- function(file_name,
                             variable,
                             bearer,
                             quality_flag_rm,
+                            h5_dir,
                             quiet){
   
   year       <- file_name %>% substring(10,13)
@@ -445,28 +446,36 @@ download_raster <- function(file_name,
                 product_id, '/', year, '/', day, '/', file_name)
   
   headers <- c('Authorization' = paste('Bearer', bearer))
-  download_path <- file.path(temp_dir, file_name)
   
-  if(quiet == FALSE) message(paste0("Processing: ", file_name))
-  
-  if(quiet == TRUE){
-    response <- httr::GET(url, 
-                          add_headers(headers), 
-                          write_disk(download_path, overwrite = TRUE))
+  if(is.null(h5_dir)){
+    download_path <- file.path(temp_dir, file_name)
   } else{
-    response <- httr::GET(url, 
-                          add_headers(headers), 
-                          write_disk(download_path, overwrite = TRUE),
-                          progress())
+    download_path <- file.path(h5_dir, file_name)
   }
   
-  
-  if(response$status_code != 200){
-    message("Error in downloading data")
-    message(response)
+  if(!file.exists(download_path)){
+    
+    if(quiet == FALSE) message(paste0("Processing: ", file_name))
+    
+    if(quiet == TRUE){
+      response <- httr::GET(url, 
+                            add_headers(headers), 
+                            write_disk(download_path, overwrite = TRUE))
+    } else{
+      response <- httr::GET(url, 
+                            add_headers(headers), 
+                            write_disk(download_path, overwrite = TRUE),
+                            progress())
+    }
+    
+    if(response$status_code != 200){
+      message("Error in downloading data")
+      message(response)
+    }
+    
   }
   
-  r <- file_to_raster(file.path(temp_dir, file_name),
+  r <- file_to_raster(download_path,
                       variable,
                       quality_flag_rm)
   
@@ -555,6 +564,7 @@ count_n_obs <- function(values, coverage_fraction) {
 #' @param file_dir (If `output_location_type = file`). The directory where data should be exported (default: `NULL`, so the working directory will be used)
 #' @param file_prefix (If `output_location_type = file`). Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].csv`
 #' @param file_skip_if_exists (If `output_location_type = file`). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
+#' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #'
 #' @param ... Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
@@ -604,6 +614,7 @@ bm_extract <- function(roi_sf,
                        file_dir = NULL,
                        file_prefix = NULL,
                        file_skip_if_exists = TRUE,
+                       h5_dir = NULL,
                        quiet = FALSE,
                        ...){
   
@@ -661,6 +672,7 @@ bm_extract <- function(roi_sf,
                       quality_flag_rm = quality_flag_rm,
                       check_all_tiles_exist = check_all_tiles_exist,
                       interpol_na = F,
+                      h5_dir = h5_dir,
                       quiet = quiet,
                       temp_dir = temp_dir)
     
@@ -726,6 +738,7 @@ bm_extract <- function(roi_sf,
                                variable = variable,
                                quality_flag_rm = quality_flag_rm,
                                check_all_tiles_exist = check_all_tiles_exist,
+                               h5_dir = h5_dir,
                                quiet = quiet,
                                temp_dir = temp_dir)
               names(r) <- date_name_i
@@ -778,6 +791,7 @@ bm_extract <- function(roi_sf,
                                  variable = variable,
                                  quality_flag_rm = quality_flag_rm,
                                  check_all_tiles_exist = check_all_tiles_exist,
+                                 h5_dir = h5_dir,
                                  quiet = quiet,
                                  temp_dir = temp_dir)
             names(r_out) <- date_name_i
@@ -887,6 +901,7 @@ bm_extract <- function(roi_sf,
 #' @param file_dir The directory where data should be exported (default: `NULL`, so the working directory will be used)
 #' @param file_prefix Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].tif`
 #' @param file_skip_if_exists Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
+#' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #' @param ... Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
 #'
@@ -947,6 +962,7 @@ bm_raster <- function(roi_sf,
                       file_dir = NULL,
                       file_prefix = NULL,
                       file_skip_if_exists = TRUE,
+                      h5_dir = NULL,
                       quiet = FALSE,
                       ...){
   
@@ -1024,6 +1040,7 @@ bm_raster <- function(roi_sf,
                              variable = variable,
                              quality_flag_rm = quality_flag_rm,
                              check_all_tiles_exist = check_all_tiles_exist,
+                             h5_dir = h5_dir,
                              quiet = quiet,
                              temp_dir = temp_dir)
             names(r) <- date_name_i
@@ -1044,6 +1061,7 @@ bm_raster <- function(roi_sf,
                                variable = variable,
                                quality_flag_rm = quality_flag_rm,
                                check_all_tiles_exist = check_all_tiles_exist,
+                               h5_dir = h5_dir,
                                quiet = quiet,
                                temp_dir = temp_dir)
           names(r_out) <- date_name_i
@@ -1104,6 +1122,7 @@ bm_raster_i <- function(roi_sf,
                         variable,
                         quality_flag_rm,
                         check_all_tiles_exist,
+                        h5_dir,
                         quiet,
                         temp_dir){
   
@@ -1181,7 +1200,7 @@ bm_raster_i <- function(roi_sf,
   }
   
   r_list <- lapply(bm_files_df$name, function(name_i){
-    download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, quiet)
+    download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, quiet)
   })
   
   if(length(r_list) == 1){
