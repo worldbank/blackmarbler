@@ -36,7 +36,7 @@ This function extracts and processes raster data either for a single raster or f
 This function extracts raster data from the specified regions of interest (\code{roi_sf}) and processes it using the specified function (\code{fun}). It can handle both single raster and multiple raster inputs.
 }
 \examples{
-#' \dontrun{
+\dontrun{
 # For a single raster
 extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean, is_single = TRUE,
                     add_n_pixels = TRUE, quiet = FALSE)

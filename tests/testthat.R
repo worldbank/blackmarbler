@@ -7,6 +7,5 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(blackmarbler)
 
-test_check("blackmarbler")
+test_local(load_package = "source")
