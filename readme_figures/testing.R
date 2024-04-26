@@ -1,39 +1,90 @@
 # Testing
 
-# Setup ------------------------------------------------------------------------
-library(geodata)
-library(sf)
-library(terra)
-library(ggplot2)
-
 library(readr)
 library(hdf5r)
 library(dplyr)
 library(purrr)
 library(lubridate)
 library(tidyr)
+library(raster)
 library(sf)
 library(exactextractr)
 library(stringr)
 library(httr)
 
+# Setup ------------------------------------------------------------------------
+library(blackmarbler)
+library(geodata)
+
 bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 
-roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) |> st_as_sf()
+roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) 
 
-roi_sf = roi_sf
-product_id = "VNP46A3"
-date = "2018-04"
-bearer = bearer
-variable = "AllAngle_Composite_Snow_Free"
-quality_flag_rm = NULL
-check_all_tiles_exist = TRUE
-interpol_na = FALSE
-output_location_type = "memory"
-file_dir = NULL
-file_prefix = NULL
-file_skip_if_exists = TRUE
-quiet = FALSE
+# bm_raster: Basic -------------------------------------------------------------
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = "2021-10-01", 
+               bearer = bearer)
+
+dir.create("~/Desktop/h5_tmp")
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = "2021-10-01", 
+               bearer = bearer,
+               h5_dir = "~/Desktop/h5_tmp")
+
+dir.create("~/Desktop/ntl_tmp")
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A3",
+               date = "2021-10-01", 
+               bearer = bearer,
+               h5_dir = "~/Desktop/h5_tmp",
+               output_location_type = "file",
+               file_dir = "~/Desktop/ntl_tmp")
+
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A4",
+               date = 2018:2020, 
+               bearer = bearer,
+               h5_dir = "~/Desktop/h5_tmp",
+               interpol_na = T)
+
+exact_extract(r, st_as_sf(roi_sf), fun = "mean")
+
+df <- bm_extract(roi_sf = roi_sf,
+                 product_id = "VNP46A4",
+                 date = 2018:2020, 
+                 bearer = bearer,
+                 h5_dir = "~/Desktop/h5_tmp",
+                 interpol_na = T,
+                 aggregation_fun = c("mean", "sum"))
+
+bm_r <- terra::approximate(r,
+                           method = method,
+                           rule = rule,
+                           f = f,
+                           ties = ties,
+                           z = z,
+                           NArule = NArule)
+
+r <- bm_raster(roi_sf = roi_sf,
+               product_id = "VNP46A4",
+               date = 2015:2020, 
+               bearer = bearer,
+               h5_dir = "~/Desktop/h5_tmp",
+               output_location_type = "file",
+               file_dir = "~/Desktop/ntl_tmp")
+
+# bm_extract: Basic ------------------------------------------------------------
+ntl_df <- bm_extract(roi_sf = roi_sf,
+                     product_id = "VNP46A3",
+                     date = "2021-10-01", 
+                     bearer = bearer)
+
+ntl_df <- bm_extract(roi_sf = roi_sf,
+                     product_id = "VNP46A4",
+                     date = 2020, 
+                     bearer = bearer)
 
 r_202110 <- bm_raster(roi_sf = roi_sf,
                       product_id = "VNP46A3",
@@ -46,13 +97,13 @@ r_202110 <- bm_raster(roi_sf = roi_sf,
                       file_dir = "~/Desktop")
 
 r_202110 <- bm_extract(roi_sf = roi_sf,
-                      product_id = "VNP46A3",
-                      variable = "NearNadir_Composite_Snow_Free",
-                      date = "2021-10-01", 
-                      bearer = bearer,
-                      h5_dir = "~/Desktop/h5_test",
-                      output_location_type = "file",
-                      file_dir = "~/Desktop")
+                       product_id = "VNP46A3",
+                       variable = "NearNadir_Composite_Snow_Free",
+                       date = "2021-10-01", 
+                       bearer = bearer,
+                       h5_dir = "~/Desktop/h5_test",
+                       output_location_type = "file",
+                       file_dir = "~/Desktop")
 
 a <- terra::extract(r_202110, roi_sf, fun = sum, exact = T)$t2021_10
 b <- exact_extract(r_202110, roi_sf, fun = "sum")

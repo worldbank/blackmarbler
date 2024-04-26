@@ -1,6 +1,6 @@
 Package: blackmarbler
 Title: Black Marble Data and Statistics
-Version: 0.1.2
+Version: 0.2.0
 Authors@R: 
     c(person("Robert", "Marty", , "rmarty@worldbank.org", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3164-3813")),
@@ -20,7 +20,7 @@ Imports:
   purrr,
   lubridate,
   tidyr,
-  raster,
+  terra,
   sf,
   exactextractr,
   stringr,
