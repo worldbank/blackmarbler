@@ -165,7 +165,7 @@ bm_raster <- function(roi_sf,
       },
       error = function(e) {
         # add error message of error
-        cli::cli_inform("Error in download and process function")
+        custom_inform("Error in download and process function", quiet)
         return(NULL)
       }
     )
@@ -254,7 +254,7 @@ bm_extract <- function(roi_sf,
   # Interpolation if ---------------------------------------------------------------
 
   if (interpol_na) { # if interpolation true then approximate
-cli::cli_inform("Inside Interpolation if")
+custom_inform("Inside Interpolation if", quiet)
 # Create raster -----------------------------------------------------------
 
 
@@ -298,7 +298,7 @@ cli::cli_inform("Inside Interpolation if")
 
 
   } else {
-    cli::cli_inform("Else Interpolation if")
+    custom_inform("Else Interpolation if", quiet)
     #Apply to each date data --------------------------------------------------------------
     extracted_data_list <- lapply(date, function(date_i) {
       tryCatch(
@@ -332,7 +332,8 @@ cli::cli_inform("Inside Interpolation if")
 
 # Create raster -----------------------------------------------------------
 
-cli::cli_inform("Creating raster")
+custom_inform("Creating raster", quiet)
+
             bm_r <- bm_raster(
               roi_sf = roi_sf,
               product_id = product_id,
@@ -351,7 +352,8 @@ cli::cli_inform("Creating raster")
 # Extract and Process -----------------------------------------------------
 
 
-cli::cli_inform("Extracting and processing")
+custom_inform("Extracting and processing", quiet)
+
             r_agg <- extract_and_process(bm_r = bm_r,
                                          roi_sf = roi_sf,
                                          fun = aggregation_fun,
@@ -362,7 +364,8 @@ cli::cli_inform("Extracting and processing")
 
 # Export ------------------------------------------------------------------
 
-            cli::cli_inform("Exporting to file")
+            custom_inform("Exporting to file", quiet)
+
             saveRDS(r_agg, out_path)
             #check file was created succesfuly
             if (!file.exists(out_path)) {
@@ -373,7 +376,7 @@ cli::cli_inform("Extracting and processing")
             return(r_agg)
           } else {
 
-            cli::cli_inform("output location in memory")
+            custom_inform("output location in memory", quiet)
 
 # Else --------------------------------------------------------------------
 
@@ -382,7 +385,7 @@ cli::cli_inform("Extracting and processing")
 
 # Create Raster -----------------------------------------------------------
 
-            cli::cli_inform("Calling BM raster for bm Spat Raster")
+            custom_inform("Calling BM raster for bm Spat Raster", quiet)
 
             bm_r <- bm_raster(
               roi_sf = roi_sf,
@@ -399,7 +402,7 @@ cli::cli_inform("Extracting and processing")
 
 # Extract and Process -----------------------------------------------------
 
-            cli::cli_inform("Calling extract and process")
+            custom_inform("Calling extract and process", quiet)
 
             r_out <- extract_and_process(bm_r = bm_r,
                                          roi_sf = roi_sf,
