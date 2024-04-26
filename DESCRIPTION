@@ -25,13 +25,15 @@ Imports:
   exactextractr,
   stringr,
   httr2,
-  terra
+  terra,
+  cli
 Suggests: 
     geodata,
     ggplot2,
     knitr,
     leaflet,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    fs
 Depends: 
     R (>= 2.10)
 LazyData: true
