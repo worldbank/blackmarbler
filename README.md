@@ -3,7 +3,6 @@
 <!-- badges: start -->
 
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/blackmarbler)](https://cran.r-project.org/package=blackmarbler)
-[![R-CMD-check](https://github.com/dime-worldbank/googletraffic/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml)
 ![downloads](http://cranlogs.r-pkg.org/badges/grand-total/blackmarbler)
 [![GitHub Repo stars](https://img.shields.io/github/stars/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler)
 [![activity](https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler/graphs/commit-activity)
