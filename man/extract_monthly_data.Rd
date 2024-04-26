@@ -11,6 +11,23 @@ extract_monthly_data(
   quality_flags_to_remove
 )
 }
+\arguments{
+\item{download_file_path}{Path to the downloaded HDF5 file.}
+
+\item{h5_data}{The HDF5 data.}
+
+\item{blackmarble_variable}{The variable to extract from the HDF5 data.}
+
+\item{quality_flags_to_remove}{Quality flag values to set to NA.}
+}
+\value{
+A list containing the extracted data and bounding box coordinates.
+}
 \description{
-Extract Monthly Data from HDF5 File
+This function extracts monthly data from an HDF5 file.
+}
+\examples{
+# Extract monthly data
+data <- extract_monthly_data(download_file_path, h5_data, blackmarble_variable, quality_flags_to_remove)
+
 }

@@ -2,5 +2,9 @@
 ^\.Rproj\.user$
 ^\\.Renviron$
 ^\\.Rprofile$
-^\\.github$
+^docs$
+^\.github$
 ^readme_figures$
+^_pkgdown$
+^pkgdown$
+

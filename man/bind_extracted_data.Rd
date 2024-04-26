@@ -2,12 +2,12 @@
 % Please edit documentation in R/blackmarble_utils.R
 \name{bind_extracted_data}
 \alias{bind_extracted_data}
-\title{Bind extracted data}
+\title{Bind extracted data frames}
 \usage{
 bind_extracted_data(extracted_data_list)
 }
 \arguments{
-\item{...}{One or more extracted data frames or a list of extracted data frames.}
+\item{extracted_data_list}{One or more extracted data frames or a list of extracted data frames.}
 }
 \value{
 A single data frame containing the bound extracted data.

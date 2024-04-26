@@ -14,11 +14,11 @@ extract_data_and_metadata_from_hdf5(
 \arguments{
 \item{h5_data}{The HDF5 file data.}
 
+\item{download_path}{A character string specifying the path to the downloaded file.}
+
 \item{blackmarble_variable}{A character string specifying the variable name.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data.}
-
-\item{file_path}{A character string specifying the file path.}
 }
 \value{
 A list containing the extracted data and metadata.

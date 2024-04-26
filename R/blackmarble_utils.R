@@ -209,7 +209,7 @@ apply_scaling_factor_to_viirs_data <- function(x, variable, quiet = TRUE) {
 #' Downloads a VIIRS satellite image in HDF5 format from NASA's LADSWeb and saves it to a temporary directory or persistent location.
 #'
 #' @param file_name A character string representing the name of the file to download.
-#' @param temp_dir A character string specifying the temporary directory where the file will be saved.
+#' @param download_path A character string representing the path to save the downloaded file.
 #' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
 #' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
@@ -415,6 +415,21 @@ extract_daily_data <- function(download_file_path,
 }
 
 #' Extract Monthly Data from HDF5 File
+#'
+#' This function extracts monthly data from an HDF5 file.
+#'
+#' @param download_file_path Path to the downloaded HDF5 file.
+#' @param h5_data The HDF5 data.
+#' @param blackmarble_variable The variable to extract from the HDF5 data.
+#' @param quality_flags_to_remove Quality flag values to set to NA.
+#'
+#' @return A list containing the extracted data and bounding box coordinates.
+#'
+#' @examples
+#' # Extract monthly data
+#' data <- extract_monthly_data(download_file_path, h5_data, blackmarble_variable, quality_flags_to_remove)
+#'
+#' @export
 extract_monthly_data <- function(download_file_path,
                                  h5_data, blackmarble_variable,
                                  quality_flags_to_remove) {
@@ -462,11 +477,12 @@ extract_monthly_data <- function(download_file_path,
 
 
   # Check if the data type of the first element is not numeric
-  if (class(out[1, 1]) != "numeric") {
+  if (!inherits(out[1, 1], "numeric")) {
     #cli::cli_inform("Data is not numeric. Converting to numeric.")
     # Convert the entire matrix to numeric
     out <- as.matrix(as.numeric(out))
   }
+
 
 
   # Extract Bounding Box from Raster NOT ----------------------------------------
@@ -495,7 +511,7 @@ extract_monthly_data <- function(download_file_path,
 #' This function extracts data and metadata from an HDF5 file.
 #'
 #' @param h5_data The HDF5 file data.
-#' @param file_path A character string specifying the file path.
+#' @param download_path A character string specifying the path to the downloaded file.
 #' @param blackmarble_variable A character string specifying the variable name.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data.
 #'
@@ -629,7 +645,7 @@ clean_raster_data <- function(raster_obj, variable_name) {
 #'
 #' Converts an HDF5 file to a raster object.
 #'
-#' @param file_path A character string representing the filepath to the HDF5 file.
+#' @param download_path A character string representing the download path to the HDF5 file.
 #' @param blackmarble_variable A character string specifying the blackmarble_variable name to extract from the HDF5 file.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
 #'
@@ -940,8 +956,6 @@ define_raster_name <- function(date_string, product_id) {
 #' Counts observations for each variable, considering coverage fraction, for use in exact_extract.
 #'
 #' @param values A data frame containing the values.
-#' @param coverage_fraction A numeric value representing the coverage fraction.
-#'
 #' @return A data frame with the count of non-NA pixels and total pixels for each variable.
 #'
 #' @details This function counts observations for each variable in the provided data frame, considering coverage fraction,
@@ -1035,8 +1049,6 @@ process_tiles <-
 #' @param black_marble_tiles_sf Spatial object representing Black Marble tiles.
 #' @param roi_sf Spatial object representing the region of interest.
 #' @return Spatial object containing Black Marble tiles intersecting with the region of interest.
-#' @import sf
-#' @importFrom stringr str_detect
 #' @examples
 #' \dontrun{
 #' # Load required libraries
@@ -1170,7 +1182,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 #'
 #' This function extracts and processes raster data either for a single raster or for multiple rasters.
 #'
-#' @param raster The raster data.
+#' @param bm_r The raster data.
 #' @param roi_sf The spatial features representing the regions of interest.
 #' @param fun The function to apply to the raster data for extraction and processing.
 #' @param add_n_pixels Logical indicating whether to compute additional pixel information.
@@ -1291,11 +1303,11 @@ extract_and_process <-
   }
 }
 
-#' Bind extracted data
+#' Bind extracted data frames
 #'
 #' This function binds together the extracted data frames or a list of extracted data frames.
 #'
-#' @param ... One or more extracted data frames or a list of extracted data frames.
+#' @param extracted_data_list One or more extracted data frames or a list of extracted data frames.
 #'
 #' @return A single data frame containing the bound extracted data.
 #'
@@ -1315,13 +1327,11 @@ bind_extracted_data <- function(extracted_data_list) {
 
   # If only one data frame provided, return it
   if (length(dfs) == 1) {
-    #cli::cli_inform("Only one data frame provided. Returning it.")
     return(dfs[[1]])
   }
 
   # Bind the data frames together
   if (length(dfs) > 1) {
-    #cli::cli_inform("Binding data frames together.")
     combined_df <- dplyr::bind_rows(dfs)
     return(combined_df)
   }

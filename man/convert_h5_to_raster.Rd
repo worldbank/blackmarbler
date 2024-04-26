@@ -11,11 +11,11 @@ convert_h5_to_raster(
 )
 }
 \arguments{
+\item{download_path}{A character string representing the download path to the HDF5 file.}
+
 \item{blackmarble_variable}{A character string specifying the blackmarble_variable name to extract from the HDF5 file.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data (optional).}
-
-\item{file_path}{A character string representing the filepath to the HDF5 file.}
 }
 \value{
 A raster object containing the extracted variable data from the HDF5 file.

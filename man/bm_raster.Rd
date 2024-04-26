@@ -49,6 +49,22 @@ bm_raster(
 For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for VNP46A1, see Table 3; for VNP46A2 see Table 6; for VNP46A3 and VNP46A4, see Table 9.
 }}
 
+\item{quality_flags_to_remove}{Quality flag values to use to set values to NA. Each pixel has a quality flag value, where low quality values can be removed. Values are set to NA for each value in ther quality_flag_rm vector. (Default: NULL).
+
+For VNP46A1 and VNP46A2 (daily data):
+\itemize{
+\item 0: High-quality, Persistent nighttime lights
+\item 1: High-quality, Ephemeral nighttime Lights
+\item 2: Poor-quality, Outlier, potential cloud contamination, or other issues
+}
+
+For VNP46A3 and VNP46A4 (monthly and annual data):
+\itemize{
+\item 0: Good-quality, The number of observations used for the composite is larger than 3
+\item 1: Poor-quality, The number of observations used for the composite is less than or equal to 3
+\item 2: Gap filled NTL based on historical data
+}}
+
 \item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If TRUE, skips cases where not all tiles are available. (Default: TRUE).}
 
 \item{interpol_na}{When data for more than one date is downloaded, whether to interpolate NA values in rasters using the raster::approxNA function. Additional arguments for the raster::approxNA function can also be passed into bm_extract (eg, method, rule, f, ties, z, NA_rule). (Default: FALSE).}
@@ -64,26 +80,6 @@ For information on other variable choices, see \href{https://ladsweb.modaps.eosd
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: FALSE).}
 
 \item{...}{Additional arguments for raster::approxNA, if interpol_na = TRUE}
-
-\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the fun argument in exactextractr::exact_extract (Default: mean).}
-
-\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (e.g., number of pixels used to compute average of nighttime lights). When TRUE, it adds three values: n_non_na_pixels (the number of non-NA pixels used for computing nighttime light statistics); n_pixels (the total number of pixels); and prop_non_na_pixels the proportion of the two. (Default: TRUE).}
-
-\item{quality_flag_rm}{Quality flag values to use to set values to NA. Each pixel has a quality flag value, where low quality values can be removed. Values are set to NA for each value in ther quality_flag_rm vector. (Default: NULL).
-
-For VNP46A1 and VNP46A2 (daily data):
-\itemize{
-\item 0: High-quality, Persistent nighttime lights
-\item 1: High-quality, Ephemeral nighttime Lights
-\item 2: Poor-quality, Outlier, potential cloud contamination, or other issues
-}
-
-For VNP46A3 and VNP46A4 (monthly and annual data):
-\itemize{
-\item 0: Good-quality, The number of observations used for the composite is larger than 3
-\item 1: Poor-quality, The number of observations used for the composite is less than or equal to 3
-\item 2: Gap filled NTL based on historical data
-}}
 }
 \value{
 Raster

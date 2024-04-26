@@ -14,6 +14,8 @@ extract_and_process(
 )
 }
 \arguments{
+\item{bm_r}{The raster data.}
+
 \item{roi_sf}{The spatial features representing the regions of interest.}
 
 \item{fun}{The function to apply to the raster data for extraction and processing.}
@@ -23,8 +25,6 @@ extract_and_process(
 \item{quiet}{Logical indicating whether to show progress messages.}
 
 \item{is_single}{Logical indicating whether a single raster is being processed. Default is \code{FALSE}.}
-
-\item{raster}{The raster data.}
 }
 \value{
 A data frame containing the extracted and processed raster data.

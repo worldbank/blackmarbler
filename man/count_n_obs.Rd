@@ -8,8 +8,6 @@ count_n_obs(values)
 }
 \arguments{
 \item{values}{A data frame containing the values.}
-
-\item{coverage_fraction}{A numeric value representing the coverage fraction.}
 }
 \value{
 A data frame with the count of non-NA pixels and total pixels for each variable.

@@ -15,13 +15,13 @@ download_h5_viirs_sat_image(
 \arguments{
 \item{file_name}{A character string representing the name of the file to download.}
 
+\item{download_path}{A character string representing the path to save the downloaded file.}
+
 \item{bearer}{A character string containing the authorization token for accessing NASA's LADSWeb.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data (optional).}
 
 \item{quiet}{Logical; indicating whether to suppress progress messages (default: FALSE).}
-
-\item{temp_dir}{A character string specifying the temporary directory where the file will be saved.}
 }
 \description{
 Downloads a VIIRS satellite image in HDF5 format from NASA's LADSWeb and saves it to a temporary directory or persistent location.
