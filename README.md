@@ -74,6 +74,7 @@ library(sf)
 library(terra)
 library(ggplot2)
 library(tidyterra)
+library(lubridate)
 
 #### Define NASA bearer token
 bearer <- "BEARER-TOKEN-HERE"
@@ -146,18 +147,19 @@ r <- bm_raster(roi_sf = roi_sf,
                bearer = bearer)
 
 #### Prep data
-r <- r |> terraLLmask(roi_sf)
+r <- r |> terra::mask(roi_sf)
 
 ## Distribution is skewed, so log
 r[] <- log(r[] + 1)
 
 ##### Map
-p <- ggplot() +
+ggplot() +
   geom_spatraster(data = r) +
   scale_fill_gradient2(low = "black",
                        mid = "yellow",
                        high = "red",
-                       midpoint = 4.5) +
+                       midpoint = 4.5,
+                       na.value = "transparent") +
   labs(title = "Nighttime Lights: October 2021") +
   coord_sf() +
   theme_void() +

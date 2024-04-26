@@ -57,8 +57,9 @@ df <- bm_extract(roi_sf = roi_sf,
                  date = 2018:2020, 
                  bearer = bearer,
                  h5_dir = "~/Desktop/h5_tmp",
-                 interpol_na = T,
+                 output_location_type = "file",
                  file_dir = "~/Desktop/ntl_tmp",
+                 file_return_null = F,
                  aggregation_fun = c("mean", "sum"))
 
 bm_r <- terra::approximate(r,
