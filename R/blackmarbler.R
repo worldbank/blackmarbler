@@ -557,6 +557,7 @@ count_n_obs <- function(values, coverage_fraction) {
 #' @param file_dir (If `output_location_type = file`). The directory where data should be exported (default: `NULL`, so the working directory will be used)
 #' @param file_prefix (If `output_location_type = file`). Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].csv`
 #' @param file_skip_if_exists (If `output_location_type = file`). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
+#' @param file_return_null Whether to return `NULL` instead of a `dataframe`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `dataframe` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #'
@@ -607,6 +608,7 @@ bm_extract <- function(roi_sf,
                        file_dir = NULL,
                        file_prefix = NULL,
                        file_skip_if_exists = TRUE,
+                       file_return_null = FALSE,
                        h5_dir = NULL,
                        quiet = FALSE,
                        ...){
@@ -848,11 +850,15 @@ bm_extract <- function(roi_sf,
   
   # Output dataframe when output_location_type = "file" ------------------------
   if(output_location_type == "file"){
-    r <- file_dir %>%
-      list.files(full.names = T,
-                 pattern = paste0("*.Rds")) %>%
-      str_subset(out_name_begin) %>%
-      map_df(readRDS)
+    if(!file_return_null){
+      r <- file_dir %>%
+        list.files(full.names = T,
+                   pattern = paste0("*.Rds")) %>%
+        str_subset(out_name_begin) %>%
+        map_df(readRDS)
+    } else{
+      r <- NULL
+    }
   }
   
   unlink(temp_dir, recursive = T)
@@ -899,6 +905,7 @@ bm_extract <- function(roi_sf,
 #' @param file_dir The directory where data should be exported (default: `NULL`, so the working directory will be used)
 #' @param file_prefix Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].tif`
 #' @param file_skip_if_exists Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
+#' @param file_return_null Whether to return `NULL` instead of a `SpatRaster`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `SpatRaster` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #' @param ... Additional arguments for `terra::approximate`, if `interpol_na = TRUE`
@@ -960,6 +967,7 @@ bm_raster <- function(roi_sf,
                       file_dir = NULL,
                       file_prefix = NULL,
                       file_skip_if_exists = TRUE,
+                      file_return_null = FALSE,
                       h5_dir = NULL,
                       quiet = FALSE,
                       ...){
@@ -1108,11 +1116,15 @@ bm_raster <- function(roi_sf,
   
   # Output raster when output_location_type = "file" ---------------------------
   if(output_location_type == "file"){
-    r <- file_dir %>%
-      list.files(full.names = T,
-                 pattern = paste0("*.tif")) %>%
-      str_subset(out_name_begin) %>%
-      rast()
+    if(!file_return_null){
+      r <- file_dir %>%
+        list.files(full.names = T,
+                   pattern = paste0("*.tif")) %>%
+        str_subset(out_name_begin) %>%
+        rast()
+    } else{
+      r <- NULL
+    }
   }
   
   return(r)

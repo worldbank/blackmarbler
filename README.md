@@ -296,6 +296,8 @@ If `output_location_type = "file"`, the following arguments can be used:
 * **file_dir:** The directory where data should be exported (default: `NULL`, so the working directory will be used)
 * **file_prefix:** Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].[tif/Rds]`
 * **file_skip_if_exists:** Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`). If the function is first run with `date = c(2018, 2019, 2020)`, then is later run with `date = c(2018, 2019, 2020, 2021)`, the function will only download/extract data for 2021. Skipping existing files can facilitate re-running the function at a later date to download only more recent data.
+* **file_return_null:** Whether to return `NULL` instead of a output to R (`SpatRaster` or `dataframe`). When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
+
   
 * **...:** Additional arguments for [`terra::approximate`](https://rspatial.github.io/terra/reference/approximate.html), if `interpol_na = TRUE`
 

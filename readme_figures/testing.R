@@ -40,7 +40,8 @@ r <- bm_raster(roi_sf = roi_sf,
                bearer = bearer,
                h5_dir = "~/Desktop/h5_tmp",
                output_location_type = "file",
-               file_dir = "~/Desktop/ntl_tmp")
+               file_dir = "~/Desktop/ntl_tmp",
+               file_return_null = T)
 
 r <- bm_raster(roi_sf = roi_sf,
                product_id = "VNP46A4",
@@ -57,6 +58,7 @@ df <- bm_extract(roi_sf = roi_sf,
                  bearer = bearer,
                  h5_dir = "~/Desktop/h5_tmp",
                  interpol_na = T,
+                 file_dir = "~/Desktop/ntl_tmp",
                  aggregation_fun = c("mean", "sum"))
 
 bm_r <- terra::approximate(r,
