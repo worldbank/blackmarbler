@@ -67,6 +67,7 @@
 <span>  file_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file_prefix <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  file_skip_if_exists <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  file_return_null <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  h5_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -88,7 +89,7 @@
 
 
 <dt>date</dt>
-<dd><p>Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.</p><ul><li><p>For <code>product_id</code>s <code>"VNP46A1"</code> and <code>"VNP46A2"</code>, a date (eg, <code>"2021-10-03"</code>).</p></li>
+<dd><p>Date of raster data. Entering one date will produce a <code>SpatRaster</code> object. Entering multiple dates will produce a <code>SpatRaster</code> object with multiple bands; one band per date.</p><ul><li><p>For <code>product_id</code>s <code>"VNP46A1"</code> and <code>"VNP46A2"</code>, a date (eg, <code>"2021-10-03"</code>).</p></li>
 <li><p>For <code>product_id</code> <code>"VNP46A3"</code>, a date or year-month (e.g., <code>"2021-10-01"</code>, where the day will be ignored, or <code>"2021-10"</code>).</p></li>
 <li><p>For <code>product_id</code> <code>"VNP46A4"</code>, year or date  (e.g., <code>"2021-10-01"</code>, where the month and day will be ignored, or <code>2021</code>).</p></li>
 </ul></dd>
@@ -122,7 +123,7 @@ For information on other variable choices, see <a href="https://ladsweb.modaps.e
 
 
 <dt>interpol_na</dt>
-<dd><p>When data for more than one date is downloaded, whether to interpolate <code>NA</code> values using the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function. Additional arguments for the <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code> function can also be passed into <code>bm_raster</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></dd>
+<dd><p>When data for more than one date is downloaded, whether to interpolate <code>NA</code> values using the <code><a href="https://rspatial.github.io/terra/reference/approximate.html" class="external-link">terra::approximate</a></code> function. Additional arguments for the <code><a href="https://rspatial.github.io/terra/reference/approximate.html" class="external-link">terra::approximate</a></code> function can also be passed into <code>bm_raster</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></dd>
 
 
 <dt>output_location_type</dt>
@@ -142,6 +143,10 @@ For <code>output_location_type = file</code>:</p></dd>
 <dd><p>Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: <code>TRUE</code>).</p></dd>
 
 
+<dt>file_return_null</dt>
+<dd><p>Whether to return <code>NULL</code> instead of a <code>SpatRaster</code>. When <code>output_location_type = 'file'</code>, the function will export data to the <code>file_dir</code> directory. When <code>file_return_null = FALSE</code>, the function will also return a <code>SpatRaster</code> of the queried data---so the data is available in R memory. Setting <code>file_return_null = TRUE</code>, data will be saved to <code>file_dir</code> but no data will be returned by the function to R memory (default: <code>FALSE</code>).</p></dd>
+
+
 <dt>h5_dir</dt>
 <dd><p>Black Marble data are originally downloaded as <code>h5</code> files. If <code>h5_dir = NULL</code>, the function downloads to a temporary directory then deletes the directory. If <code>h5_dir</code> is set to a path, <code>h5</code> files are saved to that directory and not deleted. The function will then check if the needed <code>h5</code> file already exists in the directory; if it exists, the function will not re-download the <code>h5</code> file.</p></dd>
 
@@ -151,7 +156,7 @@ For <code>output_location_type = file</code>:</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Additional arguments for <code><a href="https://rdrr.io/pkg/raster/man/approxNA.html" class="external-link">raster::approxNA</a></code>, if <code>interpol_na = TRUE</code></p></dd>
+<dd><p>Additional arguments for <code><a href="https://rspatial.github.io/terra/reference/approximate.html" class="external-link">terra::approximate</a></code>, if <code>interpol_na = TRUE</code></p></dd>
 
 </dl></div>
     <div class="section level2">
