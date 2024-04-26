@@ -463,7 +463,7 @@ extract_monthly_data <- function(download_file_path,
 
   # Check if the data type of the first element is not numeric
   if (class(out[1, 1]) != "numeric") {
-    print("Data is not numeric. Converting to numeric.")
+    #cli::cli_inform("Data is not numeric. Converting to numeric.")
     # Convert the entire matrix to numeric
     out <- as.matrix(as.numeric(out))
   }
@@ -515,7 +515,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
                                                 quality_flags_to_remove) {
 
   if (grepl("VNP46A1|VNP46A2", download_path, ignore.case = TRUE)) {
-    print("im in daily_result")
+    #cli::cli_inform("im in daily_result")
     # Extract data for daily files
     daily_result <- extract_daily_data(
       download_path,
@@ -530,7 +530,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
     min_lat <- daily_result$min_lat
     max_lat <- daily_result$max_lat
   } else {
-    print("im in monthly_result")
+    #cli::cli_inform("im in monthly_result")
     # Extract data for monthly/annually files
     monthly_result <- extract_monthly_data(
       download_path,
@@ -650,7 +650,7 @@ convert_h5_to_raster <- function(download_path,
   h5_data <- hdf5r::h5file(download_path, "r+")
 
   # Extract data and metadata
-  # print("extract_data_and_metadata_from_hdf5")
+  # cli::cli_inform("extract_data_and_metadata_from_hdf5")
 
   result_metadata_list <- extract_data_and_metadata_from_hdf5(
     h5_data,
@@ -663,12 +663,12 @@ convert_h5_to_raster <- function(download_path,
 
   metadata <- result_metadata_list$metadata
 
-  print("create_raster")
+  #cli::cli_inform("create_raster")
   # Convert data to raster
 
   raster_obj <- create_raster_from_data_metadata(data, metadata)
 
-  print("clean_raster_data")
+  #cli::cli_inform("clean_raster_data")
 
   # Clean raster data
   clean_raster_obj <- clean_raster_data(raster_obj, blackmarble_variable)
@@ -772,7 +772,7 @@ read_black_marble_csv <- function(year, day, product_id) {
   )
 
   # Add a small delay to avoid overloading the server
-  print("adding delay to avoid overloading the server")
+  #cli::cli_inform("adding delay to avoid overloading the server")
   Sys.sleep(0.1) # Adding a small delay to avoid overloading the server
 
   return(df_out)
@@ -1140,7 +1140,7 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
     roi_sf
   )
   # Make Raster ----------------------------------------------------------------
-  print("processing tiles...")
+  custom_inform("processing tiles...", quiet)
 
   raster <- process_tiles(
     bm_files_df,
@@ -1209,14 +1209,14 @@ extract_and_process <-
 
 
 # drop geometry -----------------------------------------------------------
-    cli::cli_inform("dropping geometry...")
+    custom_inform("dropping geometry...", quiet)
 
 
     roi_df <- sf::st_drop_geometry(roi_sf)
-    cli::cli_inform("nulling date...")
+    custom_inform("nulling date...", quiet)
     roi_df$date <- NULL
 
-    cli::cli_inform("using extract function...")
+    custom_inform("using extract function...", quiet)
 
     extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
@@ -1263,15 +1263,15 @@ extract_and_process <-
 
 # else --------------------------------------------------------------------
     # drop geometry -----------------------------------------------------------
-    cli::cli_inform("dropping geometry...")
+    custom_inform("dropping geometry...", quiet)
 
 
     roi_df <- sf::st_drop_geometry(roi_sf)
 
-    cli::cli_inform("nulling date...")
+    custom_inform("nulling date...", quiet)
     roi_df$date <- NULL
 
-    cli::cli_inform("using extract function...")
+    custom_inform("using extract function...", quiet)
 
     extracted_data <- exactextractr::exact_extract(bm_r, roi_sf, fun, progress = !quiet)
 
@@ -1315,13 +1315,13 @@ bind_extracted_data <- function(extracted_data_list) {
 
   # If only one data frame provided, return it
   if (length(dfs) == 1) {
-    cli::cli_inform("Only one data frame provided. Returning it.")
+    #cli::cli_inform("Only one data frame provided. Returning it.")
     return(dfs[[1]])
   }
 
   # Bind the data frames together
   if (length(dfs) > 1) {
-    cli::cli_inform("Binding data frames together.")
+    #cli::cli_inform("Binding data frames together.")
     combined_df <- dplyr::bind_rows(dfs)
     return(combined_df)
   }
@@ -1357,3 +1357,27 @@ add_n_pixels <- function(roi_df, bm_r, roi_sf, quiet) {
 
   return(roi_df)
 }
+
+
+
+# Utils -------------------------------------------------------------------
+
+#' Custom Inform Function
+#'
+#' This function prints an information message if quiet is set to FALSE.
+#'
+#' @param message The message to be printed.
+#' @param quiet Logical indicating whether to suppress printing the message. Default is FALSE.
+#'
+#' @export
+#'
+#' @examples
+#' custom_inform("This is an information message.", quiet = FALSE)
+#' custom_inform("This message will not be printed.", quiet = TRUE)
+#'
+custom_inform <- function(message, quiet = FALSE) {
+  if (!quiet) {
+    cli::cli_inform(message)
+  }
+}
+
