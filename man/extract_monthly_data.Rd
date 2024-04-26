@@ -27,7 +27,8 @@ A list containing the extracted data and bounding box coordinates.
 This function extracts monthly data from an HDF5 file.
 }
 \examples{
+\dontrun{
 # Extract monthly data
 data <- extract_monthly_data(download_file_path, h5_data, blackmarble_variable, quality_flags_to_remove)
-
+}
 }

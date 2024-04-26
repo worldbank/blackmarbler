@@ -16,9 +16,11 @@ A single data frame containing the bound extracted data.
 This function binds together the extracted data frames or a list of extracted data frames.
 }
 \examples{
+\dontrun{
 # Binding extracted data frames
 bind_extracted_data(df1, df2)
 
 # Binding a list of extracted data frames
 bind_extracted_data(list_of_dfs)
+}
 }

@@ -221,7 +221,9 @@ bm_raster <- function(roi_sf,
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' bm_extract(roi_sf = my_roi_sf, product_id = "my_product", date = "2024-04-02", bearer = "my_bearer")
+#' }
 bm_extract <- function(roi_sf,
                        product_id,
                        date,

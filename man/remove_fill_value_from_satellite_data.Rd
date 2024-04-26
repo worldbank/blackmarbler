@@ -31,8 +31,10 @@ described in the Black Marble User Guide (https://viirsland.gsfc.nasa.gov/PDF/Bl
 }
 
 \examples{
+\dontrun{
 # Remove artifact values from UTC_Time variable in satellite data
 cleaned_data <- remove_fill_value_from_satellite_data(satellite_data, "UTC_Time")
+}
 }
 \references{
 For more information on artifact values in satellite data, refer to the Black Marble User Guide.

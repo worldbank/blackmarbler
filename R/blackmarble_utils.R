@@ -11,9 +11,12 @@
 #' @return An interactive Leaflet map object.
 #'
 #' @examples
+#' \dontrun{
 #' library(leaflet)
 #' # Generate the map
 #' map_black_marble_tiles()
+#'
+#' }
 map_black_marble_tiles <- function() {
   # Define the center coordinates and zoom level
   center <- c(19.432608, -99.133209) # Mexico City coordinates
@@ -43,11 +46,13 @@ map_black_marble_tiles <- function() {
 #' @param julian_date A character string representing the day of the year in Julian format (e.g., "001" for January 1st).
 #' @return A number representing the month corresponding to the given Julian date (e.g., 1 for January).
 #' @examples
+#' \dontrun{
 #' julian_to_month("001")
 #' # [1] 1
 #'
 #' julian_to_month("032")
 #' # [1] 2
+#' }
 #' @references
 #' For more information on the Julian day system, see: https://en.wikipedia.org/wiki/Julian_day
 #' @export
@@ -74,8 +79,10 @@ julian_to_month <- function(julian_date) {
 #' @param blackmarble_variable A character string specifying the blackmarble_variable for which artifact values should be removed.
 #' @return The input data with artifact values replaced by NA.
 #' @examples
+#' \dontrun{
 #' # Remove artifact values from UTC_Time variable in satellite data
 #' cleaned_data <- remove_fill_value_from_satellite_data(satellite_data, "UTC_Time")
+#' }
 #' @references
 #' For more information on artifact values in satellite data, refer to the Black Marble User Guide.
 #'
@@ -426,9 +433,10 @@ extract_daily_data <- function(download_file_path,
 #' @return A list containing the extracted data and bounding box coordinates.
 #'
 #' @examples
+#' \dontrun{
 #' # Extract monthly data
 #' data <- extract_monthly_data(download_file_path, h5_data, blackmarble_variable, quality_flags_to_remove)
-#'
+#' }
 #' @export
 extract_monthly_data <- function(download_file_path,
                                  h5_data, blackmarble_variable,
@@ -764,9 +772,10 @@ download_and_convert_raster <- function(file_name,
 #' consecutive requests using \code{Sys.sleep(0.1)}.
 #'
 #' @examples
+#' \dontrun{
 #' # Read Black Marble CSV data for the year 2023, day 150, and product ID "VIIRS_SNPP_CorrectedReflectance_BandM3"
 #' data <- read_black_marble_csv(2023, 150, "VIIRS_SNPP_CorrectedReflectance_BandM3")
-#'
+#' }
 #' @export
 read_black_marble_csv <- function(year, day, product_id) {
   df_out <- tryCatch(
@@ -814,12 +823,13 @@ read_black_marble_csv <- function(year, day, product_id) {
 #' type of data.
 #'
 #' @examples
+#' \dontrun{
 #' # Generate filenames for all available Black Marble data
 #' all_data <- create_black_marble_dataset_df("VNP46A1")
 #'
 #' # Generate filenames for Black Marble data for specific years and months
 #' specific_data <- create_black_marble_dataset_df("VNP46A2", years = c(2018, 2019), months = 1:6)
-#'
+#' }
 #' @export
 create_black_marble_dataset_df <- function(product_id,
                                            all = TRUE,
@@ -1194,13 +1204,14 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 #' This function extracts raster data from the specified regions of interest (\code{roi_sf}) and processes it using the specified function (\code{fun}). It can handle both single raster and multiple raster inputs.
 #'
 #' @examples
+#' #' \dontrun{
 #' # For a single raster
 #' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean, is_single = TRUE,
 #'                     add_n_pixels = TRUE, quiet = FALSE)
 #'
 #' # For multiple rasters
 #' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean)
-#'
+#'}
 #' @export
 extract_and_process <-
   function(bm_r,
@@ -1314,11 +1325,13 @@ extract_and_process <-
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Binding extracted data frames
 #' bind_extracted_data(df1, df2)
 #'
 #' # Binding a list of extracted data frames
 #' bind_extracted_data(list_of_dfs)
+#' }
 bind_extracted_data <- function(extracted_data_list) {
   dfs <- extracted_data_list
 
@@ -1351,9 +1364,10 @@ bind_extracted_data <- function(extracted_data_list) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' # Adding pixel information to extracted data
 #' add_n_pixels(roi_df, bm_r, roi_sf, quiet = FALSE)
-#'
+#'}
 add_n_pixels <- function(roi_df, bm_r, roi_sf, quiet) {
   roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
     sum(!is.na(values))
@@ -1382,9 +1396,10 @@ add_n_pixels <- function(roi_df, bm_r, roi_sf, quiet) {
 #' @export
 #'
 #' @examples
+#' \dontrun{
 #' custom_inform("This is an information message.", quiet = FALSE)
 #' custom_inform("This message will not be printed.", quiet = TRUE)
-#'
+#'}
 custom_inform <- function(message, quiet = FALSE) {
   if (!quiet) {
     cli::cli_inform(message)

@@ -15,7 +15,8 @@ custom_inform(message, quiet = FALSE)
 This function prints an information message if quiet is set to FALSE.
 }
 \examples{
+\dontrun{
 custom_inform("This is an information message.", quiet = FALSE)
 custom_inform("This message will not be printed.", quiet = TRUE)
-
+}
 }

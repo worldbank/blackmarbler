@@ -16,11 +16,13 @@ A number representing the month corresponding to the given Julian date (e.g., 1 
 This function translates Julian dates to regular month representations.
 }
 \examples{
+\dontrun{
 julian_to_month("001")
 # [1] 1
 
 julian_to_month("032")
 # [1] 2
+}
 }
 \references{
 For more information on the Julian day system, see: https://en.wikipedia.org/wiki/Julian_day

@@ -22,7 +22,8 @@ The input data frame with added columns for pixel information.
 This function calculates additional pixel information for the extracted data frames.
 }
 \examples{
+\dontrun{
 # Adding pixel information to extracted data
 add_n_pixels(roi_df, bm_r, roi_sf, quiet = FALSE)
-
+}
 }

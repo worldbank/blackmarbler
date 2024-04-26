@@ -63,5 +63,7 @@ A data frame containing the extracted and processed raster data.
 This function extracts and processes raster data for individual dates.
 }
 \examples{
+\dontrun{
 bm_extract(roi_sf = my_roi_sf, product_id = "my_product", date = "2024-04-02", bearer = "my_bearer")
+}
 }

@@ -37,10 +37,11 @@ year, and day or month. The resulting data frame includes columns for the year a
 type of data.
 }
 \examples{
+\dontrun{
 # Generate filenames for all available Black Marble data
 all_data <- create_black_marble_dataset_df("VNP46A1")
 
 # Generate filenames for Black Marble data for specific years and months
 specific_data <- create_black_marble_dataset_df("VNP46A2", years = c(2018, 2019), months = 1:6)
-
+}
 }

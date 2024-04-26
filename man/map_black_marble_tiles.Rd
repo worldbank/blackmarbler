@@ -18,7 +18,10 @@ This function requires the \code{leaflet} package for generating interactive map
 This function generates an interactive map displaying black marble tiles obtained from NASA's Black Marble project using the Leaflet library. The map includes black marble tiles overlaid on a base map, with a marker indicating the center coordinates (latitude and longitude).
 }
 \examples{
+\dontrun{
 library(leaflet)
 # Generate the map
 map_black_marble_tiles()
+
+}
 }
