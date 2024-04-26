@@ -21,5 +21,5 @@ This function cleans raster data by removing fill values and applying scaling fa
 This function removes fill values and applies scaling factors to the specified variable in the raster object.
 }
 \seealso{
-\code{\link{remove_fill_value_from_satellite_data}}, \code{\link{apply_scaling_factor_to_viirs_data}}
+\link{remove_fill_value_from_satellite_data}, \link{apply_scaling_factor_to_viirs_data}
 }

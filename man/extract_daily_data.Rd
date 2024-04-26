@@ -4,14 +4,19 @@
 \alias{extract_daily_data}
 \title{Extract Daily Data from HDF5 File}
 \usage{
-extract_daily_data(file_path, h5_data, variable_name, quality_flags_to_remove)
+extract_daily_data(
+  download_file_path,
+  h5_data,
+  blackmarble_variable,
+  quality_flags_to_remove
+)
 }
 \arguments{
-\item{file_path}{A character string specifying the file path.}
+\item{download_file_path}{A character string specifying the file path.}
 
 \item{h5_data}{The HDF5 file data.}
 
-\item{variable_name}{A character string specifying the variable name.}
+\item{blackmarble_variable}{A character string specifying the variable name.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data.}
 }

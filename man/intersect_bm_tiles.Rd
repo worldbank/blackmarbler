@@ -2,20 +2,20 @@
 % Please edit documentation in R/blackmarble_utils.R
 \name{intersect_bm_tiles}
 \alias{intersect_bm_tiles}
-\title{Intersect black marble tiles with region of interest}
+\title{Intersect Black Marble Tiles with Region of Interest}
 \usage{
 intersect_bm_tiles(black_marble_tiles_sf, roi_sf)
 }
 \arguments{
-\item{black_marble_tiles_sf}{Spatial object representing black marble tiles.}
+\item{black_marble_tiles_sf}{Spatial object representing Black Marble tiles.}
 
 \item{roi_sf}{Spatial object representing the region of interest.}
 }
 \value{
-Spatial object containing black marble tiles intersecting with the region of interest.
+Spatial object containing Black Marble tiles intersecting with the region of interest.
 }
 \description{
-This function intersects black marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
+This function intersects Black Marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
 }
 \examples{
 \dontrun{
@@ -26,7 +26,7 @@ library(sf)
 black_marble_tiles_sf <- st_read("path_to_black_marble_tiles_shapefile")
 roi_sf <- st_read("path_to_roi_shapefile")
 
-# Intersect black marble tiles with region of interest
+# Intersect Black Marble tiles with region of interest
 intersected_tiles <- intersect_bm_tiles(black_marble_tiles_sf, roi_sf)
 }
 }

@@ -17,3 +17,13 @@ A character string representing the defined variable.
 \description{
 Defines the variable based on the Black Marble product ID if it is NULL.
 }
+\details{
+This function defines the variable based on the provided Black Marble product ID if the variable is NULL.
+It checks if the product ID is valid and then assigns a default variable based on the product ID if the variable is NULL.
+The default variables for each product ID are as follows:
+\itemize{
+\item \code{VNP46A1}: "DNB_At_Sensor_Radiance_500m"
+\item \code{VNP46A2}: "Gap_Filled_DNB_BRDF-Corrected_NTL"
+\item \code{VNP46A3} and \code{VNP46A4}: "NearNadir_Composite_Snow_Free"
+}
+}

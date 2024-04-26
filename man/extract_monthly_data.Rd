@@ -4,7 +4,12 @@
 \alias{extract_monthly_data}
 \title{Extract Monthly Data from HDF5 File}
 \usage{
-extract_monthly_data(h5_data, variable_name, quality_flags_to_remove)
+extract_monthly_data(
+  download_file_path,
+  h5_data,
+  blackmarble_variable,
+  quality_flags_to_remove
+)
 }
 \description{
 Extract Monthly Data from HDF5 File

@@ -29,6 +29,6 @@ consecutive requests using \code{Sys.sleep(0.1)}.
 }
 \examples{
 # Read Black Marble CSV data for the year 2023, day 150, and product ID "VIIRS_SNPP_CorrectedReflectance_BandM3"
-data <- read_bm_csv(2023, 150, "VIIRS_SNPP_CorrectedReflectance_BandM3")
+data <- read_black_marble_csv(2023, 150, "VIIRS_SNPP_CorrectedReflectance_BandM3")
 
 }

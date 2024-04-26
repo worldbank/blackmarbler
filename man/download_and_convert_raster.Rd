@@ -7,7 +7,7 @@
 download_and_convert_raster(
   file_name,
   temp_dir,
-  variable,
+  blackmarble_variable,
   bearer,
   quality_flags_to_remove = numeric(),
   quiet = FALSE
@@ -18,7 +18,7 @@ download_and_convert_raster(
 
 \item{temp_dir}{A character string specifying the temporary directory where the file will be saved.}
 
-\item{variable}{A character string specifying the variable to extract from the raster data.}
+\item{blackmarble_variable}{A character string specifying the variable to extract from the raster data.}
 
 \item{bearer}{A character string containing the authorization token for accessing NASA's LADSWeb.}
 

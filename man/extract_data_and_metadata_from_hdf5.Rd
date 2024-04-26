@@ -6,19 +6,19 @@
 \usage{
 extract_data_and_metadata_from_hdf5(
   h5_data,
-  file_path,
-  variable_name,
+  download_path,
+  blackmarble_variable,
   quality_flags_to_remove
 )
 }
 \arguments{
 \item{h5_data}{The HDF5 file data.}
 
-\item{file_path}{A character string specifying the file path.}
-
-\item{variable_name}{A character string specifying the variable name.}
+\item{blackmarble_variable}{A character string specifying the variable name.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data.}
+
+\item{file_path}{A character string specifying the file path.}
 }
 \value{
 A list containing the extracted data and metadata.

@@ -17,3 +17,13 @@ A character string representing the generated raster name.
 \description{
 Generates a name for the raster based on the given date and product ID.
 }
+\details{
+This function generates a name for the raster based on the provided date and product ID.
+The raster name format depends on the product ID as follows:
+\itemize{
+\item For \code{VNP46A1}: The raster name is simply the product ID.
+\item For \code{VNP46A2}: The raster name starts with "t" followed by the date string with hyphens replaced by underscores.
+\item For \code{VNP46A3}: The raster name starts with "t" followed by the year and month extracted from the date string.
+\item For \code{VNP46A4}: The raster name starts with "t" followed by the year extracted from the date string.
+}
+}

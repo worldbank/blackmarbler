@@ -17,3 +17,8 @@ A data frame with the count of non-NA pixels and total pixels for each variable.
 \description{
 Counts observations for each variable, considering coverage fraction, for use in exact_extract.
 }
+\details{
+This function counts observations for each variable in the provided data frame, considering coverage fraction,
+for use in exact_extract. It calculates the number of non-NA pixels and total pixels for each variable. The coverage_fraction
+parameter is included in the function's signature but currently not used in the calculation.
+}

@@ -10,7 +10,7 @@ map_black_marble_tiles()
 An interactive Leaflet map object.
 }
 \description{
-Function to generate an interactive map displaying black marble tiles using Leaflet.
+Generate an interactive map displaying black marble tiles using Leaflet.
 }
 \details{
 This function requires the \code{leaflet} package for generating interactive maps.
@@ -21,7 +21,4 @@ This function generates an interactive map displaying black marble tiles obtaine
 library(leaflet)
 # Generate the map
 map_black_marble_tiles()
-}
-\seealso{
-\url{https://leafletjs.com/}
 }

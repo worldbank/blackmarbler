@@ -2,7 +2,7 @@
 % Please edit documentation in R/blackmarbler.R
 \name{bm_extract}
 \alias{bm_extract}
-\title{Extracts raster data for specified region of interest}
+\title{Extract and process raster data for individual dates}
 \usage{
 bm_extract(
   roi_sf,
@@ -24,39 +24,44 @@ bm_extract(
 )
 }
 \arguments{
-\item{roi_sf}{Spatial object representing the region of interest.}
+\item{roi_sf}{The spatial features representing the regions of interest.}
 
-\item{product_id}{Identifier for the product.}
+\item{product_id}{The product ID.}
 
-\item{date}{Dates for which raster data is to be extracted.}
+\item{date}{The date.}
 
-\item{bearer}{Authentication token for accessing the data.}
+\item{bearer}{The bearer.}
 
-\item{aggregation_fun}{Aggregation function to summarize raster values (default is "mean").}
+\item{aggregation_fun}{The function to aggregate data.}
 
-\item{add_n_pixels}{Logical indicating whether to add pixel count information (default is TRUE).}
+\item{add_n_pixels}{Logical indicating whether to compute additional pixel information.}
 
-\item{variable}{Variable to extract from the product (default is NULL).}
+\item{variable}{The variable.}
 
-\item{quality_flags_to_remove}{Quality flag removal options (default is NULL).}
+\item{quality_flags_to_remove}{The quality flags to remove.}
 
-\item{check_all_tiles_exist}{Logical indicating whether to check if all tiles exist (default is TRUE).}
+\item{check_all_tiles_exist}{Logical indicating whether to check if all tiles exist.}
 
-\item{interpol_na}{Logical indicating whether to interpolate missing values (default is FALSE).}
+\item{interpol_na}{Logical indicating whether to interpolate missing values.}
 
-\item{output_location_type}{Output location type ("memory" or "file", default is "memory").}
+\item{output_location_type}{The type of output location.}
 
-\item{file_dir}{Directory for saving output files (used if output_location_type is "file", default is NULL).}
+\item{file_dir}{The directory to save files.}
 
-\item{file_prefix}{Prefix for output file names (default is NULL).}
+\item{file_prefix}{The prefix for file names.}
 
-\item{file_skip_if_exists}{Logical indicating whether to skip file creation if output file already exists (default is TRUE).}
+\item{file_skip_if_exists}{Logical indicating whether to skip saving if files exist.}
 
-\item{quiet}{Logical indicating whether to suppress progress messages (default is FALSE).}
+\item{quiet}{Logical indicating whether to suppress messages.}
+
+\item{...}{Additional arguments passed to helper functions.}
 }
 \value{
-A data frame containing extracted raster data.
+A data frame containing the extracted and processed raster data.
 }
 \description{
-Extracts raster data for specified region of interest
+This function extracts and processes raster data for individual dates.
+}
+\examples{
+bm_extract(roi_sf = my_roi_sf, product_id = "my_product", date = "2024-04-02", bearer = "my_bearer")
 }

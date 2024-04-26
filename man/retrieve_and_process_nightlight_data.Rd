@@ -9,7 +9,7 @@ retrieve_and_process_nightlight_data(
   product_id,
   date,
   bearer,
-  variable,
+  blackmarble_variable,
   quality_flags_to_remove,
   check_all_tiles_exist = TRUE,
   quiet = FALSE,
@@ -25,7 +25,7 @@ retrieve_and_process_nightlight_data(
 
 \item{bearer}{A character string representing the authorization bearer token.}
 
-\item{variable}{A character string specifying the variable to extract.}
+\item{blackmarble_variable}{A character string specifying the blackmarble_variable to extract.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data (optional).}
 

@@ -1,27 +1,12 @@
-# box::use(
-#   terra[rast, crop, mosaic, approximate, ext],
-#   sf[read_sf, st_intersects, st_drop_geometry],
-#   purrr[list_rbind, map2],
-#   hdf5r[h5file],
-#   stringr[stringr::str_replace_all, str_detect, str_extract],
-#   readr[read_csv],
-#   dplyr[mutate, across, summarise, bind_cols, bind_rows],
-#   httr2[req_headers, request, req_perform, req_user_agent, resp_status, req_progress],
-#   lubridate[year, month, yday],
-#   exactextractr[exact_extract]
-# )
 
 #' Map Black Marble Tiles
 #'
-#' Function to generate an interactive map displaying black marble tiles using Leaflet.
+#' Generate an interactive map displaying black marble tiles using Leaflet.
 #'
 #' This function requires the \code{leaflet} package for generating interactive maps.
 #'
 #' @details
 #' This function generates an interactive map displaying black marble tiles obtained from NASA's Black Marble project using the Leaflet library. The map includes black marble tiles overlaid on a base map, with a marker indicating the center coordinates (latitude and longitude).
-#'
-#' @seealso
-#' \url{https://leafletjs.com/}
 #'
 #' @return An interactive Leaflet map object.
 #'
@@ -50,7 +35,6 @@ map_black_marble_tiles <- function() {
 
   return(map)
 }
-
 
 #' Translate Julian Dates to Regular Month Representation
 #'
@@ -83,8 +67,9 @@ julian_to_month <- function(julian_date) {
 #' The artifact values and their corresponding blackmarble_variables are based on the data format
 #' described in the Black Marble User Guide (https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf).
 #'  # * Table 3 (page 12)
-# * Table 6 (page 16)
-# * Table 9 (page 18)
+#' * Table 6 (page 16)
+#' * Table 9 (page 18)
+#'
 #' @param data A matrix or data frame containing satellite data.
 #' @param blackmarble_variable A character string specifying the blackmarble_variable for which artifact values should be removed.
 #' @return The input data with artifact values replaced by NA.
@@ -300,6 +285,8 @@ download_h5_viirs_sat_image <- function(file_name,
     message("Error occurred during download: ", conditionMessage(e))
   })
 }
+
+
 #' Extracts bounding box coordinates based on tile ID from the file path
 #'
 #' This code snippet extracts the bounding box coordinates (minimum longitude, minimum latitude, maximum longitude, maximum latitude)
@@ -333,9 +320,9 @@ extract_bounding_box <- function(file_path, black_marble_tiles_sf) {
 #'
 #' This function extracts daily data from an HDF5 file based on the provided file path and variable name.
 #'
-#' @param file_path A character string specifying the file path.
+#' @param download_file_path A character string specifying the file path.
 #' @param h5_data The HDF5 file data.
-#' @param variable_name A character string specifying the variable name.
+#' @param blackmarble_variable A character string specifying the variable name.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data.
 #'
 #' @return A list containing the extracted data and metadata.
@@ -575,6 +562,7 @@ extract_data_and_metadata_from_hdf5 <- function(h5_data,
 
   return(list(data = data, metadata = metadata))
 }
+
 #' Create Raster Object from Data and Metadata using terra
 #'
 #' This function creates a raster object from the provided data and metadata using the terra package.
@@ -612,6 +600,7 @@ create_raster_from_data_metadata <- function(data, metadata) {
 
   return(my_raster)
 }
+
 #' Clean Raster Data
 #'
 #' This function cleans raster data by removing fill values and applying scaling factors.
@@ -623,7 +612,7 @@ create_raster_from_data_metadata <- function(data, metadata) {
 #'
 #' @details This function removes fill values and applies scaling factors to the specified variable in the raster object.
 #'
-#' @seealso \code{\link{remove_fill_value_from_satellite_data}}, \code{\link{apply_scaling_factor_to_viirs_data}}
+#' @seealso \link{remove_fill_value_from_satellite_data}, \link{apply_scaling_factor_to_viirs_data}
 #'
 #' @export
 clean_raster_data <- function(raster_obj, variable_name) {
@@ -690,13 +679,14 @@ convert_h5_to_raster <- function(download_path,
 
   return(clean_raster_obj)
 }
+
 #' Download and Convert Raster Data
 #'
 #' Downloads raster data from NASA's LADSWeb and converts it to a raster object.
 #'
 #' @param file_name A character string representing the name of the file to download.
 #' @param temp_dir A character string specifying the temporary directory where the file will be saved.
-#' @param variable A character string specifying the variable to extract from the raster data.
+#' @param blackmarble_variable A character string specifying the variable to extract from the raster data.
 #' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
 #' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
 #' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
@@ -759,14 +749,14 @@ download_and_convert_raster <- function(file_name,
 #'
 #' @examples
 #' # Read Black Marble CSV data for the year 2023, day 150, and product ID "VIIRS_SNPP_CorrectedReflectance_BandM3"
-#' data <- read_bm_csv(2023, 150, "VIIRS_SNPP_CorrectedReflectance_BandM3")
+#' data <- read_black_marble_csv(2023, 150, "VIIRS_SNPP_CorrectedReflectance_BandM3")
 #'
 #' @export
 read_black_marble_csv <- function(year, day, product_id) {
   df_out <- tryCatch(
     {
       df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/", product_id, "/", year, "/", day, ".csv"),
-        show_col_types = FALSE
+                            show_col_types = FALSE
       ) |>
         dplyr::mutate(
           year = year,
@@ -785,10 +775,9 @@ read_black_marble_csv <- function(year, day, product_id) {
   print("adding delay to avoid overloading the server")
   Sys.sleep(0.1) # Adding a small delay to avoid overloading the server
 
-  # should we just download the tiles df data?
-
   return(df_out)
 }
+
 
 #' Create Black Marble Dataset DataFrame
 #'
@@ -879,6 +868,7 @@ create_black_marble_dataset_df <- function(product_id,
 
   return(files_df)
 }
+
 #' Define Black Marble Variable
 #'
 #' Defines the variable based on the Black Marble product ID if it is NULL.
@@ -887,6 +877,13 @@ create_black_marble_dataset_df <- function(product_id,
 #' @param product_id A character string representing the product ID.
 #'
 #' @return A character string representing the defined variable.
+#'
+#' @details This function defines the variable based on the provided Black Marble product ID if the variable is NULL.
+#' It checks if the product ID is valid and then assigns a default variable based on the product ID if the variable is NULL.
+#' The default variables for each product ID are as follows:
+#' - \code{VNP46A1}: "DNB_At_Sensor_Radiance_500m"
+#' - \code{VNP46A2}: "Gap_Filled_DNB_BRDF-Corrected_NTL"
+#' - \code{VNP46A3} and \code{VNP46A4}: "NearNadir_Composite_Snow_Free"
 #'
 #' @export
 define_blackmarble_variable <- function(variable, product_id) {
@@ -910,8 +907,6 @@ define_blackmarble_variable <- function(variable, product_id) {
 }
 
 
-
-
 #' Define Raster Name by Date
 #'
 #' Generates a name for the raster based on the given date and product ID.
@@ -920,6 +915,13 @@ define_blackmarble_variable <- function(variable, product_id) {
 #' @param product_id A character string representing the product ID (e.g., "VNP46A1", "VNP46A2").
 #'
 #' @return A character string representing the generated raster name.
+#'
+#' @details This function generates a name for the raster based on the provided date and product ID.
+#' The raster name format depends on the product ID as follows:
+#' - For \code{VNP46A1}: The raster name is simply the product ID.
+#' - For \code{VNP46A2}: The raster name starts with "t" followed by the date string with hyphens replaced by underscores.
+#' - For \code{VNP46A3}: The raster name starts with "t" followed by the year and month extracted from the date string.
+#' - For \code{VNP46A4}: The raster name starts with "t" followed by the year extracted from the date string.
 #'
 #' @export
 define_raster_name <- function(date_string, product_id) {
@@ -942,6 +944,10 @@ define_raster_name <- function(date_string, product_id) {
 #'
 #' @return A data frame with the count of non-NA pixels and total pixels for each variable.
 #'
+#' @details This function counts observations for each variable in the provided data frame, considering coverage fraction,
+#' for use in exact_extract. It calculates the number of non-NA pixels and total pixels for each variable. The coverage_fraction
+#' parameter is included in the function's signature but currently not used in the calculation.
+#'
 #' @export
 count_n_obs <- function(values) {
   # coverage_fraction was a param but not used perhaps the other functions needs it
@@ -957,6 +963,23 @@ count_n_obs <- function(values) {
     )
 }
 
+#' Process Tiles
+#'
+#' Processes satellite imagery tiles based on specified parameters.
+#'
+#' @param bm_files_df A data frame containing Black Marble dataset filenames.
+#' @param grid_use_sf A spatial grid containing TileIDs.
+#' @param check_all_tiles_exist Logical; indicating whether to check if all tiles exist (default: TRUE).
+#' @param temp_dir A character string specifying the temporary directory.
+#' @param product_id A character string representing the product ID.
+#' @param blackmarble_variable A character string specifying the Black Marble variable.
+#' @param bearer A character string containing the authorization token for accessing NASA's LADSWeb.
+#' @param quality_flags_to_remove A numeric vector containing quality flag values to be removed from the data (optional).
+#' @param quiet Logical; indicating whether to suppress progress messages (default: FALSE).
+#'
+#' @return A raster object processed from satellite imagery tiles.
+#'
+#' @export
 process_tiles <-
   function(bm_files_df,
            grid_use_sf,
@@ -1003,15 +1026,15 @@ process_tiles <-
       r_list$fun <- max
       return(do.call(terra::mosaic, r_list))
     }
-  }
-#' Intersect black marble tiles with region of interest
+}
+
+#' Intersect Black Marble Tiles with Region of Interest
 #'
-#' This function intersects black marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
+#' This function intersects Black Marble tiles with a region of interest, removing grid along edges to avoid issues with \code{st_intersects}.
 #'
-#' @param black_marble_tiles_sf Spatial object representing black marble tiles.
+#' @param black_marble_tiles_sf Spatial object representing Black Marble tiles.
 #' @param roi_sf Spatial object representing the region of interest.
-#' @return Spatial object containing black marble tiles intersecting with the region of interest.
-#' @export
+#' @return Spatial object containing Black Marble tiles intersecting with the region of interest.
 #' @import sf
 #' @importFrom stringr str_detect
 #' @examples
@@ -1023,9 +1046,10 @@ process_tiles <-
 #' black_marble_tiles_sf <- st_read("path_to_black_marble_tiles_shapefile")
 #' roi_sf <- st_read("path_to_roi_shapefile")
 #'
-#' # Intersect black marble tiles with region of interest
+#' # Intersect Black Marble tiles with region of interest
 #' intersected_tiles <- intersect_bm_tiles(black_marble_tiles_sf, roi_sf)
 #' }
+#' @export
 intersect_bm_tiles <- function(black_marble_tiles_sf, roi_sf) {
   # Remove grid along edges, which causes st_intersects to fail
   black_marble_tiles_sf <- black_marble_tiles_sf[!(stringr::str_detect(black_marble_tiles_sf$TileID, "h00") | stringr::str_detect(black_marble_tiles_sf$TileID, "v00")), ]
@@ -1151,29 +1175,21 @@ retrieve_and_process_nightlight_data <- function(roi_sf,
 #' @param fun The function to apply to the raster data for extraction and processing.
 #' @param add_n_pixels Logical indicating whether to compute additional pixel information.
 #' @param quiet Logical indicating whether to show progress messages.
-#' @param is_single Logical indicating whether the extraction is for a single raster or multiple rasters. Default is FALSE.
-#' @param product_id The product ID if is_single is TRUE.
-#' @param date_i The date if is_single is TRUE.
-#' @param bearer The bearer if is_single is TRUE.
-#' @param blackmarble_variable The blackmarble variable if is_single is TRUE.
-#' @param quality_flags_to_remove The quality flags to remove if is_single is TRUE.
-#' @param check_all_tiles_exist Logical indicating whether to check if all tiles exist if is_single is TRUE.
-#' @param temp_dir The temporary directory if is_single is TRUE.
-#'
+#' @param is_single Logical indicating whether a single raster is being processed. Default is \code{FALSE}.
 #' @return A data frame containing the extracted and processed raster data.
 #'
-#' @export
+#' @details
+#' This function extracts raster data from the specified regions of interest (\code{roi_sf}) and processes it using the specified function (\code{fun}). It can handle both single raster and multiple raster inputs.
 #'
 #' @examples
 #' # For a single raster
 #' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean, is_single = TRUE,
-#'                     product_id = "my_product", date_i = "2024-04-02", bearer = "my_bearer",
-#'                     blackmarble_variable = "my_variable", quality_flags_to_remove = NULL,
-#'                     check_all_tiles_exist = TRUE, temp_dir = tempdir())
+#'                     add_n_pixels = TRUE, quiet = FALSE)
 #'
 #' # For multiple rasters
 #' extract_and_process(raster = my_raster, roi_sf = my_roi_sf, fun = mean)
 #'
+#' @export
 extract_and_process <-
   function(bm_r,
            roi_sf,
@@ -1291,7 +1307,6 @@ extract_and_process <-
 #'
 #' # Binding a list of extracted data frames
 #' bind_extracted_data(list_of_dfs)
-#'
 bind_extracted_data <- function(extracted_data_list) {
   dfs <- extracted_data_list
 
@@ -1312,7 +1327,23 @@ bind_extracted_data <- function(extracted_data_list) {
   }
 }
 
+#' Add pixel information to extracted data
+#'
+#' This function calculates additional pixel information for the extracted data frames.
+#'
+#' @param roi_df Data frame containing extracted data.
+#' @param bm_r The raster data.
+#' @param roi_sf The spatial features representing the regions of interest.
+#' @param quiet Logical indicating whether to show progress messages.
+#'
+#' @return The input data frame with added columns for pixel information.
+#'
 #' @export
+#'
+#' @examples
+#' # Adding pixel information to extracted data
+#' add_n_pixels(roi_df, bm_r, roi_sf, quiet = FALSE)
+#'
 add_n_pixels <- function(roi_df, bm_r, roi_sf, quiet) {
   roi_df$n_non_na_pixels <- exactextractr::exact_extract(bm_r, roi_sf, function(values, coverage_fraction) {
     sum(!is.na(values))

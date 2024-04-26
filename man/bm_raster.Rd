@@ -22,74 +22,74 @@ bm_raster(
 )
 }
 \arguments{
-\item{roi_sf}{Region of interest; sf polygon. Must be in the \href{https://epsg.io/4326}{WGS 84 (epsg:4326)} coordinate reference system.}
+\item{roi_sf}{Region of interest; sf polygon. Must be in the WGS 84 (epsg:4326) coordinate reference system.}
 
 \item{product_id}{One of the following:
 \itemize{
-\item \code{"VNP46A1"}: Daily (raw)
-\item \code{"VNP46A2"}: Daily (corrected)
-\item \code{"VNP46A3"}: Monthly
-\item \code{"VNP46A4"}: Annual
+\item "VNP46A1": Daily (raw)
+\item "VNP46A2": Daily (corrected)
+\item "VNP46A3": Monthly
+\item "VNP46A4": Annual
 }}
 
 \item{date}{Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.
 \itemize{
-\item For \code{product_id}s \code{"VNP46A1"} and \code{"VNP46A2"}, a date (eg, \code{"2021-10-03"}).
-\item For \code{product_id} \code{"VNP46A3"}, a date or year-month (e.g., \code{"2021-10-01"}, where the day will be ignored, or \code{"2021-10"}).
-\item For \code{product_id} \code{"VNP46A4"}, year or date  (e.g., \code{"2021-10-01"}, where the month and day will be ignored, or \code{2021}).
+\item For product_ids "VNP46A1" and "VNP46A2", a date (e.g., "2021-10-03").
+\item For product_id "VNP46A3", a date or year-month (e.g., "2021-10-01", where the day will be ignored, or "2021-10").
+\item For product_id "VNP46A4", year or date (e.g., "2021-10-01", where the month and day will be ignored, or 2021).
 }}
 
 \item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/worldbank/blackmarbler#bearer-token-}{here}.}
 
-\item{variable}{Variable to used to create raster (default: \code{NULL}). If \code{NULL}, uses the following default variables:
+\item{variable}{Variable to used to create raster (default: NULL). If NULL, uses the following default variables:
 \itemize{
-\item For \code{product_id} \verb{:VNP46A1"}, uses \code{DNB_At_Sensor_Radiance_500m}.
-\item For \code{product_id} \code{"VNP46A2"}, uses \code{Gap_Filled_DNB_BRDF-Corrected_NTL}.
-\item For \code{product_id}s \code{"VNP46A3"} and \code{"VNP46A4"}, uses \code{NearNadir_Composite_Snow_Free}.
-For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for \code{VNP46A1}, see Table 3; for \code{VNP46A2} see Table 6; for \code{VNP46A3} and \code{VNP46A4}, see Table 9.
+\item For product_id ":VNP46A1", uses DNB_At_Sensor_Radiance_500m.
+\item For product_id "VNP46A2", uses Gap_Filled_DNB_BRDF-Corrected_NTL.
+\item For product_ids "VNP46A3" and "VNP46A4", uses NearNadir_Composite_Snow_Free.
+For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for VNP46A1, see Table 3; for VNP46A2 see Table 6; for VNP46A3 and VNP46A4, see Table 9.
 }}
 
-\item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}
+\item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If TRUE, skips cases where not all tiles are available. (Default: TRUE).}
 
-\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate \code{NA} values in rasters using the \code{raster::approxNA} function. Additional arguments for the \code{raster::approxNA} function can also be passed into \code{bm_extract} (eg, \code{method}, \code{rule}, \code{f}, \code{ties}, \code{z}, \code{NA_rule}). (Default: \code{FALSE}).}
+\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate NA values in rasters using the raster::approxNA function. Additional arguments for the raster::approxNA function can also be passed into bm_extract (eg, method, rule, f, ties, z, NA_rule). (Default: FALSE).}
 
-\item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a dataframe in R. If \code{file}, function exports a \code{.csv} file and returns \code{NULL}.}
+\item{output_location_type}{Where to produce output; either memory or file. If memory, functions returns a dataframe in R. If file, function exports a .csv file and returns NULL.}
 
-\item{file_dir}{(If \code{output_location_type = file}). The directory where data should be exported (default: \code{NULL}, so the working directory will be used)}
+\item{file_dir}{(If output_location_type = file). The directory where data should be exported (default: NULL, so the working directory will be used)}
 
-\item{file_prefix}{(If \code{output_location_type = file}). Prefix to add to the file to be saved. The file will be saved as the following: \verb{[file_prefix][product_id]_t[date].csv}}
+\item{file_prefix}{(If output_location_type = file). Prefix to add to the file to be saved. The file will be saved as the following: \link[=product_id]{file_prefix}_t\link{date}.csv}
 
-\item{file_skip_if_exists}{(If \code{output_location_type = file}). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
+\item{file_skip_if_exists}{(If output_location_type = file). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: TRUE).}
 
-\item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
+\item{quiet}{Suppress output that show downloading progress and other messages. (Default: FALSE).}
 
-\item{...}{Additional arguments for \code{raster::approxNA}, if \code{interpol_na = TRUE}}
+\item{...}{Additional arguments for raster::approxNA, if interpol_na = TRUE}
 
-\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
+\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the fun argument in exactextractr::exact_extract (Default: mean).}
 
-\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_non_na_pixels} (the number of non-\code{NA} pixels used for computing nighttime light statistics); \code{n_pixels} (the total number of pixels); and \code{prop_non_na_pixels} the proportion of the two. (Default: \code{TRUE}).}
+\item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (e.g., number of pixels used to compute average of nighttime lights). When TRUE, it adds three values: n_non_na_pixels (the number of non-NA pixels used for computing nighttime light statistics); n_pixels (the total number of pixels); and prop_non_na_pixels the proportion of the two. (Default: TRUE).}
 
-\item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in ther \code{quality_flag_rm} vector. (Default: \code{NULL}).
+\item{quality_flag_rm}{Quality flag values to use to set values to NA. Each pixel has a quality flag value, where low quality values can be removed. Values are set to NA for each value in ther quality_flag_rm vector. (Default: NULL).
 
-For \code{VNP46A1} and \code{VNP46A2} (daily data):
+For VNP46A1 and VNP46A2 (daily data):
 \itemize{
-\item \code{0}: High-quality, Persistent nighttime lights
-\item \code{1}: High-quality, Ephemeral nighttime Lights
-\item \code{2}: Poor-quality, Outlier, potential cloud contamination, or other issues
+\item 0: High-quality, Persistent nighttime lights
+\item 1: High-quality, Ephemeral nighttime Lights
+\item 2: Poor-quality, Outlier, potential cloud contamination, or other issues
 }
 
-For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
+For VNP46A3 and VNP46A4 (monthly and annual data):
 \itemize{
-\item \code{0}: Good-quality, The number of observations used for the composite is larger than 3
-\item \code{1}: Poor-quality, The number of observations used for the composite is less than or equal to 3
-\item \code{2}: Gap filled NTL based on historical data
+\item 0: Good-quality, The number of observations used for the composite is larger than 3
+\item 1: Poor-quality, The number of observations used for the composite is less than or equal to 3
+\item 2: Gap filled NTL based on historical data
 }}
 }
 \value{
 Raster
 }
 \description{
-Extract and aggregate nighttime lights data from \href{https://blackmarble.gsfc.nasa.gov/}{NASA Black Marble data}
+Extract and aggregate nighttime lights data from NASA Black Marble data.
 }
 \examples{
 \dontrun{
@@ -98,25 +98,31 @@ bearer <- "BEARER-TOKEN-HERE"
 
 # sf polygon of Ghana
 library(geodata)
-roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) \%>\% st_as_sf()
+roi_sf <- gadm(country = "GHA", level = 1, path = tempdir()) \%>\% st_as_sf()
 
 # Daily data: raster for October 3, 2021
-ken_20210205_r <- bm_extract(roi_sf = roi_sf,
-                            product_id = "VNP46A2",
-                            date = "2021-10-03",
-                            bearer = bearer)
+ken_20210205_r <- bm_raster(
+  roi_sf = roi_sf,
+  product_id = "VNP46A2",
+  date = "2021-10-03",
+  bearer = bearer
+)
 
 # Monthly data: raster for March 2021
-ken_202103_r <- bm_extract(roi_sf = roi_sf,
-                          product_id = "VNP46A3",
-                          date = "2021-03-01",
-                          bearer = bearer)
+ken_202103_r <- bm_raster(
+  roi_sf = roi_sf,
+  product_id = "VNP46A3",
+  date = "2021-03-01",
+  bearer = bearer
+)
 
 # Annual data: raster for 2021
-ken_2021_r <- bm_extract(roi_sf = roi_sf,
-                        product_id = "VNP46A4",
-                        date = 2021,
-                        bearer = bearer)
+ken_2021_r <- bm_raster(
+  roi_sf = roi_sf,
+  product_id = "VNP46A4",
+  date = 2021,
+  bearer = bearer
+)
 }
 
 }

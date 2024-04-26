@@ -1,47 +1,46 @@
 #' Extract and Aggregate Black Marble Data
 #'
-#' Extract and aggregate nighttime lights data from [NASA Black Marble data](https://blackmarble.gsfc.nasa.gov/)
-
-#' @param roi_sf Region of interest; sf polygon. Must be in the [WGS 84 (epsg:4326)](https://epsg.io/4326) coordinate reference system.
+#' Extract and aggregate nighttime lights data from NASA Black Marble data.
+#'
+#' @param roi_sf Region of interest; sf polygon. Must be in the WGS 84 (epsg:4326) coordinate reference system.
 #' @param product_id One of the following:
-#' * `"VNP46A1"`: Daily (raw)
-#' * `"VNP46A2"`: Daily (corrected)
-#' * `"VNP46A3"`: Monthly
-#' * `"VNP46A4"`: Annual
+#' * "VNP46A1": Daily (raw)
+#' * "VNP46A2": Daily (corrected)
+#' * "VNP46A3": Monthly
+#' * "VNP46A4": Annual
 #' @param date Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.
-#' * For `product_id`s `"VNP46A1"` and `"VNP46A2"`, a date (eg, `"2021-10-03"`).
-#' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
-#' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
+#' * For product_ids "VNP46A1" and "VNP46A2", a date (e.g., "2021-10-03").
+#' * For product_id "VNP46A3", a date or year-month (e.g., "2021-10-01", where the day will be ignored, or "2021-10").
+#' * For product_id "VNP46A4", year or date (e.g., "2021-10-01", where the month and day will be ignored, or 2021).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
-#' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `mean`).
-#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_non_na_pixels` (the number of non-`NA` pixels used for computing nighttime light statistics); `n_pixels` (the total number of pixels); and `prop_non_na_pixels` the proportion of the two. (Default: `TRUE`).
-#' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
-#' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
-#' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
-#' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
-#' For information on other variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
-#' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in ther `quality_flag_rm` vector. (Default: `NULL`).
+#' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the fun argument in exactextractr::exact_extract (Default: mean).
+#' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (e.g., number of pixels used to compute average of nighttime lights). When TRUE, it adds three values: n_non_na_pixels (the number of non-NA pixels used for computing nighttime light statistics); n_pixels (the total number of pixels); and prop_non_na_pixels the proportion of the two. (Default: TRUE).
+#' @param variable Variable to used to create raster (default: NULL). If NULL, uses the following default variables:
+#' * For product_id ":VNP46A1", uses DNB_At_Sensor_Radiance_500m.
+#' * For product_id "VNP46A2", uses Gap_Filled_DNB_BRDF-Corrected_NTL.
+#' * For product_ids "VNP46A3" and "VNP46A4", uses NearNadir_Composite_Snow_Free.
+#' For information on other variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for VNP46A1, see Table 3; for VNP46A2 see Table 6; for VNP46A3 and VNP46A4, see Table 9.
+#' @param quality_flag_rm Quality flag values to use to set values to NA. Each pixel has a quality flag value, where low quality values can be removed. Values are set to NA for each value in ther quality_flag_rm vector. (Default: NULL).
 #'
+#' For VNP46A1 and VNP46A2 (daily data):
+#' - 0: High-quality, Persistent nighttime lights
+#' - 1: High-quality, Ephemeral nighttime Lights
+#' - 2: Poor-quality, Outlier, potential cloud contamination, or other issues
 #'
-#' For `VNP46A1` and `VNP46A2` (daily data):
-#' - `0`: High-quality, Persistent nighttime lights
-#' - `1`: High-quality, Ephemeral nighttime Lights
-#' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
+#' For VNP46A3 and VNP46A4 (monthly and annual data):
+#' - 0: Good-quality, The number of observations used for the composite is larger than 3
+#' - 1: Poor-quality, The number of observations used for the composite is less than or equal to 3
+#' - 2: Gap filled NTL based on historical data
 #'
+#' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If TRUE, skips cases where not all tiles are available. (Default: TRUE).
+#' @param interpol_na When data for more than one date is downloaded, whether to interpolate NA values in rasters using the raster::approxNA function. Additional arguments for the raster::approxNA function can also be passed into bm_extract (eg, method, rule, f, ties, z, NA_rule). (Default: FALSE).
+#' @param output_location_type Where to produce output; either memory or file. If memory, functions returns a dataframe in R. If file, function exports a .csv file and returns NULL.
+#' @param file_dir (If output_location_type = file). The directory where data should be exported (default: NULL, so the working directory will be used)
+#' @param file_prefix (If output_location_type = file). Prefix to add to the file to be saved. The file will be saved as the following: [file_prefix][product_id]_t[date].csv
+#' @param file_skip_if_exists (If output_location_type = file). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: TRUE).
+#' @param quiet Suppress output that show downloading progress and other messages. (Default: FALSE).
 #'
-#' For `VNP46A3` and `VNP46A4` (monthly and annual data):
-#' - `0`: Good-quality, The number of observations used for the composite is larger than 3
-#' - `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
-#' - `2`: Gap filled NTL based on historical data
-#' @param check_all_tiles_exist Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
-#' @param interpol_na When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the `raster::approxNA` function. Additional arguments for the `raster::approxNA` function can also be passed into `bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
-#' @param output_location_type Where to produce output; either `memory` or `file`. If `memory`, functions returns a dataframe in R. If `file`, function exports a `.csv` file and returns `NULL`.
-#' @param file_dir (If `output_location_type = file`). The directory where data should be exported (default: `NULL`, so the working directory will be used)
-#' @param file_prefix (If `output_location_type = file`). Prefix to add to the file to be saved. The file will be saved as the following: `[file_prefix][product_id]_t[date].csv`
-#' @param file_skip_if_exists (If `output_location_type = file`). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
-#' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
-#'
-#' @param ... Additional arguments for `raster::approxNA`, if `interpol_na = TRUE`
+#' @param ... Additional arguments for raster::approxNA, if interpol_na = TRUE
 #'
 #' @return Raster
 #'
@@ -55,7 +54,7 @@
 #' roi_sf <- gadm(country = "GHA", level = 1, path = tempdir()) %>% st_as_sf()
 #'
 #' # Daily data: raster for October 3, 2021
-#' ken_20210205_r <- bm_extract(
+#' ken_20210205_r <- bm_raster(
 #'   roi_sf = roi_sf,
 #'   product_id = "VNP46A2",
 #'   date = "2021-10-03",
@@ -63,7 +62,7 @@
 #' )
 #'
 #' # Monthly data: raster for March 2021
-#' ken_202103_r <- bm_extract(
+#' ken_202103_r <- bm_raster(
 #'   roi_sf = roi_sf,
 #'   product_id = "VNP46A3",
 #'   date = "2021-03-01",
@@ -71,7 +70,7 @@
 #' )
 #'
 #' # Annual data: raster for 2021
-#' ken_2021_r <- bm_extract(
+#' ken_2021_r <- bm_raster(
 #'   roi_sf = roi_sf,
 #'   product_id = "VNP46A4",
 #'   date = 2021,
@@ -225,7 +224,6 @@ bm_raster <- function(roi_sf,
 #'
 #' @examples
 #' bm_extract(roi_sf = my_roi_sf, product_id = "my_product", date = "2024-04-02", bearer = "my_bearer")
-#'
 bm_extract <- function(roi_sf,
                        product_id,
                        date,

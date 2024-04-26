@@ -4,8 +4,21 @@
 \alias{bind_extracted_data}
 \title{Bind extracted data}
 \usage{
-bind_extracted_data(n_obs_df, ntl_df)
+bind_extracted_data(extracted_data_list)
+}
+\arguments{
+\item{...}{One or more extracted data frames or a list of extracted data frames.}
+}
+\value{
+A single data frame containing the bound extracted data.
 }
 \description{
-Bind extracted data
+This function binds together the extracted data frames or a list of extracted data frames.
+}
+\examples{
+# Binding extracted data frames
+bind_extracted_data(df1, df2)
+
+# Binding a list of extracted data frames
+bind_extracted_data(list_of_dfs)
 }

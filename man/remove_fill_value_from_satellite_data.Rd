@@ -4,12 +4,12 @@
 \alias{remove_fill_value_from_satellite_data}
 \title{Remove Artifact Values from Satellite Data}
 \usage{
-remove_fill_value_from_satellite_data(data, variable)
+remove_fill_value_from_satellite_data(data, blackmarble_variable)
 }
 \arguments{
 \item{data}{A matrix or data frame containing satellite data.}
 
-\item{variable}{A character string specifying the variable for which artifact values should be removed.}
+\item{blackmarble_variable}{A character string specifying the blackmarble_variable for which artifact values should be removed.}
 }
 \value{
 The input data with artifact values replaced by NA.
@@ -20,10 +20,16 @@ Artifact values are commonly used in satellite data to represent fill values,
 invalid measurements, or missing data.
 }
 \details{
-The artifact values and their corresponding variables are based on the data format
+The artifact values and their corresponding blackmarble_variables are based on the data format
 described in the Black Marble User Guide (https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_v1.2_20220916.pdf).
- # * Table 3 (page 12)
 }
+\section{* Table 3 (page 12)}{
+\itemize{
+\item Table 6 (page 16)
+\item Table 9 (page 18)
+}
+}
+
 \examples{
 # Remove artifact values from UTC_Time variable in satellite data
 cleaned_data <- remove_fill_value_from_satellite_data(satellite_data, "UTC_Time")

@@ -5,17 +5,17 @@
 \title{Convert HDF5 File to Raster}
 \usage{
 convert_h5_to_raster(
-  file_path,
-  variable_name,
+  download_path,
+  blackmarble_variable,
   quality_flags_to_remove = numeric()
 )
 }
 \arguments{
-\item{file_path}{A character string representing the filepath to the HDF5 file.}
-
-\item{variable_name}{A character string specifying the variable name to extract from the HDF5 file.}
+\item{blackmarble_variable}{A character string specifying the blackmarble_variable name to extract from the HDF5 file.}
 
 \item{quality_flags_to_remove}{A numeric vector containing quality flag values to be removed from the data (optional).}
+
+\item{file_path}{A character string representing the filepath to the HDF5 file.}
 }
 \value{
 A raster object containing the extracted variable data from the HDF5 file.
