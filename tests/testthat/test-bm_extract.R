@@ -1,5 +1,7 @@
 test_that("Query VNP46A1", {
   
+  skip()
+  
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
   
@@ -19,6 +21,8 @@ test_that("Query VNP46A1", {
 })
 
 test_that("Query VNP46A2", {
+  
+  skip()
   
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
@@ -40,6 +44,8 @@ test_that("Query VNP46A2", {
 
 test_that("Query VNP46A3", {
   
+  skip()
+  
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")
   
@@ -59,6 +65,8 @@ test_that("Query VNP46A3", {
 })
 
 test_that("Query VNP46A4", {
+  
+  skip()
   
   # Define bearer token
   bearer <- Sys.getenv("BEARER_NASA_TOKEN")

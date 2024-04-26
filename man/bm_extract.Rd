@@ -19,6 +19,7 @@ bm_extract(
   file_dir = NULL,
   file_prefix = NULL,
   file_skip_if_exists = TRUE,
+  file_return_null = FALSE,
   h5_dir = NULL,
   quiet = FALSE,
   ...
@@ -35,7 +36,7 @@ bm_extract(
 \item \code{"VNP46A4"}: Annual
 }}
 
-\item{date}{Date of raster data. Entering one date will produce a raster. Entering multiple dates will produce a raster stack.
+\item{date}{Date of raster data. Entering one date will produce a \code{SpatRaster} object. Entering multiple dates will produce a \code{SpatRaster} object with multiple bands; one band per date.
 \itemize{
 \item For \code{product_id}s \code{"VNP46A1"} and \code{"VNP46A2"}, a date (eg, \code{"2021-10-03"}).
 \item For \code{product_id} \code{"VNP46A3"}, a date or year-month (e.g., \code{"2021-10-01"}, where the day will be ignored, or \code{"2021-10"}).
@@ -74,7 +75,7 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 
 \item{check_all_tiles_exist}{Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If \code{TRUE}, skips cases where not all tiles are available. (Default: \code{TRUE}).}
 
-\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate \code{NA} values in rasters using the \code{raster::approxNA} function. Additional arguments for the \code{raster::approxNA} function can also be passed into \code{bm_extract} (eg, \code{method}, \code{rule}, \code{f}, \code{ties}, \code{z}, \code{NA_rule}). (Default: \code{FALSE}).}
+\item{interpol_na}{When data for more than one date is downloaded, whether to interpolate \code{NA} values in rasters using the \code{terra::approximate} function. Additional arguments for the \code{terra::approximate} function can also be passed into \code{bm_extract} (eg, \code{method}, \code{rule}, \code{f}, \code{ties}, \code{z}, \code{NA_rule}). (Default: \code{FALSE}).}
 
 \item{output_location_type}{Where to produce output; either \code{memory} or \code{file}. If \code{memory}, functions returns a dataframe in R. If \code{file}, function exports a \code{.csv} file and returns \code{NULL}.}
 
@@ -84,11 +85,13 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 
 \item{file_skip_if_exists}{(If \code{output_location_type = file}). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: \code{TRUE}).}
 
+\item{file_return_null}{Whether to return \code{NULL} instead of a \code{dataframe}. When \code{output_location_type = 'file'}, the function will export data to the \code{file_dir} directory. When \code{file_return_null = FALSE}, the function will also return a \code{dataframe} of the queried data---so the data is available in R memory. Setting \code{file_return_null = TRUE}, data will be saved to \code{file_dir} but no data will be returned by the function to R memory (default: \code{FALSE}).}
+
 \item{h5_dir}{Black Marble data are originally downloaded as \code{h5} files. If \code{h5_dir = NULL}, the function downloads to a temporary directory then deletes the directory. If \code{h5_dir} is set to a path, \code{h5} files are saved to that directory and not deleted. The function will then check if the needed \code{h5} file already exists in the directory; if it exists, the function will not re-download the \code{h5} file.}
 
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
 
-\item{...}{Additional arguments for \code{raster::approxNA}, if \code{interpol_na = TRUE}}
+\item{...}{Additional arguments for \code{terra::approximate}, if \code{interpol_na = TRUE}}
 }
 \value{
 Raster
