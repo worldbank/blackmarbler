@@ -17,6 +17,8 @@ In logic for extracting bm_extract, when its 1 file it drops the geometry then e
 
 ## Next steps
 
+ - [ ] Send test check to github action (cause my laptop not cool)
+
  - [ ] performance tuning
  - [ ] migrate to `cli` package
  - [! ] Fix Docs, Roxygen2 
