@@ -8,7 +8,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler)
 [![activity](https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler/graphs/commit-activity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit/)
-
+[![R-CMD-check](https://github.com/dar4datascience/blackmarbler/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/dar4datascience/blackmarbler/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 ## Comments
