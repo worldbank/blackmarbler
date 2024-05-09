@@ -466,6 +466,10 @@ download_raster <- function(file_name,
       message(response)
     }
     
+    if(response$all_headers[[1]]$status != 200){
+      message("**Error in downloading data; bearer token likely invalid.** Try regenerating the bearer token; please see this link for instructions to obtain a bearer token: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-")
+    }
+    
   }
   
   r <- file_to_raster(download_path,
