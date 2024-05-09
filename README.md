@@ -53,7 +53,7 @@ The function requires using a **Earthdata Download Bearer Token**; to obtain a t
 4. Click "Generate Token" from the dropdown menu
 5. Click the "Generate Token" link that appears in a row of links
 6. Click the green "Generate token" button 
-7. Click the blue "Show token" button; this is your bearer token
+7. Click the blue "Show token" button; this is your bearer token. It will be a long string of text (over 500 characters).
 
 <p align="center">
 <img src="man/figures/nasa_laads_login.png" alt="NASA LAADS Bearer Token" width="800"/>
