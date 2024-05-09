@@ -461,10 +461,6 @@ download_raster <- function(file_name,
                             progress())
     }
     
-    url1 <<- url
-    headers1 <<- headers
-    download_path1 <<- download_path
-    
     if(response$status_code != 200){
       message("Error in downloading data")
       message(response)
