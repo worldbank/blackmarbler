@@ -45,14 +45,15 @@ devtools::install_github("worldbank/blackmarbler")
 
 ## Bearer Token <a name="token">
 
-The function requires using a **Bearer Token**; to obtain a token, follow the below steps:
+The function requires using a **Earthdata Download Bearer Token**; to obtain a token, follow the below steps:
 
 1. Go to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/)
-2. Click "Login" (bottom on top right); create an account if needed.
-3. Click "See wget Download Command" (bottom near top, in the middle)
-4. After clicking, you will see text that can be used to download data. The "Bearer" token will be a long string in red.
-
-**After logging in, the below will show the bearer token in red instead of `INSERT_DOWNLOAD_TOKEN_HERE`.** Sometimes, after logging in, the NASA website will redirect to another part of the website. To obtain the bearer token, just navigate to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) after logging in.
+2. Click "Login" (button on top right), and click "Earthdata Login"; create an account if needed.
+3. Once logged on, from the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/) page, click "Login" again
+4. Click "Generate Token" from the dropdown menu
+5. Click the "Generate Token" link that appears in a row of links
+6. Click the green "Generate token" button 
+7. Click the blue "Show token" button; this is your bearer token
 
 <p align="center">
 <img src="man/figures/nasa_laads_login.png" alt="NASA LAADS Bearer Token" width="800"/>

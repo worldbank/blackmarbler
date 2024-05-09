@@ -195,7 +195,7 @@ file_to_raster <- function(f,
   #### Daily
   if(f %>% str_detect("VNP46A1|VNP46A2")){
     
-    tile_i <- f %>% str_extract("h\\d{2}v\\d{2}")
+    tile_i <- f %>% stringr::str_extract("h\\d{2}v\\d{2}")
     
     bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
     grid_i_sf <- bm_tiles_sf[bm_tiles_sf$TileID %in% tile_i,]
@@ -460,6 +460,10 @@ download_raster <- function(file_name,
                             write_disk(download_path, overwrite = TRUE),
                             progress())
     }
+    
+    url1 <<- url
+    headers1 <<- headers
+    download_path1 <<- download_path
     
     if(response$status_code != 200){
       message("Error in downloading data")
@@ -1178,7 +1182,7 @@ bm_raster_i <- function(roi_sf,
   # Remove grid along edges, which causes st_intersects to fail
   bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
   bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
-  
+
   inter <- tryCatch(
     {
       inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
@@ -1191,7 +1195,7 @@ bm_raster_i <- function(roi_sf,
       stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
     }
   )
-  
+
   grid_use_sf <- bm_tiles_sf[inter > 0,]
   
   # Make Raster ----------------------------------------------------------------
