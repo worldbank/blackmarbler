@@ -632,6 +632,13 @@ bm_extract <- function(roi_sf,
     stop("roi must be an sf object")
   }
   
+  # Required parameters used in try statement, so error not generated when used, 
+  # so use them here
+  roi_sf <- roi_sf
+  product_id <- product_id
+  date <- date
+  bearer <- bearer
+  
   # Assign interpolation variables ---------------------------------------------
   if(interpol_na == T){
     if(!exists("method")) method <- "linear"
@@ -990,6 +997,13 @@ bm_raster <- function(roi_sf,
   if(!("sf" %in% class(roi_sf))){
     stop("roi must be an sf object")
   }
+  
+  # Required parameters used in try statement, so error not generated when used, 
+  # so use them here
+  roi_sf <- roi_sf
+  product_id <- product_id
+  date <- date
+  bearer <- bearer
   
   # Assign interpolation variables ---------------------------------------------
   if(interpol_na == T){
