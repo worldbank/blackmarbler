@@ -13,7 +13,8 @@ library(stringr)
 library(httr)
 
 # Setup ------------------------------------------------------------------------
-library(blackmarbler)
+source("~/Documents/Github/blackmarbler/R/blackmarbler.R")
+#library(blackmarbler)
 library(geodata)
 
 bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
@@ -21,10 +22,25 @@ bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
 roi_sf <- gadm(country = "CHE", level=1, path = tempdir()) 
 
 # bm_raster: Basic -------------------------------------------------------------
-r <- bm_raster(roi_sf = roi_sf,
+r1 <- bm_raster(roi_sf = roi_sf,
+                product_id = "VNP46A2",
+                date = "2021-10-01", 
+                bearer = bearer)
+
+r2 <- bm_raster(roi_sf = roi_sf,
                product_id = "VNP46A3",
                date = "2021-10-01", 
                bearer = bearer)
+
+r3 <- bm_raster(roi_sf = roi_sf,
+                product_id = "VNP46A4",
+                date = "2021", 
+                bearer = bearer)
+
+
+
+
+
 
 dir.create("~/Desktop/h5_tmp")
 r <- bm_raster(roi_sf = roi_sf,
