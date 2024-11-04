@@ -12,9 +12,22 @@ library(exactextractr)
 library(stringr)
 library(httr)
 
+bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
+bearer <- "BEARER HERE"
+library(blackmarbler)
+library(geodata)
+roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) 
+
+r_20210205 <- bm_raster(roi_sf = roi_sf,
+                        product_id = "VNP46A2",
+                        date = "2021-02-05",
+                        bearer = bearer)
+
+
+
 # Setup ------------------------------------------------------------------------
 source("~/Documents/Github/blackmarbler/R/blackmarbler.R")
-#library(blackmarbler)
+library(blackmarbler)
 library(geodata)
 
 bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
@@ -28,9 +41,9 @@ r1 <- bm_raster(roi_sf = roi_sf,
                 bearer = bearer)
 
 r2 <- bm_raster(roi_sf = roi_sf,
-               product_id = "VNP46A3",
-               date = "2021-10-01", 
-               bearer = bearer)
+                product_id = "VNP46A3",
+                date = "2021-10-01", 
+                bearer = bearer)
 
 r3 <- bm_raster(roi_sf = roi_sf,
                 product_id = "VNP46A4",

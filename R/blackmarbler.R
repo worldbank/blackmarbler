@@ -450,13 +450,12 @@ download_raster <- function(file_name,
     download_path <- file.path(h5_dir, file_name)
   }
   
-  
-  
   if(!file.exists(download_path)){
     
     if(quiet == FALSE) message(paste0("Processing: ", file_name))
     
     if(quiet == TRUE){
+      
       response <- httr::GET(url, 
                             httr::timeout(60),
                             httr::add_headers(headers), 
@@ -1013,10 +1012,10 @@ bm_raster <- function(roi_sf,
   
   # Required parameters used in try statement, so error not generated when used, 
   # so use them here
-  roi_sf <- roi_sf
+  roi_sf     <- roi_sf
   product_id <- product_id
-  date <- date
-  bearer <- bearer
+  date       <- date
+  bearer     <- bearer
   
   # Assign interpolation variables ---------------------------------------------
   if(interpol_na == T){
@@ -1149,11 +1148,18 @@ bm_raster <- function(roi_sf,
   # Output raster when output_location_type = "file" ---------------------------
   if(output_location_type == "file"){
     if(!file_return_null){
-      r <- file_dir %>%
-        list.files(full.names = T,
-                   pattern = paste0("*.tif")) %>%
-        str_subset(out_name_begin) %>%
+      
+      ## Output path
+      date_names <- define_date_name(date, product_id)
+      
+      out_name_end <- paste0("_",
+                             date_names,
+                             ".tif")
+      out_name <- paste0(out_name_begin, out_name_end)
+      
+      r <- file.path(file_dir, out_name) %>%
         rast()
+
     } else{
       r <- NULL
     }
@@ -1199,17 +1205,12 @@ bm_raster_i <- function(roi_sf,
   year  <- date %>% year()
   month <- date %>% month()
   day   <- date %>% yday()
-  
-  
-  
+
   bm_files_df <- create_dataset_name_df(product_id = product_id,
                                         all = T,
                                         years = year,
                                         months = month,
                                         days = day)
-  
-  
-  
   
   
   # Intersecting tiles ---------------------------------------------------------
