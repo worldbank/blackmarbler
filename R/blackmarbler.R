@@ -874,11 +874,25 @@ bm_extract <- function(roi_sf,
   # Output dataframe when output_location_type = "file" ------------------------
   if(output_location_type == "file"){
     if(!file_return_null){
-      r <- file_dir %>%
-        list.files(full.names = T,
-                   pattern = paste0("*.Rds")) %>%
-        str_subset(out_name_begin) %>%
+      
+      print(out_name_begin)
+      
+      ## Output path
+      date_names <- define_date_name(date, product_id)
+      
+      out_name_end <- paste0("_",
+                             date_names,
+                             ".Rds")
+      out_name <- paste0(out_name_begin, out_name_end)
+      
+      r <- file.path(file_dir, out_name) %>%
         map_df(readRDS)
+      
+      # r <- file_dir %>%
+      #   list.files(full.names = T,
+      #              pattern = paste0("*.Rds")) %>%
+      #   str_subset(out_name_begin) %>%
+      #   map_df(readRDS)
     } else{
       r <- NULL
     }
