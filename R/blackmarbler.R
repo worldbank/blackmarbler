@@ -875,8 +875,6 @@ bm_extract <- function(roi_sf,
   if(output_location_type == "file"){
     if(!file_return_null){
       
-      print(out_name_begin)
-      
       ## Output path
       date_names <- define_date_name(date, product_id)
       
