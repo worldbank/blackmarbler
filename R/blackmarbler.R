@@ -883,6 +883,11 @@ bm_extract <- function(roi_sf,
                              ".Rds")
       out_name <- paste0(out_name_begin, out_name_end)
       
+      ## Restrict to files that exist, in case user enters date with no data
+      ## (eg, year after current year)
+      all_files <- list.files(file_dir)
+      out_name <- out_name[out_name %in% all_files]
+      
       r <- file.path(file_dir, out_name) %>%
         map_df(readRDS)
       
@@ -1169,6 +1174,11 @@ bm_raster <- function(roi_sf,
                              ".tif")
       out_name <- paste0(out_name_begin, out_name_end)
       
+      ## Restrict to files that exist, in case user enters date with no data
+      ## (eg, year after current year)
+      all_files <- list.files(file_dir)
+      out_name <- out_name[out_name %in% all_files]
+
       r <- file.path(file_dir, out_name) %>%
         rast()
 
