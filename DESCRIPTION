@@ -28,6 +28,7 @@ Imports:
 Suggests: 
     geodata,
     ggplot2,
+    httr2,
     knitr,
     tidyterra,
     testthat (>= 3.0.0)
