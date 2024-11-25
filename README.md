@@ -2,8 +2,8 @@
 
 <!-- badges: start -->
 
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/blackmarbler)](https://cran.r-project.org/package=blackmarbler)
-![downloads](http://cranlogs.r-pkg.org/badges/grand-total/blackmarbler)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/blackmarbler)](https://cran.r-project.org/package=blackmarbler)
+![downloads](https://cranlogs.r-pkg.org/badges/grand-total/blackmarbler)
 [![GitHub Repo stars](https://img.shields.io/github/stars/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler)
 [![activity](https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler)](https://github.com/worldbank/blackmarbler/graphs/commit-activity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/mit)
