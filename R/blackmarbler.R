@@ -582,7 +582,7 @@ get_nasa_token <- function(username, password) {
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
 #'
-#' For `VNP46A1` and `VNP46A2` (daily data):
+#' For `VNP46A2` (daily data):
 #' - `0`: High-quality, Persistent nighttime lights
 #' - `1`: High-quality, Ephemeral nighttime Lights
 #' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
@@ -949,7 +949,7 @@ bm_extract <- function(roi_sf,
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
 #'
-#' For `VNP46A1` and `VNP46A2` (daily data):
+#' For `VNP46A2` (daily data):
 #' - `0`: High-quality, Persistent nighttime lights
 #' - `1`: High-quality, Ephemeral nighttime Lights
 #' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
