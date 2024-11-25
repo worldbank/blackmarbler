@@ -2,10 +2,12 @@
 
 export(bm_extract)
 export(bm_raster)
+export(get_nasa_token)
 import(dplyr)
 import(exactextractr)
 import(hdf5r)
 import(httr)
+import(httr2)
 import(lubridate)
 import(purrr, except = c(flatten_df, values))
 import(readr)

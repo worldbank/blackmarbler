@@ -10,20 +10,48 @@ library(raster)
 library(sf)
 library(exactextractr)
 library(stringr)
+library(httr2)
 library(httr)
 
+source("~/Documents/Github/blackmarbler/R/blackmarbler.R")
+
 bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
-bearer <- "BEARER HERE"
-library(blackmarbler)
-library(geodata)
-roi_sf <- gadm(country = "GHA", level=1, path = tempdir()) 
+
+roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
+  st_as_sf(coords = c("lon", "lat"),
+           crs = 4326) |>
+  st_buffer(dist = 20000)
 
 r_20210205 <- bm_raster(roi_sf = roi_sf,
                         product_id = "VNP46A2",
                         date = "2021-02-05",
+                        bearer = bearer,
+                        quiet = T)
+
+r_20210205 <- bm_raster(roi_sf = roi_sf,
+                        product_id = "VNP46A1",
+                        date = "2021-02-05",
+                        variable = "Sensor_Zenith",
                         bearer = bearer)
 
 
+bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
+bearer <- "BEARER HERE"
+#library(blackmarbler)
+library(geodata)
+
+username <- readline("Username")
+password <- readline("Password")
+bearer <- get_nasa_token(username, password)
+
+out <- h5_data[[paste0("HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/", variable)]][,]
+qf  <- h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/Mandatory_Quality_Flag"]][,]
+
+h5_data[["HDFEOS/GRIDS/VNP_Grid_DNB/Data Fields/QF_Cloud_Mask"]][,] %>% table()
+
+h5_file <- "~/Desktop/VNP46A1.A2021036.h20v09.001.2021037082509.h5"
+
+h5_data <- h5file(h5_file, "r+")
 
 # Setup ------------------------------------------------------------------------
 source("~/Documents/Github/blackmarbler/R/blackmarbler.R")

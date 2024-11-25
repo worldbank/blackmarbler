@@ -1,4 +1,11 @@
 if(F){
+  
+  ## Change the oken
+  #Sys.getenv("BEARER_NASA_TOKEN")
+  #Sys.setenv(BEARER_NASA_TOKEN = "new_token_value")
+  #Sys.setenv(NASA_USERNAME = "value")
+  #Sys.setenv(NASA_PASSWORD = "value")
+
   setwd("~/Documents/Github/blackmarbler")
   
   roxygen2::roxygenise("~/Documents/Github/blackmarbler")

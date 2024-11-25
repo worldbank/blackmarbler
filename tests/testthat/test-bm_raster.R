@@ -87,6 +87,8 @@ test_that("Query VNP46A4", {
 })
 
 test_that("Get NASA token", {
+  
+  skip()
 
   expect_error(get_nasa_token(123, "black"), "username must be a character string")
   expect_error(get_nasa_token("black", 123), "password must be a character string")

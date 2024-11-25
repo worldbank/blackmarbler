@@ -1,6 +1,6 @@
 Package: blackmarbler
 Title: Black Marble Data and Statistics
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     c(person("Robert", "Marty", , "rmarty@worldbank.org", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3164-3813")),
@@ -24,11 +24,11 @@ Imports:
   sf,
   exactextractr,
   stringr,
-  httr
+  httr,
+  httr2
 Suggests: 
     geodata,
     ggplot2,
-    httr2,
     knitr,
     tidyterra,
     testthat (>= 3.0.0)
