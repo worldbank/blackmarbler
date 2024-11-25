@@ -45,6 +45,19 @@ devtools::install_github("worldbank/blackmarbler")
 
 ## Bearer Token <a name="token">
 
+To obtain a bearer token, you'll need to have a registered [NASA Earth Data account](https://ladsweb.modaps.eosdis.nasa.gov/). On the webpage, click "login" and create a username/password if needed.
+
+After an account is created, the NASA Bearer Token can be retrieved either using the `get_nasa_token` function or manually (see below).
+
+### Programmatically retrieve token <a name="token-automatic">
+
+The NASA Bearer Token can also be programmatically retrieved using the `get_nasa_token()` function. After making an account, the `get_nasa_token()` function uses your username and password to retrieve the Bearer token.
+
+```r
+bearer <- get_nasa_token(username = "USERNAME-HERE", 
+                         password = "PASSWORD-HERE")
+```
+
 ### Manually retrieve token <a name="token-manual">
 
 The function requires using a **Earthdata Download Bearer Token**; to obtain a token, follow the below steps:
@@ -68,14 +81,7 @@ The function requires using a **Earthdata Download Bearer Token**; to obtain a t
 <img src="man/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"/>
 </p>
 
-### Manually retrieve token <a name="token-automatic">
 
-The NASA Bearer Token can also be automatically retrieved using the `get_nasa_token`. After making an account, the `get_nasa_token` uses your username and password to retrieve the Bearer token.
-
-```r
-bearer <- get_nasa_token(username = "USERNAME-HERE", 
-                         password = "PASSWORD-HERE")
-```
 
 ## Usage <a name="usage">
 
