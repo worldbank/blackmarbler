@@ -57,15 +57,15 @@ The function requires using a **Earthdata Download Bearer Token**; to obtain a t
 6. Click the blue "Show token" button; this is your bearer token. It will be a long string of text (over 500 characters).
 
 <p align="center">
-<img src="man/figures/nasa_login_1.png" alt="NASA LAADS Bearer Token" width="800"/>
+<img src="man/figures/nasa_login_1.png" alt="NASA LAADS Bearer Token" width="500"/>
 </p>
 
 <p align="center">
-<img src="man/figures/nasa_login_2.png" alt="NASA LAADS Bearer Token" width="800"/>
+<img src="man/figures/nasa_login_2.png" alt="NASA LAADS Bearer Token" width="500"/>
 </p>
 
 <p align="center">
-<img src="man/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="800"/>
+<img src="man/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"/>
 </p>
 
 ### Manually retrieve token <a name="token-automatic">
