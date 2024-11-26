@@ -59,7 +59,7 @@ For information on other variable choices, see \href{https://ladsweb.modaps.eosd
 
 \item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in the \code{quality_flag_rm} vector. Note that \code{quality_flag_rm} does not apply for \code{VNP46A1}. (Default: \code{NULL}).
 
-For \code{VNP46A1} and \code{VNP46A2} (daily data):
+For \code{VNP46A2} (daily data):
 \itemize{
 \item \code{0}: High-quality, Persistent nighttime lights
 \item \code{1}: High-quality, Ephemeral nighttime Lights
