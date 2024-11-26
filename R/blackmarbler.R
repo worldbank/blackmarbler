@@ -1091,62 +1091,72 @@ bm_raster <- function(roi_sf,
   # Download data --------------------------------------------------------------
   r_list <- lapply(date, function(date_i){
     
-    #### Make name for raster based on date
-    date_name_i <- define_date_name(date_i, product_id)
-    
-    #### If save as tif format
-    if(output_location_type == "file"){
-      
-      ## Output path
-      out_name_end <- paste0("_",
-                             date_name_i,
-                             ".tif")
-      out_name <- paste0(out_name_begin, out_name_end)
-      
-      out_path <- file.path(file_dir, out_name)
-      
-      make_raster <- TRUE
-      if(file_skip_if_exists & file.exists(out_path)) make_raster <- FALSE
-      
-      if(make_raster){
+    out <- tryCatch(
+      {
         
-        r <- bm_raster_i(roi_sf = roi_sf,
-                         product_id = product_id,
-                         date = date_i,
-                         bearer = bearer,
-                         variable = variable,
-                         quality_flag_rm = quality_flag_rm,
-                         check_all_tiles_exist = check_all_tiles_exist,
-                         h5_dir = h5_dir,
-                         quiet = quiet,
-                         temp_dir = temp_dir)
-        names(r) <- date_name_i
         
-        writeRaster(r, out_path)
+        #### Make name for raster based on date
+        date_name_i <- define_date_name(date_i, product_id)
         
-      } else{
-        message(paste0('"', out_path, '" already exists; skipping.\n'))
+        #### If save as tif format
+        if(output_location_type == "file"){
+          
+          ## Output path
+          out_name_end <- paste0("_",
+                                 date_name_i,
+                                 ".tif")
+          out_name <- paste0(out_name_begin, out_name_end)
+          
+          out_path <- file.path(file_dir, out_name)
+          
+          make_raster <- TRUE
+          if(file_skip_if_exists & file.exists(out_path)) make_raster <- FALSE
+          
+          if(make_raster){
+            
+            r <- bm_raster_i(roi_sf = roi_sf,
+                             product_id = product_id,
+                             date = date_i,
+                             bearer = bearer,
+                             variable = variable,
+                             quality_flag_rm = quality_flag_rm,
+                             check_all_tiles_exist = check_all_tiles_exist,
+                             h5_dir = h5_dir,
+                             quiet = quiet,
+                             temp_dir = temp_dir)
+            names(r) <- date_name_i
+            
+            writeRaster(r, out_path)
+            
+          } else{
+            message(paste0('"', out_path, '" already exists; skipping.\n'))
+          }
+          
+          r_out <- NULL # Saving as tif file, so output from function should be NULL
+          
+        } else{
+          
+          r_out <- bm_raster_i(roi_sf = roi_sf,
+                               product_id = product_id,
+                               date = date_i,
+                               bearer = bearer,
+                               variable = variable,
+                               quality_flag_rm = quality_flag_rm,
+                               check_all_tiles_exist = check_all_tiles_exist,
+                               h5_dir = h5_dir,
+                               quiet = quiet,
+                               temp_dir = temp_dir)
+          names(r_out) <- date_name_i
+          
+        }
+        
+        return(r_out)
+        
+      },
+      error=function(e) {
+        return(NULL)
       }
-      
-      r_out <- NULL # Saving as tif file, so output from function should be NULL
-      
-    } else{
-      
-      r_out <- bm_raster_i(roi_sf = roi_sf,
-                           product_id = product_id,
-                           date = date_i,
-                           bearer = bearer,
-                           variable = variable,
-                           quality_flag_rm = quality_flag_rm,
-                           check_all_tiles_exist = check_all_tiles_exist,
-                           h5_dir = h5_dir,
-                           quiet = quiet,
-                           temp_dir = temp_dir)
-      names(r_out) <- date_name_i
-      
-    }
-    
-    return(r_out)
+    )
     
     
     #)

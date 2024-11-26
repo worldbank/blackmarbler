@@ -11,8 +11,8 @@ roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
   st_buffer(dist = 20000)
 
 r_20210205 <- bm_raster(roi_sf = roi_sf,
-                        product_id = "VNP46A3",
-                        date = "2021-02-05",
+                        product_id = "VNP46A4",
+                        date = 2023:2024,
                         bearer = bearer)
 
 library(readr)
