@@ -1,8 +1,22 @@
 # Testing
 
 #### Basic
-library(blackmarbler)
+#library(blackmarbler)
 library(sf)
+
+library(readr)
+library(hdf5r)
+library(dplyr)
+library(purrr)
+library(lubridate)
+library(tidyr)
+library(raster)
+library(sf)
+library(exactextractr)
+library(stringr)
+library(httr2)
+library(httr)
+
 bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
 
 roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
@@ -11,8 +25,8 @@ roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
   st_buffer(dist = 20000)
 
 r_20210205 <- bm_raster(roi_sf = roi_sf,
-                        product_id = "VNP46A4",
-                        date = 2023:2024,
+                        product_id = "VNP46A3",
+                        date = "2018-09-01",
                         bearer = bearer)
 
 library(readr)
