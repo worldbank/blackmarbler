@@ -5,7 +5,6 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="Geographically referenced data and statistics of nighttime lights from NASA Black Marble &lt;https://blackmarble.gsfc.nasa.gov/&gt;.">
 <title>Black Marble Data and Statistics • blackmarbler</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
@@ -15,58 +14,47 @@
 <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.jsdelivr.net/gh/afeld/bootstrap-toc@v1.0.1/dist/bootstrap-toc.min.js" integrity="sha256-4veVQbu7//Lk5TSmc7YV48MxtMy98e26cf5MrgZYnwo=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.11/clipboard.min.js" integrity="sha512-7O5pXpc0oCRrxk8RUfDYFgn0nO1t+jLuIOQdOMRp4APB7uZ4vSjspzp5y6YDtDs4VzUSTbWzBFZ/LKJhnyFOKw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Black Marble Data and Statistics">
+<script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Black Marble Data and Statistics">
+<meta name="description" content="Geographically referenced data and statistics of nighttime lights from NASA Black Marble &lt;https://blackmarble.gsfc.nasa.gov/&gt;.">
 <meta property="og:description" content="Geographically referenced data and statistics of nighttime lights from NASA Black Marble &lt;https://blackmarble.gsfc.nasa.gov/&gt;.">
 <meta property="og:image" content="/logo.png">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light" data-bs-theme="light"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="index.html">blackmarbler</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/assess-quality.html">Assessing Quality of Nighttime Lights Data</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/assess-quality.html">Assessing Quality of Nighttime Lights Data</a></li>
+  </ul>
 </li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav">
-<li class="nav-item">
-  <a class="external-link nav-link" href="https://github.com/worldbank/blackmarbler/" aria-label="github">
-    <span class="fab fa fab fa-github fa-lg"></span>
-     
-  </a>
-</li>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
+</form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/worldbank/blackmarbler/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-home">
 <div class="row">
@@ -77,8 +65,7 @@
 </div>
 <!-- badges: start -->
 
-<!-- badges: end -->
-<p><strong>BlackMarbleR</strong> is a R package that provides a simple way to use nighttime lights data from NASA’s Black Marble. <a href="https://blackmarble.gsfc.nasa.gov" class="external-link">Black Marble</a> is a <a href="https://www.earthdata.nasa.gov" class="external-link">NASA Earth Science Data Systems (ESDS)</a> project that provides a product suite of daily, monthly and yearly global <a href="https://www.earthdata.nasa.gov/learn/backgrounders/nighttime-lights" class="external-link">nighttime lights</a>. This package automates the process of downloading all relevant tiles from the <a href="https://www.earthdata.nasa.gov/eosdis/daacs/laads" class="external-link">NASA LAADS DAAC</a> to cover a region of interest, converting and mosaicing the raw files (in HDF5 format) to georeferenced rasters.</p>
+<p><strong>BlackMarbleR</strong> is a R package that provides a simple way to use nighttime lights data from NASA’s Black Marble. <a href="https://blackmarble.gsfc.nasa.gov" class="external-link">Black Marble</a> is a <a href="https://www.earthdata.nasa.gov" class="external-link">NASA Earth Science Data Systems (ESDS)</a> project that provides a product suite of daily, monthly and yearly global <a href="https://www.earthdata.nasa.gov/topics/human-dimensions/nighttime-lights" class="external-link">nighttime lights</a>. This package automates the process of downloading all relevant tiles from the <a href="https://ladsweb.modaps.eosdis.nasa.gov/" class="external-link">NASA LAADS DAAC</a> to cover a region of interest, converting and mosaicing the raw files (in HDF5 format) to georeferenced rasters.</p>
 <ul>
 <li><a href="#installation">Installation</a></li>
 <li><a href="#token">Bearer token</a></li>
@@ -120,17 +107,38 @@
 <h2 id="bearer-token-">Bearer Token <a name="token"></a>
 <a class="anchor" aria-label="anchor" href="#bearer-token-"></a>
 </h2>
-<p>The function requires using a <strong>Bearer Token</strong>; to obtain a token, follow the below steps:</p>
+<p>To obtain a bearer token, you’ll need to have a registered <a href="https://ladsweb.modaps.eosdis.nasa.gov/" class="external-link">NASA Earth Data account</a>. On the webpage, click “login” and create a username/password if needed.</p>
+<p>After an account is created, the NASA Bearer Token can be retrieved either using the <code>get_nasa_token</code> function or manually (see below).</p>
+<div class="section level3">
+<h3 id="programmatically-retrieve-token-">Programmatically retrieve token <a name="token-automatic"></a>
+<a class="anchor" aria-label="anchor" href="#programmatically-retrieve-token-"></a>
+</h3>
+<p>The NASA Bearer Token can also be programmatically retrieved using the <code><a href="reference/get_nasa_token.html">get_nasa_token()</a></code> function. After making an account, the <code><a href="reference/get_nasa_token.html">get_nasa_token()</a></code> function uses your username and password to retrieve the Bearer token.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">bearer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nasa_token.html">get_nasa_token</a></span><span class="op">(</span>username <span class="op">=</span> <span class="st">"USERNAME-HERE"</span>, </span>
+<span>                         password <span class="op">=</span> <span class="st">"PASSWORD-HERE"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="manually-retrieve-token-">Manually retrieve token <a name="token-manual"></a>
+<a class="anchor" aria-label="anchor" href="#manually-retrieve-token-"></a>
+</h3>
+<p>The function requires using a <strong>Earthdata Download Bearer Token</strong>; to obtain a token, follow the below steps:</p>
 <ol style="list-style-type: decimal">
-<li>Go to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/" class="external-link">NASA LAADS Archive</a>
+<li>Go to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/" class="external-link">NASA LAADS Archive</a>
 </li>
-<li>Click “Login” (bottom on top right); create an account if needed.</li>
-<li>Click “See wget Download Command” (bottom near top, in the middle)</li>
-<li>After clicking, you will see text that can be used to download data. The “Bearer” token will be a long string in red.</li>
+<li>Click “Login” (button on top right), and click “Earthdata Login”; create an account if needed.</li>
+<li>Enter your username and password.</li>
+<li>Click “Login”, then “Generate Token” on the dropdown.</li>
+<li>Click the “Generate Token” tab, then click the green button to generate a token</li>
+<li>Click the blue “Show token” button; this is your bearer token. It will be a long string of text (over 500 characters).</li>
 </ol>
-<p><strong>After logging in, the below will show the bearer token in red instead of <code>INSERT_DOWNLOAD_TOKEN_HERE</code>.</strong> Sometimes, after logging in, the NASA website will redirect to another part of the website. To obtain the bearer token, just navigate to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/VNP46A3/" class="external-link">NASA LAADS Archive</a> after logging in.</p>
 <p align="center">
-<img src="reference/figures/nasa_laads_login.png" alt="NASA LAADS Bearer Token" width="800"></p>
+<img src="reference/figures/nasa_login_1.png" alt="NASA LAADS Bearer Token" width="500"></p>
+<p align="center">
+<img src="reference/figures/nasa_login_2.png" alt="NASA LAADS Bearer Token" width="500"></p>
+<p align="center">
+<img src="reference/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"></p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="usage-">Usage <a name="usage"></a>
@@ -141,7 +149,7 @@
 <a class="anchor" aria-label="anchor" href="#setup-"></a>
 </h3>
 <p>Before downloading and extracting Black Marble data, we first load packages, define the NASA bearer token, and define a region of interest.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Setup</span></span>
 <span><span class="co"># Load packages</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://worldbank.github.io/blackmarbler/" class="external-link">blackmarbler</a></span><span class="op">)</span></span>
@@ -166,7 +174,7 @@
 <a class="anchor" aria-label="anchor" href="#make-raster-of-nighttime-lights-"></a>
 </h3>
 <p>The below example shows making daily, monthly, and annual rasters of nighttime lights for Ghana.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### Daily data: raster for February 5, 2021</span></span>
 <span><span class="va">r_20210205</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                        product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
@@ -190,7 +198,7 @@
 <a class="anchor" aria-label="anchor" href="#make-raster-of-nighttime-lights-across-multiple-time-periods-"></a>
 </h3>
 <p>To extract data for multiple time periods, add multiple time periods to <code>date</code>. The function will return a <code>SpatRaster</code> object with multiple bands, where each band corresponds to a different date. The below code provides examples getting data across multiple days, months, and years.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Daily data in March 2021</span></span>
 <span><span class="va">r_daily</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                     product_id <span class="op">=</span> <span class="st">"VNP46A2"</span>,</span>
@@ -214,7 +222,7 @@
 <a class="anchor" aria-label="anchor" href="#map-of-nighttime-lights-"></a>
 </h3>
 <p>Using one of the rasters, we can make a map of nighttime lights</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Make raster</span></span>
 <span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_raster.html">bm_raster</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>               product_id <span class="op">=</span> <span class="st">"VNP46A3"</span>,</span>
@@ -248,7 +256,7 @@
 <a class="anchor" aria-label="anchor" href="#trends-over-time-"></a>
 </h3>
 <p>We can use the <code>bm_extract</code> function to observe changes in nighttime lights over time. The <code>bm_extract</code> function leverages the <a href="https://github.com/isciences/exactextractr" class="external-link"><code>exactextractr</code></a> package to aggregate nighttime lights data to polygons. Below we show trends in annual nighttime lights data across Ghana’s first administrative divisions.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Extract annual data</span></span>
 <span><span class="va">ntl_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/bm_extract.html">bm_extract</a></span><span class="op">(</span>roi_sf <span class="op">=</span> <span class="va">roi_sf</span>,</span>
 <span>                     product_id <span class="op">=</span> <span class="st">"VNP46A4"</span>,</span>
@@ -278,7 +286,7 @@
 </h3>
 <p>Some users may want to monitor near-real-time changes in nighttime lights. For example, daily Black Marble nighttime lights data is updated regularly, where data is available roughly on a week delay; same use cases may require examining trends in daily nighttime lights data as new data becomes available. Below shows example code that could be regularly run to produce an updated daily dataset of nighttime lights.</p>
 <p>The below code produces a dataframe of nighttime lights for each date, where average nighttime lights for Ghana’s 1st administrative division is produced. The code will check whether data has already been downloaded/extracted for a specific date, and only download/extract new data.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create directories to store data</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/files2.html" class="external-link">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"bm_files"</span>, <span class="st">"daily"</span><span class="op">)</span><span class="op">)</span></span>
@@ -428,8 +436,8 @@
 </h2>
 <p>For more information on NASA Black Marble, see:</p>
 <ul>
-<li><a href="https://www.sciencedirect.com/science/article/pii/S003442571830110X" class="external-link">Academic paper</a></li>
-<li><a href="https://yohaniddawela.substack.com/p/not-all-nightlight-datasets-are-the" class="external-link">Substack Post</a></li>
+<li><a href="https://doi.org/10.1016/j.rse.2018.03.017" class="external-link">Academic paper</a></li>
+<li><a href="https://www.spatialedge.co/p/not-all-nightlight-datasets-are-the" class="external-link">Substack Post</a></li>
 <li><a href="https://appliedsciences.nasa.gov/get-involved/training/english/arset-introduction-nasas-black-marble-night-lights-data" class="external-link">Webinar</a></li>
 </ul>
 </div>
@@ -471,10 +479,11 @@
 <div class="dev-status">
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://cran.r-project.org/package=blackmarbler" class="external-link"><img src="http://www.r-pkg.org/badges/version/blackmarbler" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://cran.r-project.org/package=blackmarbler" class="external-link"><img src="https://www.r-pkg.org/badges/version/blackmarbler" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://github.com/worldbank/blackmarbler" class="external-link"><img src="https://img.shields.io/github/stars/worldbank/blackmarbler" alt="GitHub Repo stars"></a></li>
 <li><a href="https://github.com/worldbank/blackmarbler/graphs/commit-activity" class="external-link"><img src="https://img.shields.io/github/commit-activity/m/worldbank/blackmarbler" alt="activity"></a></li>
 <li><a href="https://opensource.org/license/mit" class="external-link"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
+<li><a href="https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/worldbank/blackmarbler/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 
@@ -487,15 +496,15 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
