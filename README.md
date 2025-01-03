@@ -45,43 +45,46 @@ devtools::install_github("worldbank/blackmarbler")
 
 ## Bearer Token <a name="token">
 
-To obtain a bearer token, you'll need to have a registered [NASA Earth Data account](https://ladsweb.modaps.eosdis.nasa.gov/). On the webpage, click "login" and create a username/password if needed.
+Follow the below steps to obtain a bearer token:
 
-After an account is created, the NASA Bearer Token can be retrieved either using the `get_nasa_token` function or manually (see below).
+1. Create a [NASA Earth Data account](https://ladsweb.modaps.eosdis.nasa.gov/) account. On the top right of the [webpage](https://ladsweb.modaps.eosdis.nasa.gov/), click "Login" then "Earthdata Login". Then click "register" (blue button).
+2. Enter the information in the registration page. You __must__ include the following information; this information is not required to create an account, but the bearer token will not work without this information:
 
-### Programmatically retrieve token <a name="token-automatic">
+    - Study Area
+    - User Type
+    - Organization
+  
+3. Click "Register for EarthData Login" (green button at bottom). Check your email, and click the link in the email to activate the account.
+4. Go to the [Earth Data Login](https://urs.earthdata.nasa.gov/users) page and login.
+5. On the panel near the top, click "EULAs" then "Accept New EULAs". Accept:
 
-The NASA Bearer Token can also be programmatically retrieved using the `get_nasa_token()` function. After making an account, the `get_nasa_token()` function uses your username and password to retrieve the Bearer token.
-
-```r
-bearer <- get_nasa_token(username = "USERNAME-HERE", 
-                         password = "PASSWORD-HERE")
-```
-
-### Manually retrieve token <a name="token-manual">
-
-The function requires using a **Earthdata Download Bearer Token**; to obtain a token, follow the below steps:
-
-1. Go to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/)
-2. Click "Login" (button on top right), and click "Earthdata Login"; create an account if needed.
-3. Enter your username and password.
-4. Click "Login", then "Generate Token" on the dropdown.
-5. Click the "Generate Token" tab, then click the green button to generate a token
-6. Click the blue "Show token" button; this is your bearer token. It will be a long string of text (over 500 characters).
+    - MERIS EULA
+    - Sentinel EULA
+  
+6. On the "Profile Home" page, you should see something like below. Information should be filled in for each category, and "Agreed To Meris EULA" and "Agreed To Sentinel-3 EULA" should be True.
 
 <p align="center">
-<img src="man/figures/nasa_login_1.png" alt="NASA LAADS Bearer Token" width="500"/>
+<img src="man/figures/nasa_profile_info.png" alt="NASA Profile Home Information" width="500"/>
 </p>
 
-<p align="center">
-<img src="man/figures/nasa_login_2.png" alt="NASA LAADS Bearer Token" width="500"/>
-</p>
+7. Go to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/) and login (login botton on top right). You will see a page to authorize use of Sentinel3 and Meris. Click the green "Authorize" button.
+
+8. To obtain the bearer token, go to the [Earth Data Login](https://urs.earthdata.nasa.gov/users) page and login. On the top panel, click "Generate token". On this page, click "Show Token" to see the bearer token.
 
 <p align="center">
 <img src="man/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"/>
 </p>
 
+9. If the bearer token ever stops working, you make need to go to the "Generate token" page (see step 8), delete any existing tokens, and generate a new token.
 
+### Programmatically retrieve token <a name="token-automatic">
+
+After following the above steps, the bearer token can also be programmatically retrieved using the `get_nasa_token()` function and your usename and password.
+
+```r
+bearer <- get_nasa_token(username = "USERNAME-HERE", 
+                         password = "PASSWORD-HERE")
+```
 
 ## Usage <a name="usage">
 
@@ -289,7 +292,7 @@ Both functions take the following arguments:
 
 ### Optional arguments <a name="args-optional">
 
-* **variable:** Variable to used to create raster (default: `NULL`). For information on all variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9. If `NULL`, uses the following default variables:
+* **variable:** Variable to used to create raster (default: `NULL`). To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on all variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9. If `NULL`, uses the following default variables:
 
   * For `product_id` `"VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
   * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.

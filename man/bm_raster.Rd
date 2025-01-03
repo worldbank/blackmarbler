@@ -123,3 +123,6 @@ ken_2021_r <- bm_raster(roi_sf = roi_sf,
 }
 
 }
+\author{
+Robert Marty \href{mailto:rmarty@worldbank.org}{rmarty@worldbank.org}
+}

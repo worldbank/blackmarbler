@@ -128,3 +128,6 @@ ken_2021_r <- bm_extract(roi_sf = roi_sf,
 }
 
 }
+\author{
+Robert Marty \href{mailto:rmarty@worldbank.org}{rmarty@worldbank.org}
+}
