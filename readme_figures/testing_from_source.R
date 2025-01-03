@@ -17,7 +17,7 @@ library(terra)
 
 source("~/Documents/Github/blackmarbler/R/blackmarbler.R")
 
-bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
+#bearer <- read.csv("~/Dropbox/bearer_bm.csv")$token
 
 roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
   st_as_sf(coords = c("lon", "lat"),

@@ -540,7 +540,7 @@ download_raster <- function(file_name,
     
     if(response$status_code == 200){
       if(length(response$body) < 10000){
-        stop(paste0("Issue with bearer token. You may need to generate a new token. Ensure that select EULAs are accepted. Please see the instructions here: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-"))
+        stop(paste0("\nISSUE WITH BEARER TOKEN. You may need to generate a new token. Ensure that select EULAs are accepted. Please see the instructions here: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-"))
       }
     }
     

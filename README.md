@@ -67,7 +67,7 @@ Follow the below steps to obtain a bearer token:
 <img src="man/figures/nasa_profile_info.png" alt="NASA Profile Home Information" width="500"/>
 </p>
 
-7. Go to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/) and login (login botton on top right). You will see a page to authorize use of Sentinel3 and Meris. Click the green "Authorize" button.
+7. Go to the [NASA LAADS Archive](https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/) and login (login button on top right). You will see a page to authorize use of Sentinel3 and Meris. Click the green "Authorize" button.
 
 8. To obtain the bearer token, go to the [Earth Data Login](https://urs.earthdata.nasa.gov/users) page and login. On the top panel, click "Generate token". On this page, click "Show Token" to see the bearer token.
 
