@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="index.html">blackmarbler</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -107,47 +107,37 @@
 <h2 id="bearer-token-">Bearer Token <a name="token"></a>
 <a class="anchor" aria-label="anchor" href="#bearer-token-"></a>
 </h2>
-<p>Follow the below steps to obtain a bearer token:</p>
-<ol style="list-style-type: decimal">
-<li>Create a <a href="https://ladsweb.modaps.eosdis.nasa.gov/" class="external-link">NASA Earth Data account</a> account. On the top right, click “Login” then “Earthdata Login”. Then click “register” (blue button).</li>
-<li>Enter the information in the registration page. You <strong>must</strong> include the following information; this information is not required to create an account, but the bearer token will not work without this information:</li>
-</ol>
-<ul>
-<li>Study Area</li>
-<li>User Type</li>
-<li>Organization</li>
-</ul>
-<ol start="3" style="list-style-type: decimal">
-<li>Click “Register for EarthData Login” (green button at bottom). Check your email, and click the link in the email to activate the account.</li>
-<li>Go to the <a href="https://urs.earthdata.nasa.gov/users" class="external-link">Earth Data Login</a> page and login.</li>
-<li>On the panel near the top, click “EULAs” then “Accept New EULAs”. Accept:</li>
-</ol>
-<ul>
-<li>MERIS EULA</li>
-<li>Sentinel EULA</li>
-</ul>
-<ol start="6" style="list-style-type: decimal">
-<li>On the “Profile Home” page, you should see something like below. Information should be filled in for each category, and “Agreed To Meris EULA” and “Agreed To Sentinel-3 EULA” should be True.</li>
-</ol>
-<p align="center">
-<img src="reference/figures/nasa_profile_info.png" alt="NASA Profile Home Information" width="500"></p>
-<ol start="7" style="list-style-type: decimal">
-<li><p>Go to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/" class="external-link">NASA LAADS Archive</a> and login (login botton on top right). You will see a page to authorize use of Sentinel3 and Meris. Click the green “Authorize” button.</p></li>
-<li><p>To obtain the bearer token, go to the <a href="https://urs.earthdata.nasa.gov/users" class="external-link">Earth Data Login</a> page and login. On the top panel, click “Generate token”. On this page, click “Show Token” to see the token.</p></li>
-</ol>
-<p align="center">
-<img src="reference/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"></p>
-<ol start="9" style="list-style-type: decimal">
-<li>If the bearer token ever stops working, you make need to go to the “Generate token” page (see step 8), delete any existing tokens, and generate a new token.</li>
-</ol>
+<p>To obtain a bearer token, you’ll need to have a registered <a href="https://ladsweb.modaps.eosdis.nasa.gov/" class="external-link">NASA Earth Data account</a>. On the webpage, click “login” and create a username/password if needed.</p>
+<p>After an account is created, the NASA Bearer Token can be retrieved either using the <code>get_nasa_token</code> function or manually (see below).</p>
 <div class="section level3">
 <h3 id="programmatically-retrieve-token-">Programmatically retrieve token <a name="token-automatic"></a>
 <a class="anchor" aria-label="anchor" href="#programmatically-retrieve-token-"></a>
 </h3>
-<p>After following the above steps, the bearer token can be programmatically retrieved using the <code><a href="reference/get_nasa_token.html">get_nasa_token()</a></code> function and your usename and password.</p>
+<p>The NASA Bearer Token can also be programmatically retrieved using the <code><a href="reference/get_nasa_token.html">get_nasa_token()</a></code> function. After making an account, the <code><a href="reference/get_nasa_token.html">get_nasa_token()</a></code> function uses your username and password to retrieve the Bearer token.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">bearer</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/get_nasa_token.html">get_nasa_token</a></span><span class="op">(</span>username <span class="op">=</span> <span class="st">"USERNAME-HERE"</span>, </span>
 <span>                         password <span class="op">=</span> <span class="st">"PASSWORD-HERE"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="manually-retrieve-token-">Manually retrieve token <a name="token-manual"></a>
+<a class="anchor" aria-label="anchor" href="#manually-retrieve-token-"></a>
+</h3>
+<p>The function requires using a <strong>Earthdata Download Bearer Token</strong>; to obtain a token, follow the below steps:</p>
+<ol style="list-style-type: decimal">
+<li>Go to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/" class="external-link">NASA LAADS Archive</a>
+</li>
+<li>Click “Login” (button on top right), and click “Earthdata Login”; create an account if needed.</li>
+<li>Enter your username and password.</li>
+<li>Click “Login”, then “Generate Token” on the dropdown.</li>
+<li>Click the “Generate Token” tab, then click the green button to generate a token</li>
+<li>Click the blue “Show token” button; this is your bearer token. It will be a long string of text (over 500 characters).</li>
+</ol>
+<p align="center">
+<img src="reference/figures/nasa_login_1.png" alt="NASA LAADS Bearer Token" width="500"></p>
+<p align="center">
+<img src="reference/figures/nasa_login_2.png" alt="NASA LAADS Bearer Token" width="500"></p>
+<p align="center">
+<img src="reference/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"></p>
 </div>
 </div>
 <div class="section level2">
