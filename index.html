@@ -133,7 +133,7 @@
 <img src="reference/figures/nasa_profile_info.png" alt="NASA Profile Home Information" width="500"></p>
 <ol start="7" style="list-style-type: decimal">
 <li><p>Go to the <a href="https://ladsweb.modaps.eosdis.nasa.gov/missions-and-measurements/products/VNP46A4/" class="external-link">NASA LAADS Archive</a> and login (login botton on top right). You will see a page to authorize use of Sentinel3 and Meris. Click the green “Authorize” button.</p></li>
-<li><p>To obtain the bearer token, go to the <a href="https://urs.earthdata.nasa.gov/users" class="external-link">Earth Data Login</a> page and login. On the top panel, click “Generate token”. On this page, click “Show Token” to see the token.</p></li>
+<li><p>To obtain the bearer token, go to the <a href="https://urs.earthdata.nasa.gov/users" class="external-link">Earth Data Login</a> page and login. On the top panel, click “Generate token”. On this page, click “Show Token” to see the bearer token.</p></li>
 </ol>
 <p align="center">
 <img src="reference/figures/nasa_login_3.png" alt="NASA LAADS Bearer Token" width="500"></p>
@@ -374,7 +374,7 @@
 </h3>
 <ul>
 <li>
-<p><strong>variable:</strong> Variable to used to create raster (default: <code>NULL</code>). For information on all variable choices, see <a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf" class="external-link">here</a>; for <code>VNP46A1</code>, see Table 3; for <code>VNP46A2</code> see Table 6; for <code>VNP46A3</code> and <code>VNP46A4</code>, see Table 9. If <code>NULL</code>, uses the following default variables:</p>
+<p><strong>variable:</strong> Variable to used to create raster (default: <code>NULL</code>). To see all variable choices, set <code>variable = ""</code> (this will create an error message that lists all valid variables). For additional information on all variable choices, see <a href="https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf" class="external-link">here</a>; for <code>VNP46A1</code>, see Table 3; for <code>VNP46A2</code> see Table 6; for <code>VNP46A3</code> and <code>VNP46A4</code>, see Table 9. If <code>NULL</code>, uses the following default variables:</p>
 <ul>
 <li>For <code>product_id</code> <code>"VNP46A1"</code>, uses <code>DNB_At_Sensor_Radiance_500m</code>.</li>
 <li>For <code>product_id</code> <code>"VNP46A2"</code>, uses <code>Gap_Filled_DNB_BRDF-Corrected_NTL</code>.</li>
