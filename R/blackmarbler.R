@@ -531,6 +531,7 @@ download_raster <- function(file_name,
     response <- httr2::request(url) %>%
       httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
       httr2::req_timeout(60) %>%
+      httr2::req_retry(max_tries = 3, backoff = ~2^.x) %>%
       httr2::req_perform() 
     
     if(response$status_code != 200){
@@ -1226,16 +1227,6 @@ bm_raster <- function(roi_sf,
     }
     
     return(r_out)
-    
-    # TRY START   
-    #   },
-    #    error=function(e) {
-    #      return(NULL)
-    #    }
-    #  )
-    # TRY END 
-    
-    
     
   })
   

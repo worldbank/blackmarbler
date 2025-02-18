@@ -16,7 +16,10 @@ roi_sf <- data.frame(lat = -1.943889, lon = 30.059444, id = 1) |>
 
 r_20210205 <- bm_raster(roi_sf = roi_sf,
                         product_id = "VNP46A2",
-                        date = "2018-09-01",
+                        date = seq.Date(ymd("2024-01-29"),
+                                        ymd("2024-02-01"),
+                                        1),
                         bearer = bearer)
+
 
 

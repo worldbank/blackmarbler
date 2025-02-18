@@ -48,7 +48,7 @@ bm_raster(
 \item For \code{product_id} \verb{:VNP46A1"}, uses \code{DNB_At_Sensor_Radiance_500m}.
 \item For \code{product_id} \code{"VNP46A2"}, uses \code{Gap_Filled_DNB_BRDF-Corrected_NTL}.
 \item For \code{product_id}s \code{"VNP46A3"} and \code{"VNP46A4"}, uses \code{NearNadir_Composite_Snow_Free}.
-For information on other variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for \code{VNP46A1}, see Table 3; for \code{VNP46A2} see Table 6; for \code{VNP46A3} and \code{VNP46A4}, see Table 9.
+To see all variable choices, set \code{variable = ""} (this will create an error message that lists all valid variables). For additional information on variable choices, see \href{https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document\%20Archive/Science\%20Data\%20Product\%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf}{here}; for \code{VNP46A1}, see Table 3; for \code{VNP46A2} see Table 6; for \code{VNP46A3} and \code{VNP46A4}, see Table 9.
 }}
 
 \item{quality_flag_rm}{Quality flag values to use to set values to \code{NA}. Each pixel has a quality flag value, where low quality values can be removed. Values are set to \code{NA} for each value in the \code{quality_flag_rm} vector. Note that \code{quality_flag_rm} does not apply for \code{VNP46A1}. (Default: \code{NULL}).
