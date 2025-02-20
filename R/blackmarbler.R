@@ -395,7 +395,6 @@ read_bm_csv <- function(year,
                         day,
                         product_id){
   
-  # 
   df_out <- tryCatch(
     {
       df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",product_id,"/",year,"/",day,".csv"),
@@ -515,8 +514,6 @@ download_raster <- function(file_name,
   
   url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
                 product_id, '/', year, '/', day, '/', file_name)
-  
-  #headers <- c('Authorization' = paste('Bearer', bearer))
   
   if(is.null(h5_dir)){
     download_path <- file.path(temp_dir, file_name)
@@ -864,44 +861,48 @@ bm_extract <- function(roi_sf,
                            h5_dir = h5_dir,
                            quiet = quiet,
                            temp_dir = temp_dir)
-          names(r) <- date_name_i
           
-          #### Extract
-          r_agg <- exact_extract(x = r, y = roi_sf, fun = aggregation_fun, 
-                                 progress = !quiet)
-          roi_df <- roi_sf
-          roi_df$geometry <- NULL
-          
-          if(length(aggregation_fun) > 1){
-            names(r_agg) <- paste0("ntl_", names(r_agg))
-            r_agg <- bind_cols(r_agg, roi_df)
+          if(!is.null(r)){
+            names(r) <- date_name_i
+            
+            #### Extract
+            r_agg <- exact_extract(x = r, y = roi_sf, fun = aggregation_fun, 
+                                   progress = !quiet)
+            roi_df <- roi_sf
+            roi_df$geometry <- NULL
+            
+            if(length(aggregation_fun) > 1){
+              names(r_agg) <- paste0("ntl_", names(r_agg))
+              r_agg <- bind_cols(r_agg, roi_df)
+            } else{
+              roi_df[[paste0("ntl_", aggregation_fun)]] <- r_agg
+              r_agg <- roi_df
+            }
+            
+            if(add_n_pixels){
+              
+              r_n_obs <- exact_extract(r, roi_sf, function(values, coverage_fraction)
+                sum(!is.na(values)),
+                progress = !quiet)
+              
+              r_n_obs_poss <- exact_extract(r, roi_sf, function(values, coverage_fraction)
+                length(values),
+                progress = !quiet)
+              
+              r_agg$n_pixels           <- r_n_obs_poss
+              r_agg$n_non_na_pixels    <- r_n_obs
+              r_agg$prop_non_na_pixels <- r_agg$n_non_na_pixels / r_agg$n_pixels 
+            }
+            
+            r_agg$date <- date_i
+            
+            #### Export
+            saveRDS(r_agg, out_path)
+            
           } else{
-            roi_df[[paste0("ntl_", aggregation_fun)]] <- r_agg
-            r_agg <- roi_df
+            warning(paste0('"', out_path, '" already exists; skipping.\n'))
           }
           
-          if(add_n_pixels){
-            
-            r_n_obs <- exact_extract(r, roi_sf, function(values, coverage_fraction)
-              sum(!is.na(values)),
-              progress = !quiet)
-            
-            r_n_obs_poss <- exact_extract(r, roi_sf, function(values, coverage_fraction)
-              length(values),
-              progress = !quiet)
-            
-            r_agg$n_pixels           <- r_n_obs_poss
-            r_agg$n_non_na_pixels    <- r_n_obs
-            r_agg$prop_non_na_pixels <- r_agg$n_non_na_pixels / r_agg$n_pixels 
-          }
-          
-          r_agg$date <- date_i
-          
-          #### Export
-          saveRDS(r_agg, out_path)
-          
-        } else{
-          warning(paste0('"', out_path, '" already exists; skipping.\n'))
         }
         
         r_out <- NULL # Saving as file, so output from function should be NULL
@@ -1170,7 +1171,6 @@ bm_raster <- function(roi_sf,
     #out <- tryCatch(
     #  {
     
-    
     #### Make name for raster based on date
     date_name_i <- define_date_name(date_i, product_id)
     
@@ -1200,9 +1200,11 @@ bm_raster <- function(roi_sf,
                          h5_dir = h5_dir,
                          quiet = quiet,
                          temp_dir = temp_dir)
-        names(r) <- date_name_i
         
-        terra::writeRaster(r, out_path)
+        if(!is.null(r)){
+          names(r) <- date_name_i
+          terra::writeRaster(r, out_path)
+        }
         
       } else{
         message(paste0('"', out_path, '" already exists; skipping.\n'))
@@ -1222,7 +1224,9 @@ bm_raster <- function(roi_sf,
                            h5_dir = h5_dir,
                            quiet = quiet,
                            temp_dir = temp_dir)
-      names(r_out) <- date_name_i
+      if(!is.null(r_out)){
+        names(r_out) <- date_name_i
+      }
       
     }
     
@@ -1272,8 +1276,12 @@ bm_raster <- function(roi_sf,
       all_files <- list.files(file_dir)
       out_name <- out_name[out_name %in% all_files]
       
-      r <- file.path(file_dir, out_name) %>%
-        rast()
+      if(length(out_name) > 0){
+        r <- file.path(file_dir, out_name) %>%
+          rast()
+      } else{
+        r <- NULL
+      }
       
     } else{
       r <- NULL
@@ -1327,59 +1335,70 @@ bm_raster_i <- function(roi_sf,
                                         months = month,
                                         days = day)
   
-  
-  # Intersecting tiles ---------------------------------------------------------
-  # Remove grid along edges, which causes st_intersects to fail
-  bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
-  bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
-  
-  
-  inter <- tryCatch(
-    {
-      inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
-        apply(1, sum)
-      
-      inter
-    },
-    error = function(e){
-      warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-      stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-    }
-  )
-  
-  grid_use_sf <- bm_tiles_sf[inter > 0,]
-  
-  # Make Raster ----------------------------------------------------------------
-  tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
-  bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
-  
-  if( (nrow(bm_files_df) < nrow(grid_use_sf)) & check_all_tiles_exist){
-    warning("Not all satellite imagery tiles for this location exist, so skipping. To ignore this error and process anyway, set check_all_tiles_exist = FALSE")
-    stop("Not all satellite imagery tiles for this location exist, so skipping. To ignore this error and process anyway, set check_all_tiles_exist = FALSE")
-  }
-  
-  unlink(file.path(temp_dir, product_id), recursive = T)
-  
-  if(quiet == F){
-    message(paste0("Processing ", nrow(bm_files_df), " nighttime light tiles"))
-  }
-  
-  r_list <- lapply(bm_files_df$name, function(name_i){
-    download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, quiet)
-  })
-  
-  if(length(r_list) == 1){
-    r <- r_list[[1]]
+  # Only move forward if dataset exists ---
+  if(nrow(bm_files_df) == 0){
+    warning(paste0("No satellite imagery exists for ", date, "; skipping"))
+    r <- NULL
   } else{
     
-    r <- do.call(terra::mosaic, c(r_list, fun = "max"))
+    # Intersecting tiles ---------------------------------------------------------
+    # Remove grid along edges, which causes st_intersects to fail
+    bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
+    bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
+    
+    inter <- tryCatch(
+      {
+        inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+          apply(1, sum)
+        
+        inter
+      },
+      error = function(e){
+        warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+        stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+      }
+    )
+    
+    grid_use_sf <- bm_tiles_sf[inter > 0,]
+    
+    # Make Raster ----------------------------------------------------------------
+    tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
+    bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
+    
+    if(nrow(bm_files_df) == 0){
+      warning(paste0("No satellite imagery exists for ", date, "; skipping"))
+      r <- NULL
+    } else{
+      
+      if( (nrow(bm_files_df) < nrow(grid_use_sf)) & check_all_tiles_exist){
+        warning("Not all satellite imagery tiles for this location exist, so skipping. To ignore this error and process anyway, set check_all_tiles_exist = FALSE")
+        #stop("Not all satellite imagery tiles for this location exist, so skipping. To ignore this error and process anyway, set check_all_tiles_exist = FALSE")
+      }
+      
+      unlink(file.path(temp_dir, product_id), recursive = T)
+      
+      if(quiet == F){
+        message(paste0("Processing ", nrow(bm_files_df), " nighttime light tiles"))
+      }
+      
+      r_list <- lapply(bm_files_df$name, function(name_i){
+        download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, quiet)
+      })
+      
+      if(length(r_list) == 1){
+        r <- r_list[[1]]
+      } else{
+        
+        r <- do.call(terra::mosaic, c(r_list, fun = "max"))
+      }
+      
+      ## Crop
+      r <- r %>% terra::crop(roi_sf)
+      
+      unlink(file.path(temp_dir, product_id), recursive = T)
+      
+    }
   }
-  
-  ## Crop
-  r <- r %>% terra::crop(roi_sf)
-  
-  unlink(file.path(temp_dir, product_id), recursive = T)
-  
   return(r)
 }
 
