@@ -525,11 +525,36 @@ download_raster <- function(file_name,
     
     if(quiet == FALSE) message(paste0("Processing: ", file_name))
     
-    response <- httr2::request(url) %>%
-      httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
-      httr2::req_timeout(60) %>%
-      httr2::req_retry(max_tries = 3, backoff = ~2^.x) %>%
-      httr2::req_perform() 
+    # response <- httr2::request(url) %>%
+    #   httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
+    #   httr2::req_timeout(60) %>%
+    #   httr2::req_retry(max_tries = 3, backoff = ~2^.x) %>%
+    #   httr2::req_perform() 
+    
+    
+    # Sometimes get 401 error which triggers an error; if happens, try again
+    response <- NULL
+    attempts <- 0
+    max_attempts <- 5
+    
+    while (attempts < max_attempts) {
+      attempts <- attempts + 1
+      tryCatch({
+        response <- httr2::request(url) %>%
+          httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
+          httr2::req_timeout(60) %>%
+          httr2::req_perform()
+        
+        break  # Exit loop if successful
+      }, error = function(e) {
+        if (attempts < max_attempts) {
+          message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
+          Sys.sleep(2)
+        } else {
+          stop("All attempts failed. Error: ", e$message)
+        }
+      })
+    }
     
     if(response$status_code != 200){
       message(response)
