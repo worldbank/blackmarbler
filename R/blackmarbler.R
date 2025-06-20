@@ -397,7 +397,7 @@ read_bm_csv <- function(year,
   
   df_out <- tryCatch(
     {
-      df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/",product_id,"/",year,"/",day,".csv"),
+      df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/",product_id,"/",year,"/",day,".csv"),
                             show_col_types = F)
       
       
@@ -512,7 +512,7 @@ download_raster <- function(file_name,
   day        <- file_name %>% substring(14,16)
   product_id <- file_name %>% substring(1,7)
   
-  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5000/',
+  url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/',
                 product_id, '/', year, '/', day, '/', file_name)
   
   if(is.null(h5_dir)){
