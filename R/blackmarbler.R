@@ -1232,18 +1232,49 @@ bm_raster_i <- function(roi_sf,
     bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
     bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
     
-    inter <- tryCatch(
-      {
-        inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+    result <- tryCatch({
+      # Approach 1: Simple intersection
+      
+      inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+        apply(1, sum)
+      
+      inter
+      
+    }, error = function(e1) {
+      # If approach 1 fails, try intersect on bounding box
+      tryCatch({
+        
+        roi_bbox_sf <- roi_sf %>%
+          st_bbox() %>%
+          st_as_sfc() %>%
+          st_as_sf()
+        
+        inter <- st_intersects(bm_tiles_sf , roi_bbox_sf, sparse = F) %>%
           apply(1, sum)
         
         inter
-      },
-      error = function(e){
+        
+      }, error = function(e2) {
+        # If both fail
+        
         warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-        stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
-      }
-    )
+        stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)", , e2$message)
+        
+      })
+    })
+    
+    # inter <- tryCatch(
+    #   {
+    #     inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+    #       apply(1, sum)
+    #     
+    #     inter
+    #   },
+    #   error = function(e){
+    #     warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+    #     stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+    #   }
+    # )
     
     grid_use_sf <- bm_tiles_sf[inter > 0,]
     

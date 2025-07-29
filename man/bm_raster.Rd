@@ -55,9 +55,12 @@ To see all variable choices, set \code{variable = ""} (this will create an error
 
 For \code{VNP46A2} (daily data):
 \itemize{
-\item \code{0}: High-quality, Persistent nighttime lights
-\item \code{1}: High-quality, Ephemeral nighttime Lights
-\item \code{2}: Poor-quality, Outlier, potential cloud contamination, or other issues
+\item \code{0}: High-quality
+\item \code{1}: Poor-quality - Main Algorithm (Outlier, Potential cloud contamination or other issues)
+\item \code{2}: Poor-quality - Main Algorithm (high solar zenith angle 102-108 degrees)
+\item \code{3}: Poor-quality - Main Algorithm (Lunar eclipse)
+\item \code{4}: Poor-quality - Main Algorithm (Aurora)
+\item \code{5}: Poor-quality - Main Algorithm (Glint)
 }
 
 For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
