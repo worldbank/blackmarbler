@@ -23,3 +23,5 @@ r_20210205 <- bm_raster(roi_sf = roi_sf,
 
 
 
+
+

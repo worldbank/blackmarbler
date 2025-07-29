@@ -535,14 +535,17 @@ get_nasa_token <- function(username, password) {
 #' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
 #' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
-#' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
+#' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf).
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
 #'
 #' For `VNP46A2` (daily data):
-#' - `0`: High-quality, Persistent nighttime lights
-#' - `1`: High-quality, Ephemeral nighttime Lights
-#' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
+#' - `0`: High-quality
+#' - `1`: Poor-quality - Main Algorithm (Outlier, Potential cloud contamination or other issues)
+#' - `2`: Poor-quality - Main Algorithm (high solar zenith angle 102-108 degrees)
+#' - `3`: Poor-quality - Main Algorithm (Lunar eclipse)
+#' - `4`: Poor-quality - Main Algorithm (Aurora)
+#' - `5`: Poor-quality - Main Algorithm (Glint)
 #'
 #'
 #' For `VNP46A3` and `VNP46A4` (monthly and annual data):
@@ -908,7 +911,7 @@ bm_extract <- function(roi_sf,
 #' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
 #' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
 #' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
-#' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
+#' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://viirsland.gsfc.nasa.gov/PDF/BlackMarbleUserGuide_Collection2.0.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
 #' For `VNP46A2` (daily data):
