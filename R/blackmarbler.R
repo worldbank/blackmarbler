@@ -373,6 +373,7 @@ download_raster <- function(file_name,
                             bearer,
                             quality_flag_rm,
                             h5_dir,
+                            download_method,
                             quiet){
   
   year       <- file_name %>% substring(10,13)
@@ -392,42 +393,61 @@ download_raster <- function(file_name,
     
     if(quiet == FALSE) message(paste0("Processing: ", file_name))
     
-    # Sometimes get 401 error which triggers an error; if happens, try again
-    response <- NULL
-    attempts <- 0
-    max_attempts <- 5
-    
-    while (attempts < max_attempts) {
-      attempts <- attempts + 1
-      tryCatch({
-        response <- httr2::request(url) %>%
-          httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
-          httr2::req_timeout(60) %>%
-          httr2::req_perform()
-        
-        break  # Exit loop if successful
-      }, error = function(e) {
-        if (attempts < max_attempts) {
-          message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
-          Sys.sleep(2)
-        } else {
-          stop("All attempts failed. Error: ", e$message)
-        }
-      })
-    }
-    
-    if(response$status_code != 200){
-      message(response)
-      stop("Error in downloading data")
-    }
-    
-    if(response$status_code == 200){
-      if(length(response$body) < 10000){
-        stop(paste0("\nISSUE WITH BEARER TOKEN. You may need to generate a new token. Ensure that select EULAs are accepted. Please see the instructions here: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-"))
+    if(download_method == "httr"){
+      # Sometimes get 401 error which triggers an error; if happens, try again
+      response <- NULL
+      attempts <- 0
+      max_attempts <- 5
+      
+      while (attempts < max_attempts) {
+        attempts <- attempts + 1
+        tryCatch({
+          response <- httr2::request(url) %>%
+            httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
+            httr2::req_timeout(60) %>%
+            httr2::req_perform()
+          
+          break  # Exit loop if successful
+        }, error = function(e) {
+          if (attempts < max_attempts) {
+            message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
+            Sys.sleep(2)
+          } else {
+            stop("All attempts failed. Error: ", e$message)
+          }
+        })
       }
+      
+      if(response$status_code != 200){
+        message(response)
+        stop("Error in downloading data")
+      }
+      
+      if(response$status_code == 200){
+        if(length(response$body) < 10000){
+          stop(paste0("\nISSUE WITH BEARER TOKEN. You may need to generate a new token. Ensure that select EULAs are accepted. Please see the instructions here: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-"))
+        }
+      }
+      
+      writeBin(httr2::resp_body_raw(response), download_path)
+    } else{
+      
+      if(is.null(h5_dir)){
+        download_dir <- temp_dir
+      } else{
+        download_dir <- h5_dir
+      }
+      
+      cmd <- sprintf(
+        'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "%s" --header="Authorization: Bearer %s" -P "%s"',
+        url,
+        bearer,
+        download_dir
+      )
+      
+      system(cmd)
+      
     }
-    
-    writeBin(httr2::resp_body_raw(response), download_path)
     
   }
   
@@ -557,6 +577,7 @@ get_nasa_token <- function(username, password) {
 #' @param file_skip_if_exists (If `output_location_type = file`). Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
 #' @param file_return_null Whether to return `NULL` instead of a `dataframe`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `dataframe` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
+#' @param download_method Method to download data from NASA LAADS Archive: "`httr`" or "`wget`". If `httr`, uses the `httr2` R package to download data. If `wget`, uses the `wget` command line tool. `httr` is fully integrated in R, while `wget` requires the `wget` system command. `wget` can be more efficient and can help avoid network issues. (Default: `"httr"`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #'
 #' @param ... Additional arguments for `terra::approximate`, if `interpol_na = TRUE`
@@ -608,6 +629,7 @@ bm_extract <- function(roi_sf,
                        file_skip_if_exists = TRUE,
                        file_return_null = FALSE,
                        h5_dir = NULL,
+                       download_method = "httr",
                        quiet = FALSE,
                        ...){
   
@@ -744,6 +766,7 @@ bm_extract <- function(roi_sf,
                            quality_flag_rm = quality_flag_rm,
                            check_all_tiles_exist = check_all_tiles_exist,
                            h5_dir = h5_dir,
+                           download_method = download_method,
                            quiet = quiet,
                            temp_dir = temp_dir)
           
@@ -801,6 +824,7 @@ bm_extract <- function(roi_sf,
                              quality_flag_rm = quality_flag_rm,
                              check_all_tiles_exist = check_all_tiles_exist,
                              h5_dir = h5_dir,
+                             download_method = download_method,
                              quiet = quiet,
                              temp_dir = temp_dir)
         names(r_out) <- date_name_i
@@ -932,6 +956,7 @@ bm_extract <- function(roi_sf,
 #' @param file_skip_if_exists Whether the function should first check wither the file already exists, and to skip downloading or extracting data if the data for that date if the file already exists (default: `TRUE`).
 #' @param file_return_null Whether to return `NULL` instead of a `SpatRaster`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `SpatRaster` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
+#' @param download_method Method to download data from NASA LAADS Archive: "`httr`" or "`wget`". If `httr`, uses the `httr2` R package to download data. If `wget`, uses the `wget` command line tool. `httr` is fully integrated in R, while `wget` requires the `wget` system command. `wget` can be more efficient and can help avoid network issues. (Default: `"httr"`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #' @param ... Additional arguments for `terra::approximate`, if `interpol_na = TRUE`
 #'
@@ -994,6 +1019,7 @@ bm_raster <- function(roi_sf,
                       file_skip_if_exists = TRUE,
                       file_return_null = FALSE,
                       h5_dir = NULL,
+                      download_method = "httr",
                       quiet = FALSE,
                       ...){
   
@@ -1084,6 +1110,7 @@ bm_raster <- function(roi_sf,
                          quality_flag_rm = quality_flag_rm,
                          check_all_tiles_exist = check_all_tiles_exist,
                          h5_dir = h5_dir,
+                         download_method = download_method,
                          quiet = quiet,
                          temp_dir = temp_dir)
         
@@ -1108,6 +1135,7 @@ bm_raster <- function(roi_sf,
                            quality_flag_rm = quality_flag_rm,
                            check_all_tiles_exist = check_all_tiles_exist,
                            h5_dir = h5_dir,
+                           download_method = download_method,
                            quiet = quiet,
                            temp_dir = temp_dir)
       if(!is.null(r_out)){
@@ -1185,6 +1213,7 @@ bm_raster_i <- function(roi_sf,
                         quality_flag_rm,
                         check_all_tiles_exist,
                         h5_dir,
+                        download_method,
                         quiet,
                         temp_dir){
   
@@ -1244,6 +1273,8 @@ bm_raster_i <- function(roi_sf,
       # If approach 1 fails, try intersect on bounding box
       tryCatch({
         
+        warning("Issue with `roi_sf` intersecting with blackmarble tiles; trying bounding box intersection. To avoid, try: roi_sf %>% st_make_valid()")
+        
         roi_bbox_sf <- roi_sf %>%
           st_bbox() %>%
           st_as_sfc() %>%
@@ -1280,7 +1311,7 @@ bm_raster_i <- function(roi_sf,
     
     # Make Raster ----------------------------------------------------------------
     tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
-
+    
     if(nrow(grid_use_sf) > 0){
       bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
     } else{
@@ -1304,7 +1335,7 @@ bm_raster_i <- function(roi_sf,
       }
       
       r_list <- lapply(bm_files_df$name, function(name_i){
-        download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, quiet)
+        download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, download_method, quiet)
       })
       
       if(length(r_list) == 1){
@@ -1322,6 +1353,200 @@ bm_raster_i <- function(roi_sf,
     }
   }
   return(r)
+}
+
+#' Download h5 files using wget
+#'
+#' Download h5 files from from [NASA Black Marble data](https://blackmarble.gsfc.nasa.gov/) using `wget`. The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.
+#'
+#' @param roi_sf Region of interest; sf polygon. Must be in the [WGS 84 (epsg:4326)](https://epsg.io/4326) coordinate reference system. If `NULL`, all `h5` files for the inputted date(s) are downloaded.
+#' @param product_id One of the following:
+#' * `"VNP46A1"`: Daily (raw)
+#' * `"VNP46A2"`: Daily (corrected)
+#' * `"VNP46A3"`: Monthly
+#' * `"VNP46A4"`: Annual
+#' @param date Date(s) to download `h5` files. 
+#' * For `product_id`s `"VNP46A1"` and `"VNP46A2"`, a date (eg, `"2021-10-03"`).
+#' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
+#' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
+#' @param h5_dir Path to download `h5` files to.
+#' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
+#'
+#' @return `NULL`
+#'
+#' @author Robert Marty <rmarty@@worldbank.org>
+#' @examples
+#' \dontrun{
+#' # Define bearer token
+#' bearer <- "BEARER-TOKEN-HERE"
+#'
+#' # sf polygon of Ghana
+#' library(geodata)
+#' roi_sf <- gadm(country = "GHA", level=0, path = tempdir()) %>% st_as_sf()
+#'
+#' # h5 files for Ghana for October 3, 2021
+#' download_h5_files(roi_sf = roi_sf,
+#'                   product_id = "VNP46A2",
+#'                   date = "2021-10-03",
+#'                   h5_dir = getwd(),        
+#'                   bearer = bearer)
+#'
+#' # Make raster using h5_files
+#' ken_202103_r <- bm_raster(roi_sf = roi_sf,
+#'                           product_id = "VNP46A3",
+#'                           date = "2021-03-01",
+#'                           bearer = bearer,
+#'                           h5_dir = getwd())
+#'
+#'}
+#'
+#' @export
+wget_h5_files <- function(roi_sf = NULL,
+                          product_id,
+                          date,
+                          h5_dir, 
+                          bearer){
+  message("The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.")
+  
+  # Input checks ---------------------------------------------------------------
+  # Ensure the output directory exists
+  if (!dir.exists(h5_dir)) {
+    stop(h5_dir, " doesn't exist")
+  }
+  
+  for(date_i in date){
+    
+    # Prep dates -----------------------------------------------------------------
+    ## For monthly, allow both yyyy-mm and yyyy-mm-dd (where -dd is ignored)
+    if(product_id == "VNP46A3"){
+      
+      if(nchar(date_i) %in% 7){
+        date_i <- paste0(date_i, "-01")
+      }
+      
+    }
+    
+    ## For year, allow both yyyy and yyyy-mm-dd (where -mm-dd is ignored)
+    if(product_id == "VNP46A4"){
+      
+      if(nchar(date_i) %in% 4){
+        date_i <- paste0(date_i, "-01-01")
+      }
+      
+    }
+    
+    date_i <- date_i %>% ymd()
+    
+    year  <- date_i %>% year()
+    month <- date_i %>% month()
+    day   <- date_i %>% yday() %>% pad3()
+    
+    date_text <- paste0(year, "/", day)
+    
+    # Grab tile dataframe --------------------------------------------------------
+    if(!is.null(roi_sf)){
+      
+      bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
+      
+      bm_files_df <- create_dataset_name_df(product_id = product_id,
+                                            all = T,
+                                            years = year,
+                                            months = month,
+                                            days = day)
+      
+      # Only move forward if dataset exists ---
+      if(nrow(bm_files_df) == 0){
+        warning(paste0("No satellite imagery exists for ", date_i, "; skipping"))
+      } else{
+        
+        # Intersecting tiles ---------------------------------------------------------
+        # Remove grid along edges, which causes st_intersects to fail
+        bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
+        bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
+        
+        inter <- tryCatch({
+          # Approach 1: Simple intersection
+          
+          inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
+            apply(1, sum)
+          
+          inter
+          
+        }, error = function(e1) {
+          # If approach 1 fails, try intersect on bounding box
+          tryCatch({
+            
+            warning("Issue with `roi_sf` intersecting with blackmarble tiles; trying bounding box intersection. To avoid, try: roi_sf %>% st_make_valid()")
+            
+            roi_bbox_sf <- roi_sf %>%
+              st_bbox() %>%
+              st_as_sfc() %>%
+              st_as_sf()
+            
+            inter <- st_intersects(bm_tiles_sf, roi_bbox_sf, sparse = F) %>%
+              apply(1, sum)
+            
+            inter
+            
+          }, error = function(e2) {
+            # If both fail
+            
+            warning("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)")
+            stop("Issue with `roi_sf` intersecting with blackmarble tiles; try buffering by a width of 0: eg, st_buffer(roi_sf, 0)", , e2$message)
+            
+          })
+        })
+        
+        grid_use_sf <- bm_tiles_sf[inter > 0,]
+        
+        # Make Raster ----------------------------------------------------------------
+        tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
+        
+        if(nrow(grid_use_sf) > 0){
+          bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
+        } else{
+          bm_files_df <- data.frame(NULL)
+        }
+        
+        if(nrow(bm_files_df) == 0){
+          warning(paste0("No satellite imagery exists for ", date_i, "; skipping"))
+        } 
+        
+      }
+      
+    }
+    
+    # Run wget command: All h5 files (roi_sf is null)  -------------------------
+    if(is.null(roi_sf)){
+      
+      cmd <- sprintf(
+        'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A4/%s/" --header="Authorization: Bearer %s" -P "%s"',
+        date_text,
+        bearer,
+        h5_dir
+      )
+      
+      system(cmd)
+      
+    } else{
+      
+      if(nrow(bm_files_df) > 0){
+        for(file_i in bm_files_df$downloadsLink){
+          
+          cmd <- sprintf(
+            'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "%s" --header="Authorization: Bearer %s" -P "%s"',
+            file_i,
+            bearer,
+            h5_dir
+          )
+          
+          system(cmd)
+          
+        }
+      }
+    }
+    
+  }
 }
 
 
