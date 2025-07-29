@@ -1232,7 +1232,7 @@ bm_raster_i <- function(roi_sf,
     bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("h00")),]
     bm_tiles_sf <- bm_tiles_sf[!(bm_tiles_sf$TileID %>% str_detect("v00")),]
     
-    result <- tryCatch({
+    inter <- tryCatch({
       # Approach 1: Simple intersection
       
       inter <- st_intersects(bm_tiles_sf, roi_sf, sparse = F) %>%
@@ -1249,7 +1249,7 @@ bm_raster_i <- function(roi_sf,
           st_as_sfc() %>%
           st_as_sf()
         
-        inter <- st_intersects(bm_tiles_sf , roi_bbox_sf, sparse = F) %>%
+        inter <- st_intersects(bm_tiles_sf, roi_bbox_sf, sparse = F) %>%
           apply(1, sum)
         
         inter
