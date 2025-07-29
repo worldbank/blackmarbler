@@ -1280,7 +1280,9 @@ bm_raster_i <- function(roi_sf,
     
     # Make Raster ----------------------------------------------------------------
     tile_ids_rx <- grid_use_sf$TileID %>% paste(collapse = "|")
-    bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
+    if(nrow(bm_files_df) > 0){
+      bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
+    }
     
     if(nrow(bm_files_df) == 0){
       warning(paste0("No satellite imagery exists for ", date, "; skipping"))

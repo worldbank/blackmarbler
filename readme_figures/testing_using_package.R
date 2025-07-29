@@ -22,8 +22,8 @@ r_a4 <- bm_raster(roi_sf = roi_sf,
 
 r_a3 <- bm_raster(roi_sf = roi_sf,
                   product_id = "VNP46A3",
-                  date = seq.Date(ymd("2024-01-01"),
-                                  ymd("2024-02-01"),
+                  date = seq.Date(ymd("2025-01-01"),
+                                  ymd("2025-06-01"),
                                   by = "month"),
                   bearer = bearer)
 
