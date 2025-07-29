@@ -18,7 +18,7 @@
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Black Marble Data and Statistics">
 <meta name="description" content="Geographically referenced data and statistics of nighttime lights from NASA Black Marble &lt;https://blackmarble.gsfc.nasa.gov/&gt;.">
 <meta property="og:description" content="Geographically referenced data and statistics of nighttime lights from NASA Black Marble &lt;https://blackmarble.gsfc.nasa.gov/&gt;.">
-<meta property="og:image" content="/logo.png">
+<meta property="og:image" content="https://worldbank.github.io/blackmarbler/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -161,7 +161,7 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#### Setup</span></span>
 <span><span class="co"># Load packages</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://worldbank.github.io/blackmarbler/" class="external-link">blackmarbler</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://worldbank.github.io/blackmarbler/">blackmarbler</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">geodata</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/" class="external-link">sf</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://rspatial.org/" class="external-link">terra</a></span><span class="op">)</span></span>
@@ -408,6 +408,7 @@
 <li><p><strong>check_all_tiles_exist:</strong> Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If <code>TRUE</code>, skips cases where not all tiles are available. (Default: <code>TRUE</code>).</p></li>
 <li><p><strong>interpol_na:</strong> When data for more than one date is downloaded, whether to interpolate <code>NA</code> values in rasters using the <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA" class="external-link"><code>terra::approximate</code></a> function. Additional arguments for the <a href="https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA" class="external-link"><code>terra::approximate</code></a> function can also be passed into <code>bm_raster</code>/<code>bm_extract</code> (eg, <code>method</code>, <code>rule</code>, <code>f</code>, <code>ties</code>, <code>z</code>, <code>NA_rule</code>). (Default: <code>FALSE</code>).</p></li>
 <li><p><strong>h5_dir:</strong> Black Marble data are originally downloaded as <code>h5</code> files. If <code>h5_dir = NULL</code>, the function downloads to a temporary directory then deletes the directory. If <code>h5_dir</code> is set to a path, <code>h5</code> files are saved to that directory and not deleted. The function will then check if the needed <code>h5</code> file already exists in the directory; if it exists, the function will not re-download the <code>h5</code> file.</p></li>
+<li><p><strong>download_method:</strong> Method to download data (h5 files) from NASA LAADS Archive: “<code>httr</code>” or “<code>wget</code>”. If <code>httr</code>, uses the <code>httr2</code> R package to download data. If <code>wget</code>, uses the <code>wget</code> command line tool. <code>httr</code> is fully integrated in R, while <code>wget</code> requires the <code>wget</code> system command. <code>wget</code> can be more efficient and can help avoid network issues. (Default: <code>"httr"</code>).</p></li>
 <li>
 <p><strong>output_location_type:</strong> Where output should be stored (default: <code>r_memory</code>). Either:</p>
 <ul>
