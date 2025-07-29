@@ -3,6 +3,7 @@
 export(bm_extract)
 export(bm_raster)
 export(get_nasa_token)
+export(wget_h5_files)
 import(dplyr)
 import(exactextractr)
 import(httr2)

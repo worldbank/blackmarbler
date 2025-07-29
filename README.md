@@ -313,7 +313,7 @@ Both functions take the following arguments:
 * **check_all_tiles_exist:** Check whether all Black Marble nighttime light tiles exist for the region of interest. Sometimes not all tiles are available, so the full region of interest may not be covered. If `TRUE`, skips cases where not all tiles are available. (Default: `TRUE`).
 * **interpol_na:** When data for more than one date is downloaded, whether to interpolate `NA` values in rasters using the [`terra::approximate`](https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA) function. Additional arguments for the [`terra::approximate`](https://www.rdocumentation.org/packages/raster/versions/3.6-26/topics/approxNA) function can also be passed into `bm_raster`/`bm_extract` (eg, `method`, `rule`, `f`, `ties`, `z`, `NA_rule`). (Default: `FALSE`).
 * **h5_dir:** Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
-
+* **download_method:** Method to download data (h5 files) from NASA LAADS Archive: "`httr`" or "`wget`". If `httr`, uses the `httr2` R package to download data. If `wget`, uses the `wget` command line tool. `httr` is fully integrated in R, while `wget` requires the `wget` system command. `wget` can be more efficient and can help avoid network issues. (Default: `"httr"`).
 
 * **output_location_type:** Where output should be stored (default: `r_memory`). Either:
 
