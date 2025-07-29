@@ -24,8 +24,10 @@ wget_h5_files(roi_sf = roi_sf,
 
 r_a4 <- bm_raster(roi_sf = roi_sf,
                   product_id = "VNP46A4",
-                  date = 2020:2021,
-                  bearer = bearer)
+                  date = 2020,
+                  bearer = bearer,
+                  h5_dir = "/Users/robmarty/Desktop/test",
+                  download_method = "wget")
 
 r_a3 <- bm_raster(roi_sf = roi_sf,
                   product_id = "VNP46A3",
