@@ -1283,6 +1283,8 @@ bm_raster_i <- function(roi_sf,
 
     if(nrow(grid_use_sf) > 0){
       bm_files_df <- bm_files_df[bm_files_df$name %>% str_detect(tile_ids_rx),]
+    } else{
+      bm_files_df <- data.frame(NULL)
     }
     
     if(nrow(bm_files_df) == 0){
