@@ -266,9 +266,9 @@ read_bm_csv <- function(year,
   
   df_out <- tryCatch(
     {
+
       con <- url(bm_url)
       df <- readr::read_csv(con, show_col_types = F)
-      close(con)
       
       df$year <- year
       df$day <- day
@@ -277,6 +277,8 @@ read_bm_csv <- function(year,
     },
     error = function(e){
       #warning(paste0("Error with year: ", year, "; day: ", day))
+      
+      close(con) # Connection stays open if there's an error
       data.frame(NULL)
     }
   )
