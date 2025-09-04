@@ -262,11 +262,13 @@ read_bm_csv <- function(year,
                         day,
                         product_id){
   
+  bm_url <- paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/",product_id,"/",year,"/",day,".csv")
+  
   df_out <- tryCatch(
     {
-      df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/",product_id,"/",year,"/",day,".csv"),
-                            show_col_types = F)
-      
+      con <- url(bm_url)
+      df <- readr::read_csv(con, show_col_types = F)
+      close(con)
       
       df$year <- year
       df$day <- day
@@ -1385,11 +1387,11 @@ bm_raster_i <- function(roi_sf,
 #' roi_sf <- gadm(country = "GHA", level=0, path = tempdir()) %>% st_as_sf()
 #'
 #' # h5 files for Ghana for October 3, 2021
-#' download_h5_files(roi_sf = roi_sf,
-#'                   product_id = "VNP46A2",
-#'                   date = "2021-10-03",
-#'                   h5_dir = getwd(),        
-#'                   bearer = bearer)
+#' wget_h5_files(roi_sf = roi_sf,
+#'               product_id = "VNP46A2",
+#'               date = "2021-10-03",
+#'               h5_dir = getwd(),        
+#'               bearer = bearer)
 #'
 #' # Make raster using h5_files
 #' ken_202103_r <- bm_raster(roi_sf = roi_sf,
