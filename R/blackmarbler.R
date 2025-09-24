@@ -1359,7 +1359,7 @@ bm_raster_i <- function(roi_sf,
   return(r)
 }
 
-#' Download h5 files using wget
+#' Download h5 files
 #'
 #' Download h5 files from from [NASA Black Marble data](https://blackmarble.gsfc.nasa.gov/) using `wget`. The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.
 #'
