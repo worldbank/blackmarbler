@@ -378,6 +378,7 @@ download_raster <- function(file_name,
                             quality_flag_rm,
                             h5_dir,
                             download_method,
+                            httr_timeout,
                             quiet){
   
   year       <- file_name %>% substring(10,13)
@@ -408,7 +409,7 @@ download_raster <- function(file_name,
         tryCatch({
           response <- httr2::request(url) %>%
             httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
-            httr2::req_timeout(60) %>%
+            httr2::req_timeout(httr_timeout) %>%
             httr2::req_perform()
           
           break  # Exit loop if successful
@@ -582,6 +583,7 @@ get_nasa_token <- function(username, password) {
 #' @param file_return_null Whether to return `NULL` instead of a `dataframe`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `dataframe` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param download_method Method to download data (h5 files) from NASA LAADS Archive: "`httr`" or "`wget`". If `httr`, uses the `httr2` R package to download data. If `wget`, uses the `wget` command line tool. `httr` is fully integrated in R, while `wget` requires the `wget` system command. `wget` can be more efficient and can help avoid network issues. (Default: `"httr"`).
+#' @param httr_timeout When `download_method` is set to `"httr"`, time limit for request in seconds. (Default: `60`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #'
 #' @param ... Additional arguments for `terra::approximate`, if `interpol_na = TRUE`
@@ -634,6 +636,7 @@ bm_extract <- function(roi_sf,
                        file_return_null = FALSE,
                        h5_dir = NULL,
                        download_method = "httr",
+                       httr_timeout = 60,
                        quiet = FALSE,
                        ...){
   
@@ -771,6 +774,7 @@ bm_extract <- function(roi_sf,
                            check_all_tiles_exist = check_all_tiles_exist,
                            h5_dir = h5_dir,
                            download_method = download_method,
+                           httr_timeout = httr_timeout,
                            quiet = quiet,
                            temp_dir = temp_dir)
           
@@ -829,6 +833,7 @@ bm_extract <- function(roi_sf,
                              check_all_tiles_exist = check_all_tiles_exist,
                              h5_dir = h5_dir,
                              download_method = download_method,
+                             httr_timeout = httr_timeout,
                              quiet = quiet,
                              temp_dir = temp_dir)
         names(r_out) <- date_name_i
@@ -961,6 +966,7 @@ bm_extract <- function(roi_sf,
 #' @param file_return_null Whether to return `NULL` instead of a `SpatRaster`. When `output_location_type = 'file'`, the function will export data to the `file_dir` directory. When `file_return_null = FALSE`, the function will also return a `SpatRaster` of the queried data---so the data is available in R memory. Setting `file_return_null = TRUE`, data will be saved to `file_dir` but no data will be returned by the function to R memory (default: `FALSE`).
 #' @param h5_dir Black Marble data are originally downloaded as `h5` files. If `h5_dir = NULL`, the function downloads to a temporary directory then deletes the directory. If `h5_dir` is set to a path, `h5` files are saved to that directory and not deleted. The function will then check if the needed `h5` file already exists in the directory; if it exists, the function will not re-download the `h5` file.
 #' @param download_method Method to download data (h5 files) from NASA LAADS Archive: "`httr`" or "`wget`". If `httr`, uses the `httr2` R package to download data. If `wget`, uses the `wget` command line tool. `httr` is fully integrated in R, while `wget` requires the `wget` system command. `wget` can be more efficient and can help avoid network issues. (Default: `"httr"`).
+#' @param httr_timeout When `download_method` is set to `"httr"`, time limit for request in seconds. (Default: `60`).
 #' @param quiet Suppress output that show downloading progress and other messages. (Default: `FALSE`).
 #' @param ... Additional arguments for `terra::approximate`, if `interpol_na = TRUE`
 #'
@@ -1024,6 +1030,7 @@ bm_raster <- function(roi_sf,
                       file_return_null = FALSE,
                       h5_dir = NULL,
                       download_method = "httr",
+                      httr_timeout = 60,
                       quiet = FALSE,
                       ...){
   
@@ -1115,6 +1122,7 @@ bm_raster <- function(roi_sf,
                          check_all_tiles_exist = check_all_tiles_exist,
                          h5_dir = h5_dir,
                          download_method = download_method,
+                         httr_timeout = httr_timeout,
                          quiet = quiet,
                          temp_dir = temp_dir)
         
@@ -1140,6 +1148,7 @@ bm_raster <- function(roi_sf,
                            check_all_tiles_exist = check_all_tiles_exist,
                            h5_dir = h5_dir,
                            download_method = download_method,
+                           httr_timeout = httr_timeout,
                            quiet = quiet,
                            temp_dir = temp_dir)
       if(!is.null(r_out)){
@@ -1218,6 +1227,7 @@ bm_raster_i <- function(roi_sf,
                         check_all_tiles_exist,
                         h5_dir,
                         download_method,
+                        httr_timeout,
                         quiet,
                         temp_dir){
   
@@ -1339,7 +1349,7 @@ bm_raster_i <- function(roi_sf,
       }
       
       r_list <- lapply(bm_files_df$name, function(name_i){
-        download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, download_method, quiet)
+        download_raster(name_i, temp_dir, variable, bearer, quality_flag_rm, h5_dir, download_method, httr_timeout, quiet)
       })
       
       if(length(r_list) == 1){
@@ -1410,7 +1420,8 @@ download_h5_files <- function(roi_sf = NULL,
                               date,
                               h5_dir, 
                               bearer,
-                              download_method = "httr"){
+                              download_method = "httr",
+                              httr_timeout = 60){
   
   if(download_method == "wget"){
     message("The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.")
@@ -1600,7 +1611,7 @@ download_h5_files <- function(roi_sf = NULL,
                 tryCatch({
                   response <- httr2::request(url) %>%
                     httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
-                    httr2::req_timeout(60) %>%
+                    httr2::req_timeout(httr_timeout) %>%
                     httr2::req_perform()
                   
                   break  # Exit loop if successful
