@@ -262,11 +262,13 @@ read_bm_csv <- function(year,
                         day,
                         product_id){
   
+  bm_url <- paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/",product_id,"/",year,"/",day,".csv")
+  
   df_out <- tryCatch(
     {
-      df <- readr::read_csv(paste0("https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/",product_id,"/",year,"/",day,".csv"),
-                            show_col_types = F)
       
+      con <- url(bm_url)
+      df <- readr::read_csv(con, show_col_types = F)
       
       df$year <- year
       df$day <- day
@@ -275,6 +277,8 @@ read_bm_csv <- function(year,
     },
     error = function(e){
       #warning(paste0("Error with year: ", year, "; day: ", day))
+      
+      close(con) # Connection stays open if there's an error
       data.frame(NULL)
     }
   )
@@ -549,7 +553,7 @@ get_nasa_token <- function(username, password) {
 #' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
 #' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
-#' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `mean`).
+#' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `sum`).
 #' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_non_na_pixels` (the number of non-`NA` pixels used for computing nighttime light statistics); `n_pixels` (the total number of pixels); and `prop_non_na_pixels` the proportion of the two. (Default: `TRUE`).
 #' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
 #' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
@@ -617,7 +621,7 @@ bm_extract <- function(roi_sf,
                        product_id,
                        date,
                        bearer,
-                       aggregation_fun = c("mean"),
+                       aggregation_fun = c("sum"),
                        add_n_pixels = TRUE,
                        variable = NULL,
                        quality_flag_rm = NULL,
@@ -1355,7 +1359,7 @@ bm_raster_i <- function(roi_sf,
   return(r)
 }
 
-#' Download h5 files using wget
+#' Download h5 files
 #'
 #' Download h5 files from from [NASA Black Marble data](https://blackmarble.gsfc.nasa.gov/) using `wget`. The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.
 #'
@@ -1385,11 +1389,11 @@ bm_raster_i <- function(roi_sf,
 #' roi_sf <- gadm(country = "GHA", level=0, path = tempdir()) %>% st_as_sf()
 #'
 #' # h5 files for Ghana for October 3, 2021
-#' download_h5_files(roi_sf = roi_sf,
-#'                   product_id = "VNP46A2",
-#'                   date = "2021-10-03",
-#'                   h5_dir = getwd(),        
-#'                   bearer = bearer)
+#' wget_h5_files(roi_sf = roi_sf,
+#'               product_id = "VNP46A2",
+#'               date = "2021-10-03",
+#'               h5_dir = getwd(),        
+#'               bearer = bearer)
 #'
 #' # Make raster using h5_files
 #' ken_202103_r <- bm_raster(roi_sf = roi_sf,
@@ -1401,12 +1405,16 @@ bm_raster_i <- function(roi_sf,
 #'}
 #'
 #' @export
-wget_h5_files <- function(roi_sf = NULL,
-                          product_id,
-                          date,
-                          h5_dir, 
-                          bearer){
-  message("The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.")
+download_h5_files <- function(roi_sf = NULL,
+                              product_id,
+                              date,
+                              h5_dir, 
+                              bearer,
+                              download_method = "httr"){
+  
+  if(download_method == "wget"){
+    message("The wget_h5_files() function requires the wget command line tool to be installed on your system. If you do not have wget installed, please install it from https://www.gnu.org/software/wget/.")
+  }
   
   # Input checks ---------------------------------------------------------------
   # Ensure the output directory exists
@@ -1508,6 +1516,8 @@ wget_h5_files <- function(roi_sf = NULL,
           bm_files_df <- data.frame(NULL)
         }
         
+        message(paste0("Downloading ", nrow(bm_files_df), " h5 files"))
+        
         if(nrow(bm_files_df) == 0){
           warning(paste0("No satellite imagery exists for ", date_i, "; skipping"))
         } 
@@ -1516,37 +1526,117 @@ wget_h5_files <- function(roi_sf = NULL,
       
     }
     
+    # Get h5 names for httr (need to loop through) -----------------------------
+    if(is.null(roi_sf) & download_method == "httr"){
+      
+      bm_tiles_sf <- read_sf("https://raw.githubusercontent.com/worldbank/blackmarbler/main/data/blackmarbletiles.geojson")
+      
+      bm_files_df <- create_dataset_name_df(product_id = product_id,
+                                            all = T,
+                                            years = year,
+                                            months = month,
+                                            days = day)
+      
+    }
+    
     # Run wget command: All h5 files (roi_sf is null)  -------------------------
-    if(is.null(roi_sf)){
+    if(download_method == "wget"){
       
-      cmd <- sprintf(
-        'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A4/%s/" --header="Authorization: Bearer %s" -P "%s"',
-        date_text,
-        bearer,
-        h5_dir
-      )
+      if(is.null(roi_sf)){
+        
+        cmd <- sprintf(
+          'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/VNP46A4/%s/" --header="Authorization: Bearer %s" -P "%s"',
+          date_text,
+          bearer,
+          h5_dir
+        )
+        
+        system(cmd)
+        
+        
+      } else{
+        
+        if(nrow(bm_files_df) > 0){
+          for(file_i in bm_files_df$downloadsLink){
+            
+            cmd <- sprintf(
+              'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "%s" --header="Authorization: Bearer %s" -P "%s"',
+              file_i,
+              bearer,
+              h5_dir
+            )
+            
+            system(cmd)
+          }
+        }
+      }
       
-      system(cmd)
-      
+      # http ------------------
     } else{
       
-      if(nrow(bm_files_df) > 0){
-        for(file_i in bm_files_df$downloadsLink){
+      for(year_i in unique(bm_files_df$year)){
+        for(day_i in unique(bm_files_df$day)){
           
-          cmd <- sprintf(
-            'wget --no-verbose -e robots=off -m -np -R .html,.tmp -nH --cut-dirs=6 "%s" --header="Authorization: Bearer %s" -P "%s"',
-            file_i,
-            bearer,
-            h5_dir
-          )
+          bm_files_df_date <- bm_files_df[(bm_files_df$year == year_i) & 
+                                            (bm_files_df$day == day_i),]
           
-          system(cmd)
-          
+          for(file_name_i in unique(bm_files_df_date$name)){
+            
+            OUT_PATH <- file.path(h5_dir, file_name_i)
+            
+            if(!file.exists(OUT_PATH)){
+              
+              url <- paste0('https://ladsweb.modaps.eosdis.nasa.gov/archive/allData/5200/',
+                            product_id, '/', year_i, '/', day_i, '/', file_name_i)
+              
+              message(paste0("Downloading: ", file_name_i))
+              
+              response <- NULL
+              attempts <- 0
+              max_attempts <- 5
+              
+              while (attempts < max_attempts) {
+                attempts <- attempts + 1
+                tryCatch({
+                  response <- httr2::request(url) %>%
+                    httr2::req_headers('Authorization' = paste('Bearer', bearer)) %>%
+                    httr2::req_timeout(60) %>%
+                    httr2::req_perform()
+                  
+                  break  # Exit loop if successful
+                }, error = function(e) {
+                  if (attempts < max_attempts) {
+                    message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
+                    Sys.sleep(2)
+                  } else {
+                    stop("All attempts failed. Error: ", e$message)
+                  }
+                })
+              }
+              
+              if(response$status_code != 200){
+                message(response)
+                stop("Error in downloading data")
+              }
+              
+              if(response$status_code == 200){
+                if(length(response$body) < 10000){
+                  stop(paste0("\nISSUE WITH BEARER TOKEN. You may need to generate a new token. Ensure that select EULAs are accepted. Please see the instructions here: https://github.com/worldbank/blackmarbler?tab=readme-ov-file#bearer-token-"))
+                }
+              }
+              
+              writeBin(httr2::resp_body_raw(response), OUT_PATH)
+              ##
+              
+            }
+            
+          }
         }
       }
     }
-    
   }
+  
+  return(NULL)
 }
 
 

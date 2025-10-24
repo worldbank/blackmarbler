@@ -9,7 +9,7 @@ bm_extract(
   product_id,
   date,
   bearer,
-  aggregation_fun = c("mean"),
+  aggregation_fun = c("sum"),
   add_n_pixels = TRUE,
   variable = NULL,
   quality_flag_rm = NULL,
@@ -46,7 +46,7 @@ bm_extract(
 
 \item{bearer}{NASA bearer token. For instructions on how to create a token, see \href{https://github.com/worldbank/blackmarbler#bearer-token-}{here}.}
 
-\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{mean}).}
+\item{aggregation_fun}{Function used to aggregate nighttime lights data to polygons; this values is passed to the \code{fun} argument in \href{https://github.com/isciences/exactextractr}{exactextractr::exact_extract} (Default: \code{sum}).}
 
 \item{add_n_pixels}{Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When \code{TRUE}, it adds three values: \code{n_non_na_pixels} (the number of non-\code{NA} pixels used for computing nighttime light statistics); \code{n_pixels} (the total number of pixels); and \code{prop_non_na_pixels} the proportion of the two. (Default: \code{TRUE}).}
 

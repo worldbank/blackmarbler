@@ -1,6 +1,6 @@
 Package: blackmarbler
 Title: Black Marble Data and Statistics
-Version: 0.2.5
+Version: 0.2.6
 Authors@R: 
     c(person("Robert", "Marty", , "rmarty@worldbank.org", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-3164-3813")),
@@ -10,7 +10,7 @@ Description: Geographically referenced data and statistics of nighttime lights f
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 URL: https://worldbank.github.io/blackmarbler/
 BugReports: https://github.com/worldbank/blackmarbler/issues
 Imports:
