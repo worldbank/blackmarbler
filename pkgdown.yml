@@ -3,7 +3,4 @@ pkgdown: 2.1.3
 pkgdown_sha: ~
 articles:
   assess-quality: assess-quality.html
-last_built: 2025-10-02T21:16Z
-urls:
-  reference: https://worldbank.github.io/blackmarbler/reference
-  article: https://worldbank.github.io/blackmarbler/articles
+last_built: 2025-10-24T20:31Z
