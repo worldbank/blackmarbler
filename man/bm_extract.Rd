@@ -90,7 +90,7 @@ For \code{VNP46A3} and \code{VNP46A4} (monthly and annual data):
 
 \item{h5_dir}{Black Marble data are originally downloaded as \code{h5} files. If \code{h5_dir = NULL}, the function downloads to a temporary directory then deletes the directory. If \code{h5_dir} is set to a path, \code{h5} files are saved to that directory and not deleted. The function will then check if the needed \code{h5} file already exists in the directory; if it exists, the function will not re-download the \code{h5} file.}
 
-\item{download_method}{Method to download data from NASA LAADS Archive: "\code{httr}" or "\code{wget}". If \code{httr}, uses the \code{httr2} R package to download data. If \code{wget}, uses the \code{wget} command line tool. \code{httr} is fully integrated in R, while \code{wget} requires the \code{wget} system command. \code{wget} can be more efficient and can help avoid network issues. (Default: \code{"httr"}).}
+\item{download_method}{Method to download data (h5 files) from NASA LAADS Archive: "\code{httr}" or "\code{wget}". If \code{httr}, uses the \code{httr2} R package to download data. If \code{wget}, uses the \code{wget} command line tool. \code{httr} is fully integrated in R, while \code{wget} requires the \code{wget} system command. \code{wget} can be more efficient and can help avoid network issues. (Default: \code{"httr"}).}
 
 \item{quiet}{Suppress output that show downloading progress and other messages. (Default: \code{FALSE}).}
 
