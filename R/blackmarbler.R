@@ -401,7 +401,7 @@ download_raster <- function(file_name,
       # Sometimes get 401 error which triggers an error; if happens, try again
       response <- NULL
       attempts <- 0
-      max_attempts <- 5
+      max_attempts <- 10
       
       while (attempts < max_attempts) {
         attempts <- attempts + 1
@@ -414,8 +414,8 @@ download_raster <- function(file_name,
           break  # Exit loop if successful
         }, error = function(e) {
           if (attempts < max_attempts) {
-            message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
-            Sys.sleep(2)
+            message(sprintf("Attempt %d failed: %s. Retrying soon...", attempts, e$message))
+            Sys.sleep(2*attempts^3)
           } else {
             stop("All attempts failed. Error: ", e$message)
           }
@@ -1593,7 +1593,7 @@ download_h5_files <- function(roi_sf = NULL,
               
               response <- NULL
               attempts <- 0
-              max_attempts <- 5
+              max_attempts <- 10
               
               while (attempts < max_attempts) {
                 attempts <- attempts + 1
@@ -1606,8 +1606,8 @@ download_h5_files <- function(roi_sf = NULL,
                   break  # Exit loop if successful
                 }, error = function(e) {
                   if (attempts < max_attempts) {
-                    message(sprintf("Attempt %d failed: %s. Retrying in 2 seconds...", attempts, e$message))
-                    Sys.sleep(2)
+                    message(sprintf("Attempt %d failed: %s. Retrying soon...", attempts, e$message))
+                    Sys.sleep(2*attempts^3)
                   } else {
                     stop("All attempts failed. Error: ", e$message)
                   }
