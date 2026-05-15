@@ -308,34 +308,34 @@ create_dataset_name_df <- function(product_id,
     as.numeric()
   
   #### Make parameter dataframe
-  if(product_id %in% c("VNP46A1", "VNP46A2")){
-    param_df <- tidyr::expand_grid(year = 2012:year_end,
-                                   day  = pad3(1:366))
-    
+  #### Make parameter dataframe
+
+  if(product_id %in% c("VNP46A1", "VNP46A2")) {
+    param_df <- tidyr::expand_grid(
+      year = 2012:year_end,
+      day  = sprintf("%03d", 1:366)
+    )
   }
-  
-  if(product_id == "VNP46A3"){
-    param_df <- tidyr::expand_grid(year = 2012:year_end,
-                                   day = c("001", "032", "061", "092", "122", "153", "183", "214", "245", "275", "306", "336",
-                                           "060", "091", "121", "152", "182", "213", "244", "274", "305", "335"))
+
+  if(product_id == "VNP46A3") {
+    param_df <- tidyr::expand_grid(
+      year = 2012:year_end,
+      month = 1:12
+    ) %>%
+      dplyr::mutate(
+        date = as.Date(sprintf("%d-%02d-01", year, month)),
+        day  = sprintf("%03d", lubridate::yday(date))
+      ) %>%
+      dplyr::select(year, day, month)
   }
-  
-  if(product_id == "VNP46A4"){
-    param_df <- tidyr::expand_grid(year = 2012:year_end,
-                                   day  = "001")
-    
+
+  if(product_id == "VNP46A4") {
+    param_df <- tidyr::expand_grid(
+      year = 2012:year_end,
+      day  = "001"
+    )
   }
-  
-  #### Add month if daily or monthly data
-  if(product_id %in% c("VNP46A1", "VNP46A2", "VNP46A3")){
-    
-    param_df <- param_df %>%
-      dplyr::mutate(month = day %>%
-                      month_start_day_to_month() %>%
-                      as.numeric())
-    
-  }
-  
+
   #### Subset time period
   ## Year
   if(!is.null(years)){
