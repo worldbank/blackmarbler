@@ -11,7 +11,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/worldbank/blackmarbler/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/worldbank/blackmarbler/blob/0.2.7/DESCRIPTION)
 
 Marty R, Stefanini Vicente G (2026). *blackmarbler: Black Marble Data
 and Statistics*. R package version 0.2.6,
