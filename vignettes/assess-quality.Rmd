@@ -63,9 +63,7 @@ bearer <- "BEARER-TOKEN-HERE"
 ```
 
 ```{r bearer, include = FALSE}
-#bearer <- read.csv("~/Desktop/bearer_bm.csv")$token
-bearer <- read.csv("https://www.dropbox.com/scl/fi/u8ixf74zxqfkwn2trv2ty/bearer_bm.csv?rlkey=zbvco8rarlzedil9kw5ybkkou&st=23me404b&dl=1")$token
-#bearer <- Sys.getenv("BEARER_NASA_TOKEN")
+bearer <- Sys.getenv("BEARER_NASA_TOKEN")
 ```
 
 ```{r}

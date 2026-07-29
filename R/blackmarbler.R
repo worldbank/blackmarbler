@@ -1263,7 +1263,7 @@ bm_raster_i <- function(roi_sf,
                                         years = year,
                                         months = month,
                                         days = day)
-  
+
   # Only move forward if dataset exists ---
   if(nrow(bm_files_df) == 0){
     warning(paste0("No satellite imagery exists for ", date, "; skipping"))
