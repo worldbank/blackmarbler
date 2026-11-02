@@ -81,7 +81,7 @@ remove_fill_value <- function(x, variable){
   if(variable %in% c("UTC_Time")){
     x[][x[] == -999.9] <- NA
   }
-  
+   
   #### -32768 
   if(variable %in% c("Sensor_Azimuth",
                      "Sensor_Zenith",
@@ -152,15 +152,15 @@ apply_scaling_factor <- function(x, variable){
   
   if(variable %in% c(
     
-    # VNP46A1
+    # VNP46A1 | VJ146A1
     "DNB_At_Sensor_Radiance",
     
-    # VNP46A2
+    # VNP46A2 | VJ146A2
     "DNB_BRDF-Corrected_NTL",
     "Gap_Filled_DNB_BRDF-Corrected_NTL",
     "DNB_Lunar_Irradiance",
     
-    # VNP46A3/4
+    # VNP46A3/4 | VJ146A3/4
     "AllAngle_Composite_Snow_Covered",
     "AllAngle_Composite_Snow_Covered_Std",
     "AllAngle_Composite_Snow_Free",
@@ -223,7 +223,7 @@ file_to_raster <- function(h5_file,
   # Filter by quality - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   if(length(quality_flag_rm) > 0){
     #### Get quality raster
-    if(h5_file %>% str_detect("VNP46A2")){
+    if(h5_file %>% str_detect("VNP46A2|VJ146A2")){
       qf <- h5_data$Mandatory_Quality_Flag
       
     } else{
@@ -295,9 +295,9 @@ create_dataset_name_df <- function(product_id,
                                    days = NULL){
   
   #### Prep dates
-  if(product_id %in% c("VNP46A1", "VNP46A2")) months <- NULL
-  if(product_id %in% c("VNP46A3"))            days <- NULL
-  if(product_id %in% c("VNP46A4")){
+  if(product_id %in% c("VNP46A1", "VNP46A2", "VJ146A1", "VJ146A2")) months <- NULL
+  if(product_id %in% c("VNP46A3", "VJ146A3"))            days <- NULL
+  if(product_id %in% c("VNP46A4", "VJ146A4")){
     days <- NULL
     months <- NULL
   }
@@ -310,14 +310,14 @@ create_dataset_name_df <- function(product_id,
   #### Make parameter dataframe
   #### Make parameter dataframe
 
-  if(product_id %in% c("VNP46A1", "VNP46A2")) {
+  if(product_id %in% c("VNP46A1", "VNP46A2", "VJ146A1", "VJ146A2")) {
     param_df <- tidyr::expand_grid(
       year = 2012:year_end,
       day  = sprintf("%03d", 1:366)
     )
   }
 
-  if(product_id == "VNP46A3") {
+  if(product_id %in% c("VNP46A3", "VJ146A3")) {
     param_df <- tidyr::expand_grid(
       year = 2012:year_end,
       month = 1:12
@@ -329,7 +329,7 @@ create_dataset_name_df <- function(product_id,
       dplyr::select(year, day, month)
   }
 
-  if(product_id == "VNP46A4") {
+  if(product_id %in% c("VNP46A4", "VJ146A4")) {
     param_df <- tidyr::expand_grid(
       year = 2012:year_end,
       day  = "001"
@@ -343,7 +343,8 @@ create_dataset_name_df <- function(product_id,
   }
   
   ## Month
-  if(product_id %in% c("VNP46A1", "VNP46A2", "VNP46A3")){
+  if(product_id %in% c("VNP46A1", "VNP46A2", "VNP46A3",
+                       "VJ146A2", "VJ146A2", "VJ146A3")){
     
     if(!is.null(months)){
       param_df <- param_df[as.numeric(param_df$month) %in% as.numeric(months),]
@@ -466,9 +467,9 @@ download_raster <- function(file_name,
 define_variable <- function(variable, product_id){
   
   if(is.null(variable)){
-    if(product_id == "VNP46A1") variable <- "DNB_At_Sensor_Radiance_500m"
-    if(product_id == "VNP46A2") variable <- "Gap_Filled_DNB_BRDF-Corrected_NTL"
-    if(product_id %in% c("VNP46A3", "VNP46A4")) variable <- "NearNadir_Composite_Snow_Free"
+    if(product_id %in% c("VNP46A1", "VJ146A1")) variable <- "DNB_At_Sensor_Radiance_500m"
+    if(product_id %in% c("VNP46A2", "VJ146A2")) variable <- "Gap_Filled_DNB_BRDF-Corrected_NTL"
+    if(product_id %in% c("VNP46A3", "VNP46A4", "VJ146A3", "VJ146A4")) variable <- "NearNadir_Composite_Snow_Free"
   }
   
   return(variable)
@@ -477,15 +478,15 @@ define_variable <- function(variable, product_id){
 define_date_name <- function(date_i, product_id){
   
   #### Make name for raster based on date
-  if(product_id %in% c("VNP46A1", "VNP46A2")){
+  if(product_id %in% c("VNP46A1", "VNP46A2", "VJ146A1", "VJ146A2")){
     date_name_i <- paste0("t", date_i %>% str_replace_all("-", "_"))
   }
   
-  if(product_id %in% c("VNP46A3")){
+  if(product_id %in% c("VNP46A3", "VJ146A3")){
     date_name_i <- paste0("t", date_i %>% str_replace_all("-", "_") %>% substring(1,7))
   }
   
-  if(product_id %in% c("VNP46A4")){
+  if(product_id %in% c("VNP46A4", "VJ146A4")){
     date_name_i <- paste0("t", date_i %>% str_replace_all("-", "_") %>% substring(1,4))
   }
   
@@ -549,28 +550,32 @@ get_nasa_token <- function(username, password) {
 #' * `"VNP46A2"`: Daily (corrected)
 #' * `"VNP46A3"`: Monthly
 #' * `"VNP46A4"`: Annual
+#' * `"VJ146A1"`: Daily (raw)
+#' * `"VJ146A2"`: Daily (corrected)
+#' * `"VJ146A3"`: Monthly
+#' * `"VJ146A4"`: Annual
 #' @param date Date of raster data. Entering one date will produce a `SpatRaster` object. Entering multiple dates will produce a `SpatRaster` object with multiple bands; one band per date.
-#' * For `product_id`s `"VNP46A1"` and `"VNP46A2"`, a date (eg, `"2021-10-03"`).
-#' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
-#' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
+#' * For `product_id`s `"VNP46A1"`, `"VNP46A2"`, `"VJ146A1"`and `"VJ146A2"` a date (eg, `"2021-10-03"`).
+#' * For `product_id`s `"VNP46A3"` and `"VJ146A3"` a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
+#' * For `product_id`s `"VNP46A4"` and `"VJ146A4"` year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
 #' @param aggregation_fun Function used to aggregate nighttime lights data to polygons; this values is passed to the `fun` argument in [exactextractr::exact_extract](https://github.com/isciences/exactextractr) (Default: `sum`).
 #' @param add_n_pixels Whether to add a variable indicating the number of nighttime light pixels used to compute nighttime lights statistics (eg, number of pixels used to compute average of nighttime lights). When `TRUE`, it adds three values: `n_non_na_pixels` (the number of non-`NA` pixels used for computing nighttime light statistics); `n_pixels` (the total number of pixels); and `prop_non_na_pixels` the proportion of the two. (Default: `TRUE`).
 #' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
-#' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
-#' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
-#' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
+#' * For `product_id`s `:VNP46A1"` and `"VJ146A1"` uses `DNB_At_Sensor_Radiance_500m`.
+#' * For `product_id`s `"VNP46A2"` and `"VJ146A2"`  uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
+#' * For `product_id`s `"VNP46A3"`, `"VNP46A4"`, `"VJ146A3"` and `"VJ146A4"` uses `NearNadir_Composite_Snow_Free`.
 #' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
 #'
-#' For `VNP46A2` (daily data):
+#' For `VNP46A2` and `VJ146A2` (daily data):
 #' - `0`: High-quality, Persistent nighttime lights
 #' - `1`: High-quality, Ephemeral nighttime Lights
 #' - `2`: Poor-quality, Outlier, potential cloud contamination, or other issues
 #'
 #'
-#' For `VNP46A3` and `VNP46A4` (monthly and annual data):
+#' For `VNP46A3`, `VNP46A4`, `VJ146A3` and `VJ146A4` (monthly and annual data):
 #' - `0`: Good-quality, The number of observations used for the composite is larger than 3
 #' - `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
 #' - `2`: Gap filled NTL based on historical data
@@ -928,23 +933,23 @@ bm_extract <- function(roi_sf,
 
 #' @param roi_sf Region of interest; sf polygon. Must be in the [WGS 84 (epsg:4326)](https://epsg.io/4326) coordinate reference system.
 #' @param product_id One of the following:
-#' * `"VNP46A1"`: Daily (raw)
-#' * `"VNP46A2"`: Daily (corrected)
-#' * `"VNP46A3"`: Monthly
-#' * `"VNP46A4"`: Annual
+#' * `"VNP46A1"` or `"VJ146A1"` : Daily (raw)
+#' * `"VNP46A2"` or `"VJ146A2"` : Daily (corrected)
+#' * `"VNP46A3"` or `"VJ146A3"`: Monthly
+#' * `"VNP46A4"` or `"VJ146A4"`: Annual
 #' @param date Date of raster data. Entering one date will produce a `SpatRaster` object. Entering multiple dates will produce a `SpatRaster` object with multiple bands; one band per date.
-#' * For `product_id`s `"VNP46A1"` and `"VNP46A2"`, a date (eg, `"2021-10-03"`).
-#' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
-#' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
+#' * For `product_id`s `"VNP46A1"`, `"VNP46A2"`, `"VJ146A1"` and `"VJ146A2"` a date (eg, `"2021-10-03"`).
+#' * For `product_id` `"VNP46A3"` and `"VJ146A3"` a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
+#' * For `product_id` `"VNP46A4"` and `"VJ146A4"` year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
 #' @param variable Variable to used to create raster (default: `NULL`). If `NULL`, uses the following default variables:
-#' * For `product_id` `:VNP46A1"`, uses `DNB_At_Sensor_Radiance_500m`.
-#' * For `product_id` `"VNP46A2"`, uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
-#' * For `product_id`s `"VNP46A3"` and `"VNP46A4"`, uses `NearNadir_Composite_Snow_Free`.
+#' * For `product_id` `:VNP46A1"` and `"VJ146A1"` uses `DNB_At_Sensor_Radiance_500m`.
+#' * For `product_id` `"VNP46A2"` and `"VJ146A2"` uses `Gap_Filled_DNB_BRDF-Corrected_NTL`.
+#' * For `product_id`s `"VNP46A3"`, `"VNP46A4"`, `"VJ146A3"` and `"VJ146A4"` uses `NearNadir_Composite_Snow_Free`.
 #' To see all variable choices, set `variable = ""` (this will create an error message that lists all valid variables). For additional information on variable choices, see [here](https://ladsweb.modaps.eosdis.nasa.gov/api/v2/content/archives/Document%20Archive/Science%20Data%20Product%20Documentation/VIIRS_Black_Marble_UG_v1.2_April_2021.pdf); for `VNP46A1`, see Table 3; for `VNP46A2` see Table 6; for `VNP46A3` and `VNP46A4`, see Table 9.
 #' @param quality_flag_rm Quality flag values to use to set values to `NA`. Each pixel has a quality flag value, where low quality values can be removed. Values are set to `NA` for each value in the `quality_flag_rm` vector. Note that `quality_flag_rm` does not apply for `VNP46A1`. (Default: `NULL`).
 #'
-#' For `VNP46A2` (daily data):
+#' For `VNP46A2` and `"VJ146A2"` (daily data):
 #' - `0`: High-quality
 #' - `1`: Poor-quality - Main Algorithm (Outlier, Potential cloud contamination or other issues)
 #' - `2`: Poor-quality - Main Algorithm (high solar zenith angle 102-108 degrees)
@@ -952,7 +957,7 @@ bm_extract <- function(roi_sf,
 #' - `4`: Poor-quality - Main Algorithm (Aurora)
 #' - `5`: Poor-quality - Main Algorithm (Glint)
 #'
-#' For `VNP46A3` and `VNP46A4` (monthly and annual data):
+#' For `VNP46A3`, `VNP46A4`, `"VJ146A3"` and `"VJ146A4"` (monthly and annual data):
 #' - `0`: Good-quality, The number of observations used for the composite is larger than 3
 #' - `1`: Poor-quality, The number of observations used for the composite is less than or equal to 3
 #' - `2`: Gap filled NTL based on historical data
@@ -1236,7 +1241,7 @@ bm_raster_i <- function(roi_sf,
   
   # Prep dates -----------------------------------------------------------------
   ## For monthly, allow both yyyy-mm and yyyy-mm-dd (where -dd is ignored)
-  if(product_id == "VNP46A3"){
+  if(product_id %in% c("VNP46A3", "VJ146A3")){
     
     if(nchar(date) %in% 7){
       date <- paste0(date, "-01")
@@ -1245,7 +1250,7 @@ bm_raster_i <- function(roi_sf,
   }
   
   ## For year, allow both yyyy and yyyy-mm-dd (where -mm-dd is ignored)
-  if(product_id == "VNP46A4"){
+  if(product_id %in% c("VNP46A4", "VJ146A4")){
     
     if(nchar(date) %in% 4){
       date <- paste0(date, "-01-01")
@@ -1375,14 +1380,14 @@ bm_raster_i <- function(roi_sf,
 #'
 #' @param roi_sf Region of interest; sf polygon. Must be in the [WGS 84 (epsg:4326)](https://epsg.io/4326) coordinate reference system. If `NULL`, all `h5` files for the inputted date(s) are downloaded.
 #' @param product_id One of the following:
-#' * `"VNP46A1"`: Daily (raw)
-#' * `"VNP46A2"`: Daily (corrected)
-#' * `"VNP46A3"`: Monthly
-#' * `"VNP46A4"`: Annual
+#' * `"VNP46A1"` or `"VJ146A1"`: Daily (raw)
+#' * `"VNP46A2"` or `"VJ146A2"`: Daily (corrected)
+#' * `"VNP46A3"` or `"VJ146A3"`: Monthly
+#' * `"VNP46A4"` or `"VJ146A4"`: Annual
 #' @param date Date(s) to download `h5` files. 
-#' * For `product_id`s `"VNP46A1"` and `"VNP46A2"`, a date (eg, `"2021-10-03"`).
-#' * For `product_id` `"VNP46A3"`, a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
-#' * For `product_id` `"VNP46A4"`, year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
+#' * For `product_id`s `"VNP46A1"`, `"VNP46A2"`, `"VJ146A1"` and `"VJ146A2"` a date (eg, `"2021-10-03"`).
+#' * For `product_id` `"VNP46A3"` and `"VJ146A3"` a date or year-month (e.g., `"2021-10-01"`, where the day will be ignored, or `"2021-10"`).
+#' * For `product_id` `"VNP46A4"` and `"VJ146A4"` year or date  (e.g., `"2021-10-01"`, where the month and day will be ignored, or `2021`).
 #' @param h5_dir Path to download `h5` files to.
 #' @param bearer NASA bearer token. For instructions on how to create a token, see [here](https://github.com/worldbank/blackmarbler#bearer-token-).
 #'
@@ -1437,7 +1442,7 @@ download_h5_files <- function(roi_sf = NULL,
     
     # Prep dates -----------------------------------------------------------------
     ## For monthly, allow both yyyy-mm and yyyy-mm-dd (where -dd is ignored)
-    if(product_id == "VNP46A3"){
+    if(product_id %in% c("VNP46A3", "VJ146A3")){
       
       if(nchar(date_i) %in% 7){
         date_i <- paste0(date_i, "-01")
@@ -1446,7 +1451,7 @@ download_h5_files <- function(roi_sf = NULL,
     }
     
     ## For year, allow both yyyy and yyyy-mm-dd (where -mm-dd is ignored)
-    if(product_id == "VNP46A4"){
+    if(product_id %in% c("VNP46A4", "VJ146A4")){
       
       if(nchar(date_i) %in% 4){
         date_i <- paste0(date_i, "-01-01")
@@ -1649,7 +1654,6 @@ download_h5_files <- function(roi_sf = NULL,
   
   return(NULL)
 }
-
 
 
 
